@@ -1,7 +1,8 @@
 ### Changelog
 
+* 2023/03/15: Fork of slack-sup with support for channel S'Ups - [@dblock](https://github.com/dblock).
 * 2023/02/18: Added `set sync now` for admins to manually sync users - [@dblock](https://github.com/dblock).
-* 2023/02/18: Fix [#118](https://github.com/dblock/slack-sup/issues/118), link to TimeZone values - [@dblock](https://github.com/dblock).
+* 2023/02/18: Fix [#118](https://github.com/dblock/slack-sup2/issues/118), link to TimeZone values - [@dblock](https://github.com/dblock).
 * 2023/01/21: Upgraded to Ruby 2.7.7 - [@dblock](https://github.com/dblock).
 * 10/1/2022: Display and set time zone in `set time` - [@dblock](https://github.com/dblock).
 * 10/1/2022: Migrated to new Google Identity Services library for gcal - [@dblock](https://github.com/dblock).

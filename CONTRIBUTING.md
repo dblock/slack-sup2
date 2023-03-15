@@ -1,8 +1,8 @@
 # Contributing to SlackSup
 
-This project is work of [many contributors](https://github.com/dblock/slack-sup/graphs/contributors).
+This project is work of [many contributors](https://github.com/dblock/slack-sup2/graphs/contributors).
 
-You're encouraged to submit [pull requests](https://github.com/dblock/slack-sup/pulls), [propose features and discuss issues](https://github.com/dblock/slack-sup/issues).
+You're encouraged to submit [pull requests](https://github.com/dblock/slack-sup2/pulls), [propose features and discuss issues](https://github.com/dblock/slack-sup2/issues).
 
 In the examples below, substitute your Github username for `contributor` in URLs.
 
@@ -102,7 +102,7 @@ git push origin my-feature-branch -f
 Update the [CHANGELOG](CHANGELOG.md) with the pull request number. A typical entry looks as follows.
 
 ```
-* [#123](https://github.com/dblock/slack-sup/pull/123): Reticulated splines - [@contributor](https://github.com/contributor).
+* [#123](https://github.com/dblock/slack-sup2/pull/123): Reticulated splines - [@contributor](https://github.com/contributor).
 ```
 
 Amend your previous commit and force push the changes.

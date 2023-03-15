@@ -19,6 +19,5 @@ curl -H "X-Access-Token:[token]" "https://sup2.playplay.io/api/teams/[id]" | jso
 
 ### Hypermedia API
 
-S'Up implements a [hypermedia REST API](https://restfulapi.net/hateoas/) with named links that can be followed to get team, round and user data. See [slack-sup/api/presenters](slack-sup/api/presenters) for documented fields in various models and [samples](samples) for working examples.
-
+S'Up implements a [hypermedia REST API](https://restfulapi.net/hateoas/) with named links that can be followed to get team, round and user data. See [lib/api/presenters](lib/api/presenters) for documented fields in various models and [samples](samples) for working examples.
 
