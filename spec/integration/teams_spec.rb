@@ -36,15 +36,29 @@ describe 'Teams', js: true, type: :feature do
     end
   end
   context 'homepage' do
-    before do
-      visit '/'
+    context 'default' do
+      before do
+        visit '/'
+      end
+      it 'displays index.html page' do
+        expect(title).to eq("S'Up v2 for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
+      end
+      it 'includes a link to add to slack with the client id' do
+        url = "#{SlackRubyBotServer::Config.oauth_authorize_url}?scope=#{SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',')}&client_id=#{ENV['SLACK_CLIENT_ID']}"
+        expect(find("a[href='#{url}']"))
+      end
     end
-    it 'displays index.html page' do
-      expect(title).to eq("S'Up v2 for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
-    end
-    it 'includes a link to add to slack with the client id' do
-      url = "#{SlackRubyBotServer::Config.oauth_authorize_url}?scope=#{SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',')}&client_id=#{ENV['SLACK_CLIENT_ID']}"
-      expect(find("a[href='#{url}']"))
+    context 'with a SLACK_APP_ID' do
+      before do
+        ENV['SLACK_APP_ID'] = 'A123456789'
+        visit '/'
+      end
+      it 'contains meta link' do
+        expect(find("meta[name='slack-app-id'][content='A123456789']", visible: false))
+      end
+      after do
+        ENV.delete('SLACK_APP_ID')
+      end
     end
   end
 end
