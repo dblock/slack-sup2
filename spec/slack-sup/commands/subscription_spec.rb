@@ -5,13 +5,13 @@ describe SlackSup::Commands::Subscription do
     include_context :stripe_mock
     context 'with a plan' do
       before do
-        stripe_helper.create_plan(id: 'slack-sup-yearly', amount: 3999)
+        stripe_helper.create_plan(id: 'slack-sup2-yearly', amount: 3999)
       end
       context 'a customer' do
         let!(:customer) do
           Stripe::Customer.create(
             source: stripe_helper.generate_card_token,
-            plan: 'slack-sup-yearly',
+            plan: 'slack-sup2-yearly',
             email: 'foo@bar.com'
           )
         end
