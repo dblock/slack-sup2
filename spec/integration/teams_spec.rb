@@ -54,6 +54,7 @@ describe 'Teams', js: true, type: :feature do
         visit '/'
       end
       it 'contains meta link' do
+        expect(title).to eq("S'Up v2 for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
         expect(find("meta[name='slack-app-id'][content='A123456789']", visible: false))
       end
       after do
