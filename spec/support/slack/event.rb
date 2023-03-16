@@ -11,6 +11,7 @@ RSpec.shared_context :event do
     {
       token: 'deprecated',
       api_app_id: 'A19GAJ72T',
+      team_id: team.team_id,
       event: {
         message_ts: '1547842100.001400'
       }.merge(event),

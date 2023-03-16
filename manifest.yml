@@ -35,6 +35,7 @@ settings:
       - member_left_channel
       - message.im
       - message.mpim
+      - app_home_opened
   interactivity:
     is_enabled: true
     request_url: https://sup2.playplay.io/api/slack/action
