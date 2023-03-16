@@ -2,6 +2,7 @@ class Channel
   include Mongoid::Document
   include Mongoid::Timestamps
   include SlackSup::Models::Mixins::Pluralize
+  include SlackSup::Models::Mixins::ShortLivedToken
 
   field :channel_id, type: String
   field :inviter_id, type: String
@@ -57,19 +58,6 @@ class Channel
   index({ enabled: 1 })
   scope :enabled, -> { where(enabled: true) }
 
-  def short_lived_token
-    JWT.encode({ dt: Time.now.utc.to_i, nonce: SecureRandom.hex }, team.token)
-  end
-
-  def short_lived_token_valid?(short_lived_token, dt = 30.minutes)
-    return false unless short_lived_token
-
-    data, = JWT.decode(short_lived_token, team.token)
-    Time.at(data['dt']).utc + dt >= Time.now.utc
-  rescue JWT::DecodeError
-    false
-  end
-
   def api_url
     return unless api?
 
@@ -94,6 +82,10 @@ class Channel
 
   def slack_client
     team.slack_client
+  end
+
+  def token
+    team.token
   end
 
   def find_user_by_slack_mention!(user_name)

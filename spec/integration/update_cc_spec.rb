@@ -17,8 +17,12 @@ describe 'Update cc', js: true, type: :feature do
     unless ENV['CI']
       context 'a team with a stripe customer ID' do
         let!(:team) { Fabricate(:team, stripe_customer_id: 'stripe_customer_id') }
-        it 'updates cc' do
+        it 'shows an error if a temporary token is missing' do
           visit "/update_cc?team_id=#{team.team_id}"
+          expect(find('#messages')).to have_text('Team not found.')
+        end
+        it 'updates cc' do
+          visit "/update_cc?team_id=#{team.team_id}&token=#{team.short_lived_token}"
           expect(find('h3')).to have_text("S'UP FOR SLACK TEAMS: UPDATE CREDIT CARD INFO")
           customer = double
           expect(Stripe::Customer).to receive(:retrieve).and_return(customer)
@@ -44,7 +48,7 @@ describe 'Update cc', js: true, type: :feature do
       context 'a team without a stripe customer ID' do
         let!(:team) { Fabricate(:team, stripe_customer_id: nil) }
         it 'displays error' do
-          visit "/update_cc?team_id=#{team.team_id}"
+          visit "/update_cc?team_id=#{team.team_id}&token=#{team.short_lived_token}"
           expect(find('h3')).to have_text("S'UP FOR SLACK TEAMS: UPDATE CREDIT CARD INFO")
           click_button 'Update Credit Card'
           sleep 1

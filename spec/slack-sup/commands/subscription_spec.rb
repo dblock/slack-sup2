@@ -16,6 +16,7 @@ describe SlackSup::Commands::Subscription do
           )
         end
         before do
+          allow_any_instance_of(Team).to receive(:short_lived_token).and_return('token')
           team.update_attributes!(subscribed: true, stripe_customer_id: customer['id'])
         end
         let(:active_subscription) { team.active_stripe_subscription }

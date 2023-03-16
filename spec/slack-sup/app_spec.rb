@@ -45,6 +45,7 @@ describe SlackSup::App do
       it 'notifies past due subscription' do
         customer.subscriptions.data.first['status'] = 'past_due'
         expect(Stripe::Customer).to receive(:retrieve).and_return(customer)
+        allow_any_instance_of(Team).to receive(:short_lived_token).and_return('token')
         expect_any_instance_of(Team).to receive(:inform!).with("Your subscription to StripeMock Default Plan ID ($39.99) is past due. #{team.update_cc_text}")
         subject.send(:check_subscribed_teams!)
       end

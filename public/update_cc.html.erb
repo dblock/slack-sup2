@@ -5,6 +5,7 @@
     <%= partial 'public/partials/_scripts.html' %>
     <%
       team = Team.where(team_id: request['team_id']).first
+      team = nil unless team && team.short_lived_token_valid?(request['token'])
       stripe_token = request['stripeToken']
       stripe_token_type = request['stripeTokenType']
       stripe_email = request['stripeEmail']

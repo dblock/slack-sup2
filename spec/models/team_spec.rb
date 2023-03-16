@@ -282,4 +282,11 @@ describe Team do
     end
   end
   pending '#enabled_channels_text'
+  context 'update_cc_url' do
+    let(:team) { Fabricate(:team) }
+    it 'generates a new token every time' do
+      expect(team.update_cc_url).to include "?team_id=#{team.team_id}"
+      expect(team.update_cc_url).to_not eq team.update_cc_url
+    end
+  end
 end

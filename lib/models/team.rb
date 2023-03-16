@@ -1,4 +1,6 @@
 class Team
+  include SlackSup::Models::Mixins::ShortLivedToken
+
   field :stripe_customer_id, type: String
   field :subscribed, type: Boolean, default: false
   field :subscribed_at, type: DateTime
@@ -64,8 +66,12 @@ class Team
     (created_at + 2.weeks) < Time.now
   end
 
+  def update_cc_url
+    "#{SlackRubyBotServer::Service.url}/update_cc?team_id=#{team_id}&token=#{short_lived_token}"
+  end
+
   def update_cc_text
-    "Update your credit card info at #{SlackRubyBotServer::Service.url}/update_cc?team_id=#{team_id}."
+    "Update your credit card info at #{update_cc_url}."
   end
 
   def slack_client
