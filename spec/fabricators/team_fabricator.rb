@@ -5,4 +5,5 @@ Fabricator(:team) do
   activated_user_id { Fabricate.sequence(:activated_user_id) { |i| "U#{i}" } }
   name { Faker::Lorem.word }
   created_at { Time.now.utc - 3.weeks }
+  bot_user_id { Fabricate.sequence(:bot_user_id) { |i| "B#{i}" } }
 end
