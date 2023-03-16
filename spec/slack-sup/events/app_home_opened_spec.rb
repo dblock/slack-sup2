@@ -27,7 +27,7 @@ describe 'events/app_home_opened' do
     let!(:channel) { Fabricate(:channel, team: team) }
     it 'welcomes user' do
       expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
-        channel: 'channel_id', text: /Hi there! I'm your team's S'Up bot. I connect users like yourself in 1 channel/
+        channel: 'channel_id', text: /Hi there! I'm your team's S'Up bot. I connect your teammates in 1 channel/
       )
 
       post '/api/slack/event', event_envelope

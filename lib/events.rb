@@ -48,8 +48,9 @@ SlackRubyBotServer::Events.configure do |config|
 
     text = [
       "Hi there! I'm your team's S'Up bot.",
-      data.team.channels.enabled.count > 0 ? "I connect users like yourself in #{pluralize(data.team.channels.enabled.count, 'channel')}#{' (' + data.team.channels.enabled.map(&:slack_mention).and + ')'}." : 'Invite me to a channel so that I can connect users like yourself.',
-      "You can opt out of S'Up by leaving a channel, or using @sup opt out."
+      data.team.channels.enabled.count > 0 ? "I connect your teammates in #{pluralize(data.team.channels.enabled.count, 'channel')}#{' (' + data.team.channels.enabled.map(&:slack_mention).and + ')'}." : 'Invite me to a channel so that I can connect you with others.',
+      "You can opt out of S'Up by leaving a channel, or using `@sup opt out` in it.",
+      "Type `help` for more options."
     ].join(' ')
 
     Api::Middleware.logger.info "#{data.team.name}: user opened bot home ##{data.channel}."
