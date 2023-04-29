@@ -41,7 +41,7 @@ describe 'Teams', js: true, type: :feature do
         visit '/'
       end
       it 'displays index.html page' do
-        expect(title).to eq("S'Up v2 for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
+        expect(title).to eq("S'Up for Slack teams - Generate Fresh Triads of Team Members to Meet Every Week")
       end
       it 'includes a link to add to slack with the client id' do
         url = "#{SlackRubyBotServer::Config.oauth_authorize_url}?scope=#{SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',')}&client_id=#{ENV['SLACK_CLIENT_ID']}"
@@ -54,7 +54,7 @@ describe 'Teams', js: true, type: :feature do
         visit '/'
       end
       it 'contains meta link' do
-        expect(title).to eq("S'Up v2 for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
+        expect(title).to eq("S'Up for Slack teams - Generate Fresh Triads of Team Members to Meet Every Week")
         expect(find("meta[name='slack-app-id'][content='A123456789']", visible: false))
       end
       after do
