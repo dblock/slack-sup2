@@ -1,11 +1,11 @@
 display_information:
-  name: S'Up 2 for Slack Teams
+  name: S'Up for Slack Teams
   description: S'Up for Slack Teams
   background_color: "#0f2a4a"
   long_description: The most valuable relationships are not made of two people, they're made of three. A third person will always stabilize and grow the relationship between the other two. It's called a triad, and the more you create, the stronger your network. This bot passively generates fresh triads of channel members to meet every week in an informal standup, or S'Up.
 features:
   bot_user:
-    display_name: S'Up 2 for Slack Teams
+    display_name: S'Up for Slack Teams
     always_online: true
 oauth_config:
   redirect_urls:
