@@ -30,6 +30,41 @@ describe Round do
         expect(round.paired_users_count).to eq 3
         expect(round.missed_users_count).to eq 0
       end
+      context 'with sup_size of 3' do
+        let!(:user4) { Fabricate(:user, channel: channel) }
+        let!(:user5) { Fabricate(:user, channel: channel) }
+        let!(:user6) { Fabricate(:user, channel: channel) }
+        let!(:user7) { Fabricate(:user, channel: channel) }
+        let!(:user8) { Fabricate(:user, channel: channel) }
+        let!(:user9) { Fabricate(:user, channel: channel) }
+        let!(:user10) { Fabricate(:user, channel: channel) }
+        before do
+          channel.update_attributes!(sup_size: 3)
+        end
+        it 'generates groups of 3' do
+          expect do
+            round = channel.sup!
+            expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
+          end.to change(Sup, :count).by(3)
+        end
+        it 'when odd users met recently' do
+          first_round = channel.sup!
+          expect(first_round.sups.map(&:users).flatten.size).to eq channel.users.size
+          expect do
+            round = channel.sup!
+            expect(round.sups.map(&:users).flatten.size).to eq channel.users.size - 1
+          end.to change(Sup, :count).by(3)
+        end
+        it 'when new users have not met recently' do
+          first_round = channel.sup!
+          expect(first_round.sups.map(&:users).flatten.size).to eq channel.users.size
+          3.times { Fabricate(:user, channel: channel) } # 3 more users so we can have at least 1 non-met group
+          expect do
+            round = channel.sup!
+            expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
+          end.to change(Sup, :count).by(4)
+        end
+      end
       context 'with sup_size of 2' do
         let!(:user4) { Fabricate(:user, channel: channel) }
         let!(:user5) { Fabricate(:user, channel: channel) }
