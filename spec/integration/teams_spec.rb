@@ -38,7 +38,7 @@ describe 'Teams', js: true, type: :feature do
   context 'homepage' do
     context 'default' do
       before do
-        visit '/'
+        visit "/?uuid=#{SecureRandom.uuid}"
       end
       it 'displays index.html page' do
         expect(title).to eq("S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
@@ -51,7 +51,7 @@ describe 'Teams', js: true, type: :feature do
     context 'with a SLACK_APP_ID' do
       before do
         ENV['SLACK_APP_ID'] = 'A123456789'
-        visit '/'
+        visit "/?uuid=#{SecureRandom.uuid}"
       end
       it 'contains meta link' do
         expect(title).to eq("S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week")
