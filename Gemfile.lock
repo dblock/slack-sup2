@@ -31,7 +31,8 @@ GEM
     childprocess (3.0.0)
     chronic (0.10.2)
     concurrent-ruby (1.2.2)
-    console (1.16.2)
+    console (1.18.0)
+      fiber-annotation
       fiber-local
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -70,21 +71,22 @@ GEM
       faraday_middleware (~> 0.9)
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
+    fiber-annotation (0.2.0)
     fiber-local (1.0.0)
     foreman (0.87.2)
-    gli (2.21.0)
-    grape (1.7.0)
+    gli (2.21.1)
+    grape (1.7.1)
       activesupport
       builder
       dry-types (>= 1.1)
       mustermann-grape (~> 1.0.0)
-      rack (>= 1.3.0)
+      rack (>= 1.3.0, < 3)
       rack-accept
     grape-roar (0.4.1)
       grape
       multi_json
       roar (~> 1.1.0)
-    grape-swagger (1.5.0)
+    grape-swagger (1.6.1)
       grape (~> 1.3)
     hashdiff (1.0.1)
     hashie (5.0.0)
@@ -98,7 +100,7 @@ GEM
       faraday_hal_middleware
       faraday_middleware
       net-http-digest_auth
-    i18n (1.12.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-console (0.6.0)
     irb (1.6.2)
@@ -116,7 +118,7 @@ GEM
     mime-types-data (3.2019.1009)
     mini_mime (1.0.2)
     mini_portile2 (2.8.1)
-    minitest (5.18.0)
+    minitest (5.18.1)
     mongo (2.18.2)
       bson (>= 4.14.1, < 5.0.0)
     mongoid (7.3.1)
@@ -142,7 +144,7 @@ GEM
     net-http-digest_auth (1.4.1)
     netrc (0.11.0)
     newrelic_rpm (6.10.0.364)
-    nio4r (2.5.8)
+    nio4r (2.5.9)
     nokogiri (1.14.0)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
@@ -153,10 +155,10 @@ GEM
     puma (6.1.0)
       nio4r (~> 2.0)
     racc (1.6.2)
-    rack (2.2.6.3)
+    rack (2.2.7)
     rack-accept (0.4.5)
       rack (>= 0.4)
-    rack-cors (2.0.0)
+    rack-cors (2.0.1)
       rack (>= 2.0.0)
     rack-rewrite (1.5.1)
     rack-robotz (0.0.4)
@@ -210,7 +212,7 @@ GEM
     selenium-webdriver (3.142.7)
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
-    slack-ruby-bot-server (2.1.0)
+    slack-ruby-bot-server (2.1.1)
       async
       foreman
       grape
@@ -257,12 +259,12 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket-driver (0.7.5)
+    websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.6.7)
+    zeitwerk (2.6.9)
 
 PLATFORMS
   ruby
@@ -309,4 +311,4 @@ RUBY VERSION
    ruby 2.7.7p221
 
 BUNDLED WITH
-   2.3.26
+   2.4.2
