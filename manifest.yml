@@ -26,6 +26,7 @@ oauth_config:
       - mpim:write
       - users.profile:read
       - users:read
+      - users:read.email
 settings:
   event_subscriptions:
     request_url: https://sup2.playplay.io/api/slack/event

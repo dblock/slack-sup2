@@ -14,6 +14,7 @@ SlackRubyBotServer.configure do |config|
     'mpim:read',
     'mpim:write',
     'users:read',
-    'users.profile:read'
+    'users.profile:read',
+    'users:read.email'
   ]
 end
