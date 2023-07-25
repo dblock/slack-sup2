@@ -102,8 +102,9 @@ class Channel
   end
 
   def self.parse_slack_mention(mention)
-    channel_match = mention.match(/^<#(.*)>$/)
-    channel_match[1] if channel_match
+    channel_match = mention.match(/^<#(?<id>.*)\|(?<name>.*)>$/)
+    channel_match ||= mention.match(/^<#(?<id>.*)>$/)
+    channel_match['id'] if channel_match
   end
 
   def self.parse_slack_mention!(mention)

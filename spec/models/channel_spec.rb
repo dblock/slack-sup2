@@ -357,6 +357,9 @@ describe Channel do
     it 'valid' do
       expect(Channel.parse_slack_mention('<#channel_id>')).to eq 'channel_id'
     end
+    it 'valid with name' do
+      expect(Channel.parse_slack_mention('<#channel_id|name>')).to eq 'channel_id'
+    end
     it 'invalid' do
       expect(Channel.parse_slack_mention('invalid')).to be nil
     end
