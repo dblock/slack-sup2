@@ -8,6 +8,7 @@ SlackRubyBotServer.configure do |config|
     'groups:history',
     'groups:read',
     'im:history',
+    'im:write',
     'mpim:history',
     'mpim:read',
     'mpim:write',
