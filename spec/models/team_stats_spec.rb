@@ -20,6 +20,7 @@ describe Stats do
     let!(:channel1) { Fabricate(:channel, team: team) }
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
+      allow_any_instance_of(Channel).to receive(:inform!)
     end
     it 'reports counts' do
       expect(stats.rounds_count).to eq 0
@@ -52,6 +53,7 @@ describe Stats do
     let!(:channel3_user3) { Fabricate(:user, channel: channel3) }
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
+      allow_any_instance_of(Channel).to receive(:inform!)
       allow_any_instance_of(Sup).to receive(:dm!)
       2.times do
         channel1.sup!

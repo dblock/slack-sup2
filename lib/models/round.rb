@@ -81,6 +81,7 @@ class Round
   def run!
     group!
     dm!
+    notify!
   end
 
   def group!
@@ -112,6 +113,26 @@ class Round
     rescue StandardError => e
       logger.warn "Error DMing sup #{self} #{sup} #{e.message}."
     end
+  end
+
+  def notify!
+    message = if total_users_count == 0
+                "Hi! Unfortunately, I couldn't find any users to pair in a new S'Up. Invite some more users to this channel!"
+              elsif opted_in_users_count == 0
+                "Hi! Unfortunately, I couldn't find any opted in users to pair in a new S'Up. Invite some more users to this channel!"
+              elsif paired_users_count == 0 && channel.sup_size > opted_in_users_count
+                "Hi! Unfortunately, I only found #{pluralize(opted_in_users_count, 'user')} to pair in a new S'Up of #{channel.sup_size}. Invite some more users to this channel, lower `@sup set size` or adjust `@sup set odd`."
+              elsif paired_users_count == 0
+                "Hi! Unfortunately I wasn't able to find groups for any of the #{pluralize(total_users_count, 'user')} in this channel. Consider increasing the value of `@sup set weeks`, or lowering the value of `@sup set recency`."
+              elsif missed_users_count > 0
+                "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing #{pluralize(paired_users_count, 'user')}. Unfortunately, I wasn't able to find a group for the remaining #{missed_users_count}. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+              else
+                "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing all of #{pluralize(paired_users_count, 'user')}."
+              end
+    channel.inform! message
+    logger.info "Notified #{channel} about the new round. #{message}"
+  rescue StandardError => e
+    logger.warn "Error notifying #{channel} #{self} #{e.message}."
   end
 
   def solve(remaining_users)

@@ -69,6 +69,7 @@ describe Stats do
     let!(:channel2_user3) { Fabricate(:user, channel: channel2) }
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
+      allow_any_instance_of(Channel).to receive(:inform!)
       allow_any_instance_of(Sup).to receive(:dm!)
       2.times do
         channel.sup!

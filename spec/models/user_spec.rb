@@ -63,6 +63,9 @@ describe User do
     end
   end
   context '#last_captain_at' do
+    before do
+      allow_any_instance_of(Channel).to receive(:inform!)
+    end
     let(:user) { Fabricate(:user) }
     it 'retuns nil when user has never been a captain' do
       expect(user.last_captain_at).to be_nil

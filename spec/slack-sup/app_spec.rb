@@ -69,6 +69,7 @@ describe SlackSup::App do
       expect(active_team_channel.sup?).to be true
       expect_any_instance_of(Channel).to receive(:sup!).once.and_call_original
       expect_any_instance_of(Channel).to receive(:sync!)
+      expect_any_instance_of(Channel).to receive(:inform!)
       subject.send(:sup!)
     end
   end

@@ -29,6 +29,7 @@ describe SlackSup::Commands::Stats do
       let!(:user3) { Fabricate(:user, channel: channel) }
       before do
         allow(channel).to receive(:sync!)
+        allow(channel).to receive(:inform!)
         allow_any_instance_of(Sup).to receive(:dm!)
         Timecop.freeze do
           channel.sup!

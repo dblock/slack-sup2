@@ -4,11 +4,71 @@ describe Round do
   let(:channel) { Fabricate(:channel) }
   before do
     allow(channel).to receive(:sync!)
+    allow(channel).to receive(:inform!)
     allow_any_instance_of(Sup).to receive(:dm!)
   end
   context '#run' do
     pending 'times out after Round::TIMEOUT'
-    context 'with users' do
+    context 'without users' do
+      it 'does not generate a sup' do
+        expect do
+          channel.sup!
+        end.to_not change(Sup, :count)
+        expect(channel).to have_received(:inform!).with(
+          "Hi! Unfortunately, I couldn't find any users to pair in a new S'Up. Invite some more users to this channel!"
+        )
+      end
+    end
+    context 'with one user' do
+      let!(:user1) { Fabricate(:user, channel: channel) }
+      it 'does not generate a sup' do
+        expect do
+          channel.sup!
+        end.to_not change(Sup, :count)
+        expect(channel).to have_received(:inform!).with(
+          "Hi! Unfortunately, I only found 1 user to pair in a new S'Up of 3. Invite some more users to this channel, lower `@sup set size` or adjust `@sup set odd`."
+        )
+      end
+    end
+    context 'with one opted out user' do
+      let!(:user1) { Fabricate(:user, channel: channel, opted_in: false) }
+      it 'does not generate a sup' do
+        expect do
+          channel.sup!
+        end.to_not change(Sup, :count)
+        expect(channel).to have_received(:inform!).with(
+          "Hi! Unfortunately, I couldn't find any opted in users to pair in a new S'Up. Invite some more users to this channel!"
+        )
+      end
+    end
+    context 'with two users' do
+      let!(:user1) { Fabricate(:user, channel: channel) }
+      let!(:user2) { Fabricate(:user, channel: channel) }
+      context 'without odd' do
+        before do
+          channel.update_attributes!(sup_odd: false)
+        end
+        it 'does not generate a sup' do
+          expect do
+            channel.sup!
+          end.to_not change(Sup, :count)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! Unfortunately, I only found 2 users to pair in a new S'Up of 3. Invite some more users to this channel, lower `@sup set size` or adjust `@sup set odd`."
+          )
+        end
+      end
+      context 'with default odd' do
+        it 'generates a sup' do
+          expect do
+            channel.sup!
+          end.to change(Sup, :count).by(1)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing all of 2 users."
+          )
+        end
+      end
+    end
+    context 'with enough users' do
       let!(:user1) { Fabricate(:user, channel: channel) }
       let!(:user2) { Fabricate(:user, channel: channel) }
       let!(:user3) { Fabricate(:user, channel: channel) }
@@ -46,6 +106,9 @@ describe Round do
             round = channel.sup!
             expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
           end.to change(Sup, :count).by(3)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 3 S'Ups, pairing all of 10 users."
+          )
         end
         it 'when odd users met recently' do
           first_round = channel.sup!
@@ -54,6 +117,9 @@ describe Round do
             round = channel.sup!
             expect(round.sups.map(&:users).flatten.size).to eq channel.users.size - 1
           end.to change(Sup, :count).by(3)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 3 S'Ups, pairing 9 users. Unfortunately, I wasn't able to find a group for the remaining 1. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+          )
         end
         it 'when new users have not met recently' do
           first_round = channel.sup!
@@ -63,6 +129,9 @@ describe Round do
             round = channel.sup!
             expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
           end.to change(Sup, :count).by(4)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 4 S'Ups, pairing all of 13 users."
+          )
         end
       end
       context 'with sup_size of 2' do
@@ -77,6 +146,9 @@ describe Round do
             channel.sup!
           end.to change(Sup, :count).by(3)
           expect(Sup.all.all? { |sup| sup.users.count == 2 })
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 3 S'Ups, pairing all of 6 users."
+          )
         end
       end
       context 'with one extra user' do
@@ -85,6 +157,9 @@ describe Round do
           round = channel.sup!
           expect(round.sups.count).to eq 1
           expect(round.sups.first.users.count).to eq 4
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing all of 4 users."
+          )
         end
         context 'with sup_odd set to false' do
           before do
@@ -94,6 +169,9 @@ describe Round do
             round = channel.sup!
             expect(round.sups.count).to eq 1
             expect(round.sups.first.users.count).to eq 3
+            expect(channel).to have_received(:inform!).with(
+              "Hi! I have created a new round with 1 S'Up, pairing 3 users. Unfortunately, I wasn't able to find a group for the remaining 1. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+            )
           end
         end
       end
@@ -104,6 +182,9 @@ describe Round do
           expect do
             channel.sup!
           end.to change(Sup, :count).by(2)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 2 S'Ups, pairing all of 5 users."
+          )
         end
         context 'with sup_odd set to false' do
           before do
@@ -113,6 +194,9 @@ describe Round do
             expect do
               channel.sup!
             end.to change(Sup, :count).by(1)
+            expect(channel).to have_received(:inform!).with(
+              "Hi! I have created a new round with 1 S'Up, pairing 3 users. Unfortunately, I wasn't able to find a group for the remaining 2. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+            )
           end
         end
       end
@@ -134,6 +218,9 @@ describe Round do
           expect(second_round.opted_out_users_count).to eq 0
           expect(second_round.paired_users_count).to eq 3
           expect(second_round.missed_users_count).to eq 2
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing 3 users. Unfortunately, I wasn't able to find a group for the remaining 2. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+          )
         end
       end
       context 'opted out' do
@@ -147,6 +234,9 @@ describe Round do
           end.to change(Sup, :count).by(1)
           sup = Sup.first
           expect(sup.users).to eq([user1, user2, user4])
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing all of 3 users."
+          )
         end
         it 'updates counts' do
           expect do
@@ -171,6 +261,9 @@ describe Round do
           end.to change(Sup, :count).by(1)
           sup = Sup.first
           expect(sup.users).to eq([user1, user2, user4])
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing all of 3 users."
+          )
         end
         it 'updates counts' do
           expect do

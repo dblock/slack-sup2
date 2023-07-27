@@ -3,6 +3,9 @@ require 'spec_helper'
 describe Sup do
   context 'a sup' do
     let(:sup) { Fabricate(:sup) }
+    before do
+      allow_any_instance_of(Channel).to receive(:inform!)
+    end
     it 'asks for outcome' do
       message = Sup::ASK_WHO_SUP_MESSAGE.dup
       message[:attachments][0][:callback_id] = sup.id.to_s
@@ -68,6 +71,7 @@ describe Sup do
     let!(:user3) { Fabricate(:user, channel: channel) }
     before do
       allow(channel).to receive(:sync!)
+      allow(channel).to receive(:inform!)
       allow_any_instance_of(Sup).to receive(:dm!)
     end
     let!(:round) { channel.sup! }
@@ -123,6 +127,7 @@ describe Sup do
     let!(:user3) { Fabricate(:user, channel: channel) }
     before do
       allow(channel).to receive(:sync!)
+      allow(channel).to receive(:inform!)
     end
     it 'uses default message' do
       expect_any_instance_of(Sup).to receive(:dm!).with(
@@ -139,6 +144,7 @@ describe Sup do
     it 'uses a custom message' do
       channel.update_attributes!(sup_message: 'SUP SUP')
       allow(channel).to receive(:sync!)
+      allow(channel).to receive(:inform!)
       expect_any_instance_of(Sup).to receive(:dm!).with(
         text: /SUP SUP/
       )

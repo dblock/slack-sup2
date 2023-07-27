@@ -5,6 +5,7 @@ describe Api::Endpoints::SlackEndpoint do
 
   before do
     allow_any_instance_of(Slack::Events::Request).to receive(:verify!)
+    allow_any_instance_of(Channel).to receive(:inform!)
   end
 
   context 'outcome' do

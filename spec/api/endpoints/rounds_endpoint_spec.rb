@@ -7,6 +7,7 @@ describe Api::Endpoints::RoundsEndpoint do
 
   before do
     @cursor_params = { channel_id: channel.id.to_s }
+    allow_any_instance_of(Channel).to receive(:inform!)
   end
 
   it_behaves_like 'a cursor api', Round

@@ -207,6 +207,7 @@ describe Channel do
     context '#sup!' do
       before do
         allow(channel).to receive(:sync!)
+        allow(channel).to receive(:inform!)
       end
       it 'creates a round for a channel' do
         expect do
@@ -214,6 +215,9 @@ describe Channel do
         end.to change(Round, :count).by(1)
         round = Round.first
         expect(round.channel).to eq(channel)
+        expect(channel).to have_received(:inform!).with(
+          "Hi! Unfortunately, I couldn't find any users to pair in a new S'Up. Invite some more users to this channel!"
+        )
       end
     end
     context '#ask!' do
@@ -223,6 +227,7 @@ describe Channel do
       context 'with a round' do
         before do
           allow(channel).to receive(:sync!)
+          allow(channel).to receive(:inform!)
           channel.sup!
         end
         let(:last_round) { channel.last_round }
@@ -241,6 +246,7 @@ describe Channel do
     context '#sup?' do
       before do
         allow(channel).to receive(:sync!)
+        allow(channel).to receive(:inform!)
       end
       context 'without rounds' do
         it 'is true' do

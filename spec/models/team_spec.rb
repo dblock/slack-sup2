@@ -20,6 +20,9 @@ describe Team do
       end.to_not change(Channel, :count)
     end
     context 'with a sup' do
+      before do
+        allow_any_instance_of(Channel).to receive(:inform!)
+      end
       let!(:sup) { Fabricate(:sup, conversation_id: 'C123') }
       it 'does not create a new channel over a sup' do
         expect do

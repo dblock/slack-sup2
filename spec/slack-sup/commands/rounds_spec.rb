@@ -28,6 +28,7 @@ describe SlackSup::Commands::Rounds do
       let!(:channel2_user3) { Fabricate(:user, channel: channel2) }
       before do
         allow_any_instance_of(Channel).to receive(:sync!)
+        allow_any_instance_of(Channel).to receive(:inform!)
         allow_any_instance_of(Sup).to receive(:dm!)
         Timecop.freeze do
           round1 = channel1.sup!
@@ -71,6 +72,7 @@ describe SlackSup::Commands::Rounds do
       let!(:user3) { Fabricate(:user, channel: channel) }
       before do
         allow(channel).to receive(:sync!)
+        allow(channel).to receive(:inform!)
         allow_any_instance_of(Sup).to receive(:dm!)
         Timecop.freeze do
           round = channel.sup!
@@ -100,6 +102,7 @@ describe SlackSup::Commands::Rounds do
       before do
         channel.update_attributes!(sup_odd: false)
         allow(channel).to receive(:sync!)
+        allow(channel).to receive(:inform!)
         allow_any_instance_of(Sup).to receive(:dm!)
         channel.sup!
       end

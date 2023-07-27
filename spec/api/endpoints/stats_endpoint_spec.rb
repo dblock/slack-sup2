@@ -33,6 +33,7 @@ describe Api::Endpoints::StatsEndpoint do
     let!(:channel3_user3) { Fabricate(:user, channel: channel3) }
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
+      allow_any_instance_of(Channel).to receive(:inform!)
       allow_any_instance_of(Sup).to receive(:dm!)
       2.times do
         channel.sup!

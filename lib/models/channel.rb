@@ -283,6 +283,10 @@ class Channel
     messages.compact.join(' ')
   end
 
+  def inform!(message)
+    slack_client.chat_postMessage(text: message, channel: channel_id, as_user: true)
+  end
+
   private
 
   def validate_team_field_label

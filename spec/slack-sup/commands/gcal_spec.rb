@@ -28,6 +28,10 @@ describe SlackSup::Commands::GCal do
   context 'channel' do
     include_context :channel
 
+    before do
+      allow(channel).to receive(:inform!)
+    end
+
     context 'subscribed team' do
       it 'requires a GOOGLE_API_CLIENT_ID' do
         expect(message: '@sup gcal').to respond_with_slack_message(
@@ -49,6 +53,9 @@ describe SlackSup::Commands::GCal do
           end
         end
         context 'inside a sup' do
+          before do
+            allow_any_instance_of(Channel).to receive(:inform!)
+          end
           let!(:sup) { Fabricate(:sup, channel: channel, conversation_id: 'sup-channel-id') }
           let(:monday) { DateTime.parse('2017/1/2 8:00 AM EST').utc }
           it 'requires a date/time' do
