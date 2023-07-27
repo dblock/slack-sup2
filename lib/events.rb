@@ -21,11 +21,11 @@ SlackRubyBotServer::Events.configure do |config|
     Api::Middleware.logger.info "#{data.team.name}: bot joined ##{data.channel}."
     data.team.join_channel!(data.channel, data.inviter)
 
-    text =
-      "Hi there! I'm your team's S'Up bot. " \
-      "Thanks for trying me out. Type `#{data.team.bot_name} help` for instructions. " \
-      "I plan to setup some S'Ups via Slack DM for all users in this channel next Monday. " \
-      'You may want to `set size`, `set day`, `set timezone`, or `set sync now` users before then.'.freeze
+    text = [
+      "Hi there! I'm your team's S'Up bot.",
+      "I will sync users in this channel in the next hour, and plan to setup a S'Up via Slack DM for all users in this channel next Monday. You may want to `set size`, `set day`, or `set timezone` before then.",
+      "Type `@#{data.team.bot_name} help` for instructions and `@#{data.team.bot_name} stats` for S'Up info."
+    ].join(' ')
 
     data.team.slack_client.chat_postMessage(channel: data.channel, text: text)
 
