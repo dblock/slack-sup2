@@ -372,4 +372,13 @@ describe Channel do
       expect { Channel.parse_slack_mention!('invalid') }.to raise_error SlackSup::Error, 'Invalid channel mention invalid.'
     end
   end
+  context '#stats' do
+    it 'generates stats' do
+      expect(channel.stats).to be_a ChannelStats
+      expect(channel.stats_s).to eq [
+        "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+        "Channel S'Up started 3 weeks ago."
+      ].join("\n")
+    end
+  end
 end

@@ -4,7 +4,7 @@ module SlackSup
       include SlackSup::Commands::Mixins::Channel
 
       channel_command 'stats' do |channel, data|
-        stats = channel ? ChannelStats.new(channel) : TeamStats.new(data.team)
+        stats = (channel || data.team).stats
         data.team.slack_client.chat_postMessage(channel: data.channel, text: stats.to_s)
         logger.info "STATS: #{data.team}, channel=#{data.channel}, user=#{data.user}"
       end

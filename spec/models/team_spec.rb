@@ -289,4 +289,11 @@ describe Team do
       expect(team.update_cc_url).to_not eq team.update_cc_url
     end
   end
+  context '#stats' do
+    let(:team) { Fabricate(:team) }
+    it 'generates stats' do
+      expect(team.stats).to be_a TeamStats
+      expect(team.stats_s).to eq "Team S'Up connects 0 users in 0 channels."
+    end
+  end
 end

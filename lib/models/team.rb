@@ -212,6 +212,14 @@ class Team
     api? ? 'on' : 'off'
   end
 
+  def stats
+    @stats ||= TeamStats.new(self)
+  end
+
+  def stats_s
+    stats.to_s
+  end
+
   private
 
   INSTALLED_TEXT =

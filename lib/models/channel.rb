@@ -152,6 +152,14 @@ class Channel
     update_attributes!(sync: false, last_sync_at: tt)
   end
 
+  def stats
+    @stats ||= ChannelStats.new(self)
+  end
+
+  def stats_s
+    stats.to_s
+  end
+
   def to_s
     "#{team}, channel_id=#{channel_id}"
   end
