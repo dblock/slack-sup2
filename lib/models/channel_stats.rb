@@ -40,12 +40,14 @@ class ChannelStats
   def to_s
     messages = []
     messages << "Channel S'Up connects groups of #{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.slack_mention}."
-    messages << if users_count > 0 && users_opted_in_count > 0
-                  "Channel S'Up started #{channel.created_at.ago_in_words(highest_measure_only: true)} with #{users_opted_in_count_percent}% (#{users_opted_in_count}/#{users_count}) of users opted in."
+    messages << if channel.sup_size > users_opted_in_count && users_opted_in_count > 0
+                  "The channel S'Up currently only has #{pluralize(users_opted_in_count, 'user')} opted in. Invite some more users to S'Up!"
+                elsif users_count > 0 && users_opted_in_count > 0
+                  "This channel S'Up started #{channel.created_at.ago_in_words(highest_measure_only: true)} and has #{users_opted_in_count_percent}% (#{users_opted_in_count}/#{users_count}) of users opted in."
                 elsif users_count > 0
-                  "Channel S'Up started #{channel.created_at.ago_in_words(highest_measure_only: true)} with 0 of #{pluralize(users_count, 'user')} opted in."
+                  "None of #{pluralize(users_count, 'user')} opted into S'Up. Invite some more users to get started!"
                 else
-                  "Channel S'Up started #{channel.created_at.ago_in_words(highest_measure_only: true)}."
+                  "There's only 1 user in this channel. Invite some more users to this channel to get started!"
                 end
     if sups_count > 0
       messages << "Facilitated #{pluralize(sups_count, 'S\'Up')} " \

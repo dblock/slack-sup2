@@ -12,7 +12,28 @@ describe Stats do
     expect(stats.reported_outcomes_count).to eq 0
     expect(stats.outcomes).to eq({})
     expect(stats.team).to eq team
-    expect(stats.to_s).to eq "Team S'Up connects 0 users in 0 channels."
+    expect(stats.to_s).to eq "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
+  end
+  context 'in a channel with no users' do
+    include_context :subscribed_team
+
+    let!(:channel1) { Fabricate(:channel, team: team) }
+    before do
+      allow_any_instance_of(Channel).to receive(:sync!)
+    end
+    it 'reports counts' do
+      expect(stats.rounds_count).to eq 0
+      expect(stats.sups_count).to eq 0
+      expect(stats.users_count).to eq 0
+      expect(stats.users_opted_in_count).to eq 0
+      expect(stats.positive_outcomes_count).to eq 0
+      expect(stats.reported_outcomes_count).to eq 0
+      expect(stats.outcomes).to eq({})
+      expect(stats.team).to eq team
+      expect(stats.to_s).to eq [
+        "Team S'Up is in 1 channel (#{channel1.slack_mention}), but does not have any users opted in. Invite some users to S'Up channels to get started!"
+      ].join("\n")
+    end
   end
   context 'with outcomes' do
     include_context :subscribed_team

@@ -44,12 +44,14 @@ class TeamStats
 
   def to_s
     messages = []
-    messages << "Team S'Up connects #{pluralize(users_opted_in_count, 'user')} in #{pluralize(channels_enabled_count, 'channel')}#{team.channels.enabled.any? ? ' (' + team.channels.enabled.map(&:slack_mention).and + ')' : nil}."
-    if users_count > 0 && users_opted_in_count > 0
-      messages << "Team S'Up has #{users_opted_in_count_percent}% (#{users_opted_in_count}/#{users_count}) of users opted in."
-    elsif users_count > 0
-      messages << "Team S'Up has none of the #{pluralize(users_count, 'user')}) opted in."
-    end
+    messages << if users_opted_in_count == 0 && channels_enabled_count == 0
+                  "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
+                elsif users_opted_in_count == 0
+                  "Team S'Up is in #{pluralize(channels_enabled_count, 'channel')} (#{team.channels.enabled.map(&:slack_mention).and}), but does not have any users opted in. Invite some users to S'Up channels to get started!"
+                else
+                  "Team S'Up connects #{pluralize(users_opted_in_count, 'user')} in #{pluralize(channels_enabled_count, 'channel')} (#{team.channels.enabled.map(&:slack_mention).and})."
+                end
+    messages << "Team S'Up has #{users_opted_in_count_percent}% (#{users_opted_in_count}/#{users_count}) of users opted in." if users_count > 0 && users_opted_in_count > 0
     if sups_count > 0
       messages << "Facilitated #{pluralize(sups_count, 'S\'Up')} " \
         "in #{pluralize(rounds_count, 'round')} " \

@@ -377,7 +377,7 @@ describe Channel do
       expect(channel.stats).to be_a ChannelStats
       expect(channel.stats_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
-        "Channel S'Up started 3 weeks ago."
+        "There's only 1 user in this channel. Invite some more users to this channel to get started!"
       ].join("\n")
     end
   end

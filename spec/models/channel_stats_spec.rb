@@ -15,8 +15,49 @@ describe Stats do
     expect(stats.channel).to eq channel
     expect(stats.to_s).to eq [
       "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
-      "Channel S'Up started 3 weeks ago."
+      "There's only 1 user in this channel. Invite some more users to this channel to get started!"
     ].join("\n")
+  end
+  context 'with one user' do
+    let!(:user1) { Fabricate(:user, channel: channel) }
+    it 'reports stats' do
+      expect(stats.to_s).to eq [
+        "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+        "The channel S'Up currently only has 1 user opted in. Invite some more users to S'Up!"
+      ].join("\n")
+    end
+  end
+  context 'with two users' do
+    let!(:user1) { Fabricate(:user, channel: channel) }
+    let!(:user2) { Fabricate(:user, channel: channel) }
+    it 'reports stats' do
+      expect(stats.to_s).to eq [
+        "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+        "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!"
+      ].join("\n")
+    end
+  end
+  context 'with three user' do
+    let!(:user1) { Fabricate(:user, channel: channel) }
+    let!(:user2) { Fabricate(:user, channel: channel) }
+    let!(:user3) { Fabricate(:user, channel: channel) }
+    it 'reports stats' do
+      expect(stats.to_s).to eq [
+        "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+        "This channel S'Up started 3 weeks ago and has 100% (3/3) of users opted in."
+      ].join("\n")
+    end
+  end
+  context 'with three users and one opted out' do
+    let!(:user1) { Fabricate(:user, channel: channel) }
+    let!(:user2) { Fabricate(:user, channel: channel) }
+    let!(:user3) { Fabricate(:user, channel: channel, opted_in: false) }
+    it 'reports stats' do
+      expect(stats.to_s).to eq [
+        "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+        "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!"
+      ].join("\n")
+    end
   end
   context 'with outcomes' do
     let!(:user1) { Fabricate(:user, channel: channel) }
@@ -48,7 +89,7 @@ describe Stats do
       expect(stats.channel).to eq channel
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
-        "Channel S'Up started 2 years ago with 100% (3/3) of users opted in.",
+        "This channel S'Up started 2 years ago and has 100% (3/3) of users opted in.",
         "Facilitated 2 S'Ups in 2 rounds for 3 users with 50% positive outcomes from 50% outcomes reported."
       ].join("\n")
     end

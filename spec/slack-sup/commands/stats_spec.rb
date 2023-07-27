@@ -6,7 +6,7 @@ describe SlackSup::Commands::Stats do
 
     it 'returns global team stats' do
       expect(message: '@sup stats', channel: 'DM').to respond_with_slack_message(
-        "Team S'Up connects 0 users in 0 channels."
+        "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
       )
     end
   end
@@ -20,7 +20,7 @@ describe SlackSup::Commands::Stats do
     it 'empty stats' do
       expect(message: '@sup stats').to respond_with_slack_message(
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.\n" \
-        "Channel S'Up started 3 weeks ago."
+        "There's only 1 user in this channel. Invite some more users to this channel to get started!"
       )
     end
     context 'with outcomes' do
@@ -43,7 +43,7 @@ describe SlackSup::Commands::Stats do
       it 'reports counts' do
         expect(message: '@sup stats').to respond_with_slack_message(
           "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.\n" \
-          "Channel S'Up started 3 weeks ago with 66% (2/3) of users opted in.\n" \
+          "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!\n" \
           "Facilitated 2 S'Ups in 2 rounds for 3 users with 50% positive outcomes from 50% outcomes reported."
         )
       end

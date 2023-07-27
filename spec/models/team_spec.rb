@@ -293,7 +293,7 @@ describe Team do
     let(:team) { Fabricate(:team) }
     it 'generates stats' do
       expect(team.stats).to be_a TeamStats
-      expect(team.stats_s).to eq "Team S'Up connects 0 users in 0 channels."
+      expect(team.stats_s).to eq "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
     end
   end
 end
