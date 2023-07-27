@@ -91,7 +91,7 @@ GEM
     hashdiff (1.0.1)
     hashie (5.0.0)
     http-accept (1.7.0)
-    http-cookie (1.0.3)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     hyperclient (0.9.1)
       addressable
@@ -113,12 +113,12 @@ GEM
       kaminari-core (~> 1.0)
     mailchimp_api_v3 (0.2.18)
       rest-client (~> 2)
-    mime-types (3.3.1)
+    mime-types (3.4.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2019.1009)
+    mime-types-data (3.2023.0218.1)
     mini_mime (1.0.2)
     mini_portile2 (2.8.1)
-    minitest (5.18.1)
+    minitest (5.19.0)
     mongo (2.18.2)
       bson (>= 4.14.1, < 5.0.0)
     mongoid (7.3.1)
@@ -227,9 +227,9 @@ GEM
       slack-ruby-bot-server (>= 0.12.0)
     slack-ruby-bot-server-events-app-mentions (0.1.1)
       slack-ruby-bot-server-events
-    slack-ruby-bot-server-mailchimp (0.2.0)
+    slack-ruby-bot-server-mailchimp (0.3.0)
       mailchimp_api_v3
-      slack-ruby-bot-server (>= 0.10.0)
+      slack-ruby-bot-server (>= 2.0.1)
     slack-ruby-client (0.14.6)
       activesupport
       faraday (>= 0.9)
@@ -251,7 +251,7 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
+    unf_ext (0.0.8.2)
     unicode-display_width (1.7.0)
     vcr (5.1.0)
     wannabe_bool (0.7.1)
