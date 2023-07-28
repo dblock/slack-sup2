@@ -573,6 +573,8 @@ module SlackSup
             team_set data.team, data, user, k, v
           end
         end
+      rescue SlackSup::Error => e
+        data.team.slack_client.chat_postMessage(channel: data.channel, text: e.message)
       end
 
       user_command 'rotate' do |channel, user, data|

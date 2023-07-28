@@ -30,9 +30,8 @@ module SlackSup
         rounds [n]                 - channel stats for the last n rounds, default is 3
         next                       - time of next round
         set                        - show all channel settings
-        sync                       - manually schedule a user sync
 
-        Channel Admins
+        In a Channel (Admins)
         --------------
         set size [number]          - set the number of people for each S'Up, default is 3
         set odd [yes/no]           - add one odd user to an existing S'Up and/or generate an additional smaller S'Up
@@ -44,6 +43,7 @@ module SlackSup
         set recency [number]       - set the number of weeks during which to avoid pairing the same people, default is 12
         set opt [in|out]           - opt in (default) or opt out new users
         set sync [now]             - review or schedule a user sync from Slack
+        sync                       - manually schedule a user sync (same as set sync now)
         set api [on|off]           - enable/disable API access to your channel data
         set api token              - require an access token in the X-Access-Token header for API access
         unset api token            - don't require an access token for API access
