@@ -227,7 +227,11 @@ class Channel
   end
 
   def sup_tzone_s
-    Time.now.in_time_zone(sup_tzone).strftime('%Z')
+    now.strftime('%Z')
+  end
+
+  def now
+    Time.now.utc.in_time_zone(sup_tzone)
   end
 
   # is it time to sup?
@@ -235,7 +239,7 @@ class Channel
     return false unless team.active?
 
     # only sup on a certain day of the week
-    now_in_tz = Time.now.utc.in_time_zone(sup_tzone)
+    now_in_tz = now
     return false unless now_in_tz.wday == sup_wday
 
     # sup after 9am by default
@@ -247,7 +251,7 @@ class Channel
   end
 
   def next_sup_at
-    now_in_tz = Time.now.utc.in_time_zone(sup_tzone)
+    now_in_tz = now
     loop do
       time_limit = now_in_tz.end_of_day - sup_every_n_weeks.weeks
 

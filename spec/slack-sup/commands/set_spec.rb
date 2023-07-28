@@ -170,6 +170,25 @@ describe SlackSup::Commands::Set do
           )
           expect(channel.reload.sup_wday).to eq 5
         end
+        context 'on Tuesday' do
+          let(:tz) { 'Eastern Time (US & Canada)' }
+          let(:tuesday) { DateTime.parse('2017/1/3 8:00 AM EST').utc }
+          before do
+            Timecop.travel(tuesday)
+          end
+          it 'changes day to today' do
+            expect(message: '@sup set day today').to respond_with_slack_message(
+              "Channel S'Up is now on Tuesday."
+            )
+            expect(channel.reload.sup_wday).to eq 2
+          end
+          it 'changes day to Today' do
+            expect(message: '@sup set day Today').to respond_with_slack_message(
+              "Channel S'Up is now on Tuesday."
+            )
+            expect(channel.reload.sup_wday).to eq 2
+          end
+        end
         it 'errors set on an invalid day' do
           expect(message: '@sup set day foobar').to respond_with_slack_message(
             "Day _foobar_ is invalid, try _Monday_, _Tuesday_, etc. Channel S'Up is on Monday."

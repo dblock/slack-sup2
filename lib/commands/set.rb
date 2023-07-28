@@ -228,7 +228,8 @@ module SlackSup
 
         def set_day(channel, data, user, v = nil)
           if user.channel_admin? && v
-            channel.update_attributes(sup_wday: Date.parse(v).wday)
+            wday = v.to_s.downcase == 'today' ? channel.now.wday : Date.parse(v).wday
+            channel.update_attributes(sup_wday: wday)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now on #{channel.sup_day}.")
           elsif v
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is on #{channel.sup_day}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
