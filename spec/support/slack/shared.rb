@@ -8,7 +8,7 @@ end
 
 RSpec.shared_context :channel do
   include_context :subscribed_team
-  let!(:channel) { Fabricate(:channel, channel_id: 'channel') }
+  let!(:channel) { Fabricate(:channel, channel_id: 'channel', sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
 end
 
 RSpec.shared_context :user do

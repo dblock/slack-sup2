@@ -4,7 +4,7 @@ describe SlackSup::Commands::Set do
   include_context :subscribed_team
 
   context 'in channel' do
-    let!(:channel) { Fabricate(:channel, team: team, channel_id: 'channel') }
+    let!(:channel) { Fabricate(:channel, team: team, channel_id: 'channel', sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
     let(:admin) { Fabricate(:user, channel: channel, user_name: 'username', is_admin: true) }
     let(:tz) { ActiveSupport::TimeZone.new('Eastern Time (US & Canada)') }
     let(:tzs) { Time.now.in_time_zone(tz).strftime('%Z') }
@@ -159,7 +159,7 @@ describe SlackSup::Commands::Set do
           )
         end
         it 'shows current value of sup day' do
-          channel.update_attributes!(sup_wday: 2)
+          channel.update_attributes!(sup_wday: Date::TUESDAY)
           expect(message: '@sup set day').to respond_with_slack_message(
             "Channel S'Up is on Tuesday."
           )
@@ -168,7 +168,7 @@ describe SlackSup::Commands::Set do
           expect(message: '@sup set day friday').to respond_with_slack_message(
             "Channel S'Up is now on Friday."
           )
-          expect(channel.reload.sup_wday).to eq 5
+          expect(channel.reload.sup_wday).to eq Date::FRIDAY
         end
         context 'on Tuesday' do
           let(:tz) { 'Eastern Time (US & Canada)' }
@@ -180,13 +180,13 @@ describe SlackSup::Commands::Set do
             expect(message: '@sup set day today').to respond_with_slack_message(
               "Channel S'Up is now on Tuesday."
             )
-            expect(channel.reload.sup_wday).to eq 2
+            expect(channel.reload.sup_wday).to eq Date::TUESDAY
           end
           it 'changes day to Today' do
             expect(message: '@sup set day Today').to respond_with_slack_message(
               "Channel S'Up is now on Tuesday."
             )
-            expect(channel.reload.sup_wday).to eq 2
+            expect(channel.reload.sup_wday).to eq Date::TUESDAY
           end
         end
         it 'errors set on an invalid day' do
@@ -202,7 +202,7 @@ describe SlackSup::Commands::Set do
           )
         end
         it 'shows current value of sup followup' do
-          channel.update_attributes!(sup_followup_wday: 2)
+          channel.update_attributes!(sup_followup_wday: Date::TUESDAY)
           expect(message: '@sup set followup').to respond_with_slack_message(
             "Channel S'Up followup day is on Tuesday."
           )
@@ -211,7 +211,7 @@ describe SlackSup::Commands::Set do
           expect(message: '@sup set followup friday').to respond_with_slack_message(
             "Channel S'Up followup day is now on Friday."
           )
-          expect(channel.reload.sup_followup_wday).to eq 5
+          expect(channel.reload.sup_followup_wday).to eq Date::FRIDAY
         end
         it 'errors set on an invalid day' do
           expect(message: '@sup set followup foobar').to respond_with_slack_message(

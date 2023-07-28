@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2023/07/28: Default channel S'Up to tomorrow when created - [@dblock](https://github.com/dblock).
 * 2023/07/28: Add `set day today` - [@dblock](https://github.com/dblock).
 * 2023/06/19: Fix odd user added to more than 1 sup - [@dblock](https://github.com/dblock).
 * 2023/03/15: Fork of slack-sup with support for channel S'Ups - [@dblock](https://github.com/dblock).

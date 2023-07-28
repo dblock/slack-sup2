@@ -23,10 +23,10 @@ class Channel
   field :sup_time_of_day, type: Integer, default: 9 * 60 * 60
   field :sup_every_n_weeks, type: Integer, default: 1
   field :sup_recency, type: Integer, default: 12
-  # sup day of the week, defaults to Monday
-  field :sup_wday, type: Integer, default: 1
-  # sup day of the week we ask for sup results, defaults to Thursday
-  field :sup_followup_wday, type: Integer, default: 4
+  # sup day of the week
+  field :sup_wday, type: Integer, default: -1
+  # sup day of the week we ask for sup results
+  field :sup_followup_wday, type: Integer, default: -1
   field :sup_tz, type: String, default: 'Eastern Time (US & Canada)'
   validates_presence_of :sup_tz
 
@@ -50,6 +50,7 @@ class Channel
   before_validation :validate_sup_every_n_weeks
   before_validation :validate_sup_size
   before_validation :validate_sup_recency
+  before_create :set_sup_wday_to_tomorrow
 
   belongs_to :team
 
@@ -234,6 +235,10 @@ class Channel
     Time.now.utc.in_time_zone(sup_tzone)
   end
 
+  def tomorrow
+    now.tomorrow
+  end
+
   # is it time to sup?
   def sup?
     return false unless team.active?
@@ -332,5 +337,27 @@ class Channel
     return if sup_size >= 2
 
     errors.add(:sup_size, "S'Up for _#{sup_size}_ is invalid, requires at least 2 people to meet.")
+  end
+
+  def set_sup_wday_to_tomorrow
+    if sup_wday == -1
+      tomorrow_wday = tomorrow.wday
+      case tomorrow_wday
+      when Date::SATURDAY, Date::SUNDAY
+        self.sup_wday = Date::MONDAY
+      else
+        self.sup_wday = tomorrow_wday
+      end
+    end
+    if sup_followup_wday == -1
+      case sup_wday
+      when Date::WEDNESDAY
+        self.sup_followup_wday = Date::FRIDAY
+      when Date::THURSDAY, Date::FRIDAY
+        self.sup_followup_wday = Date::TUESDAY
+      else
+        self.sup_followup_wday = Date::THURSDAY
+      end
+    end
   end
 end

@@ -1,8 +1,32 @@
 require 'spec_helper'
 
 describe Channel do
-  let!(:channel) { Fabricate(:channel) }
+  context 'days of week' do
+    {
+      DateTime.parse('2017/1/2 3:00 PM EST').utc => { wday: Date::TUESDAY, followup_wday: Date::THURSDAY },
+      DateTime.parse('2017/1/3 3:00 PM EST').utc => { wday: Date::WEDNESDAY, followup_wday: Date::FRIDAY },
+      DateTime.parse('2017/1/4 3:00 PM EST').utc => { wday: Date::THURSDAY, followup_wday: Date::TUESDAY },
+      DateTime.parse('2017/1/5 3:00 PM EST').utc => { wday: Date::FRIDAY, followup_wday: Date::TUESDAY },
+      DateTime.parse('2017/1/6 3:00 PM EST').utc => { wday: Date::MONDAY, followup_wday: Date::THURSDAY },
+      DateTime.parse('2017/1/7 3:00 PM EST').utc => { wday: Date::MONDAY, followup_wday: Date::THURSDAY },
+      DateTime.parse('2017/1/8 3:00 PM EST').utc => { wday: Date::MONDAY, followup_wday: Date::THURSDAY }
+    }.each_pair do |dt, expectations|
+      context "created on #{Date::DAYNAMES[dt.wday]}" do
+        before do
+          Timecop.travel(dt)
+        end
+        let(:channel) { Fabricate(:channel) }
+        it "sets sup to #{Date::DAYNAMES[expectations[:wday]]}" do
+          expect(channel.sup_wday).to eq expectations[:wday]
+        end
+        it "sets reminder to #{Date::DAYNAMES[expectations[:followup_wday]]}" do
+          expect(channel.sup_followup_wday).to eq expectations[:followup_wday]
+        end
+      end
+    end
+  end
   context 'sync!' do
+    let!(:channel) { Fabricate(:channel) }
     let(:member_default_attr) do
       {
         is_bot: false,
@@ -144,7 +168,7 @@ describe Channel do
   end
   context 'channel sup on monday 3pm' do
     let(:tz) { 'Eastern Time (US & Canada)' }
-    let(:channel) { Fabricate(:channel, sup_wday: 1, sup_tz: tz) }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz) }
     let(:monday) { DateTime.parse('2017/1/2 3:00 PM EST').utc }
     before do
       Timecop.travel(monday)
@@ -166,7 +190,7 @@ describe Channel do
   end
   context 'channel sup on monday before 9am' do
     let(:tz) { 'Eastern Time (US & Canada)' }
-    let(:channel) { Fabricate(:channel, sup_wday: 1, sup_tz: tz) }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz) }
     let(:monday) { DateTime.parse('2017/1/2 8:00 AM EST').utc }
     before do
       Timecop.travel(monday)
@@ -182,7 +206,7 @@ describe Channel do
   end
   context 'with a custom sup_time_of_day' do
     let(:tz) { 'Eastern Time (US & Canada)' }
-    let(:channel) { Fabricate(:channel, sup_wday: 1, sup_time_of_day: 7 * 60 * 60, sup_tz: tz) }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_time_of_day: 7 * 60 * 60, sup_tz: tz) }
     let(:monday) { DateTime.parse('2017/1/2 8:00 AM EST').utc }
     before do
       Timecop.travel(monday)
@@ -317,6 +341,7 @@ describe Channel do
     end
   end
   context '#find_user_by_slack_mention!' do
+    let(:channel) { Fabricate(:channel) }
     let(:user) { Fabricate(:user, channel: channel) }
     it 'finds by slack id' do
       expect(channel.find_user_by_slack_mention!("<@#{user.user_id}>")).to eq user
@@ -339,11 +364,13 @@ describe Channel do
     end
   end
   context '#api_url' do
+    let(:channel) { Fabricate(:channel) }
     it 'sets the API url' do
       expect(channel.api_url).to eq "https://sup2.playplay.io/api/channels/#{channel._id}"
     end
   end
   context '#short_lived_token' do
+    let(:channel) { Fabricate(:channel) }
     let!(:token) { channel.short_lived_token }
     it 'creates a new token every time' do
       expect(channel.short_lived_token).to_not eq token
@@ -379,6 +406,7 @@ describe Channel do
     end
   end
   context '#stats' do
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
     it 'generates stats' do
       expect(channel.stats).to be_a ChannelStats
       expect(channel.stats_s).to eq [

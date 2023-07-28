@@ -398,7 +398,7 @@ describe Round do
           end
         end
         it 'is true for Wednesday when channel.followup_day is 3' do
-          channel.update_attributes!(sup_followup_wday: 3)
+          channel.update_attributes!(sup_followup_wday: Date::WEDNESDAY)
 
           Timecop.travel(wednesday_est) do
             expect(round.ask?).to be true

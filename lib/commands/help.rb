@@ -35,11 +35,11 @@ module SlackSup
         --------------
         set size [number]          - set the number of people for each S'Up, default is 3
         set odd [yes/no]           - add one odd user to an existing S'Up and/or generate an additional smaller S'Up
-        set day [day of week]      - set the day to S'Up, e.g. Tuesday or today, default is Monday
+        set day [day of week]      - set the day to S'Up, e.g. Tuesday or today, default is tomorrow for a new channel
         set time [time of day]     - set the earliest time to S'Up, default is 9 AM
         set timezone [tz]          - set team timezone, default is Eastern Time (US & Canada)
         set weeks [number]         - set the number of weeks between S'Up, default is 1
-        set followup [day of week] - set the follow up day of S'up, default is Thursday
+        set followup [day of week] - set the follow up day of S'up, default is Thursday or Tuesday depending on S'Up day
         set recency [number]       - set the number of weeks during which to avoid pairing the same people, default is 12
         set opt [in|out]           - opt in (default) or opt out new users
         set sync [now]             - review or schedule a user sync from Slack

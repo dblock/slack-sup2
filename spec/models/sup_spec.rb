@@ -65,7 +65,7 @@ describe Sup do
     end
   end
   context 'a round' do
-    let(:channel) { Fabricate(:channel) }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
     let!(:user1) { Fabricate(:user, channel: channel) }
     let!(:user2) { Fabricate(:user, channel: channel) }
     let!(:user3) { Fabricate(:user, channel: channel) }
@@ -121,7 +121,7 @@ describe Sup do
     end
   end
   context 'sup!' do
-    let(:channel) { Fabricate(:channel) }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
     let!(:user1) { Fabricate(:user, channel: channel) }
     let!(:user2) { Fabricate(:user, channel: channel) }
     let!(:user3) { Fabricate(:user, channel: channel) }

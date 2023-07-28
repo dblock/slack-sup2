@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Stats do
-  let(:channel) { Fabricate(:channel) }
+  let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
   let(:stats) { ChannelStats.new(channel) }
   it 'reports counts' do
     expect(stats.rounds_count).to eq 0
