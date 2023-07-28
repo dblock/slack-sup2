@@ -58,6 +58,8 @@ Navigate to [localhost:5000](http://localhost:5000).
 * Create a new project on https://console.developers.google.com
 * Click `Enable APIs and Services`
 * Look for `Google Calendar API`, choose `Enable`
-* Choose `Add Credentials`, accessing `User Data` via `Google Calendar API` via `Web Browser (Javascript)`
-* Answer remaining questions and `Create a Client ID`
-* Set `GOOGLE_API_CLIENT_ID`
+* Choose `Create Credentials`, `OAuth 2.0 Client IDs`, `Web Application`.
+  * Name: `slack-sup2`
+  * Authorized JavaScript origins: `https://sup2.playplay.io`
+  * Authorized redirect URIs: `https://sup2.playplay.io`
+* Set `GOOGLE_API_CLIENT_ID` in the app to the value of `Client ID`.
