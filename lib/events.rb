@@ -23,7 +23,7 @@ SlackRubyBotServer::Events.configure do |config|
 
     text = [
       "Hi there! I'm your team's S'Up bot.",
-      "I will sync users in this channel in the next hour, and plan to setup a S'Up via Slack DM for all users in this channel tomorrow, #{channel.sup_day}.",
+      "I will sync users in this channel in the next hour, and plan to setup a S'Up via Slack DM for all users in this channel #{channel.sup_day}.",
       "You may want to `#{data.team.bot_name} set size`, `#{data.team.bot_name} set day`, or `#{data.team.bot_name} set timezone` before then.",
       "Type `#{data.team.bot_name} help` for instructions and `#{data.team.bot_name} stats` for S'Up info."
     ].join(' ')
