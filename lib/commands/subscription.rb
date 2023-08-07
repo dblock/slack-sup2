@@ -6,7 +6,7 @@ module SlackSup
       subscribe_command 'subscription' do |data|
         if data.team.is_admin?(data.user)
           subscription_info = []
-          if data.team.active_stripe_subscription?
+          if data.team.stripe_subcriptions&.any?
             subscription_info << data.team.stripe_customer_text
             subscription_info.concat(data.team.stripe_customer_subscriptions_info)
             subscription_info.concat(data.team.stripe_customer_invoices_info)
