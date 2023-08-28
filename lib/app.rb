@@ -105,10 +105,13 @@ module SlackSup
 
     def check_expired_subscriptions!
       Team.active.where(subscribed: false).each do |team|
-        logger.info "Checking #{team} created #{team.created_at.ago_in_words}, subscription #{team.subscription_expired? ? 'has expired' : 'is active'}."
-        next unless team.subscription_expired?
-
-        team.inform! team.subscribe_text
+        if team.trial?
+          remaining_trial_days = team.remaining_trial_days
+          logger.info "Team #{team} created #{team.created_at.ago_in_words}, trial ends in #{remaining_trial_days} day#{remaining_trial_days == 1 ? '' : 's'}."
+        elsif team.subscription_expired?
+          logger.info "Team #{team} created #{team.created_at.ago_in_words}, subscription has expired."
+          team.inform! team.subscribe_text
+        end
       end
     end
 

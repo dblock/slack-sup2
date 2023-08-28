@@ -161,6 +161,12 @@ class Team
     created_at + 2.weeks
   end
 
+  def trial?
+    return false if subscribed?
+
+    trial_ends_at > Time.now.utc
+  end
+
   def remaining_trial_days
     raise 'Team is subscribed.' if subscribed?
 

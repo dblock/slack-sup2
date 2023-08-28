@@ -97,4 +97,28 @@ describe SlackSup::App do
       expect(channel4.reload.enabled).to be true
     end
   end
+  context 'check_expired_subscriptions!' do
+    context 'expired trial' do
+      let!(:team) { Fabricate(:team, created_at: 3.weeks.ago) }
+      it 'informs team with an expired subscription' do
+        expect_any_instance_of(Team).to receive(:inform!)
+        expect_any_instance_of(Logger).to receive(:info).with(/subscription has expired/)
+        subject.send(:check_expired_subscriptions!)
+      end
+    end
+    context 'non expired trial' do
+      let!(:team) { Fabricate(:team, created_at: 1.week.ago) }
+      it 'logs trial' do
+        expect_any_instance_of(Logger).to receive(:info).with(/trial ends in \d days/)
+        subject.send(:check_expired_subscriptions!)
+      end
+    end
+    context 'subscribed team' do
+      let!(:team) { Fabricate(:team, subscribed: true) }
+      it 'no logs' do
+        expect_any_instance_of(Logger).to_not receive(:info)
+        subject.send(:check_expired_subscriptions!)
+      end
+    end
+  end
 end
