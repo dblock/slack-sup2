@@ -89,6 +89,10 @@ class Channel
     team.token
   end
 
+  def info
+    slack_client.conversations_info(channel: channel_id)
+  end
+
   def find_user_by_slack_mention!(user_name)
     user_match = user_name.match(/^<@(.*)>$/)
     user = if user_match

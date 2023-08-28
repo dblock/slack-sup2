@@ -10,6 +10,7 @@ module SlackSup
       logger.info 'Starting sup and subscription crons.'
       SlackRubyBotServer::Service.instance.tap do |instance|
         instance.once_and_every 60 * 60 * 24 * 3 do
+          check_channel_auth!
           check_subscribed_teams!
           check_expired_subscriptions!
         end
@@ -26,6 +27,22 @@ module SlackSup
     end
 
     private
+
+    def check_channel_auth!
+      Channel.enabled.each do |channel|
+        channel.info
+      rescue Slack::Web::Api::Errors::SlackError => e
+        case e.message
+        when 'is_archived', 'not_in_channel', 'account_inactive', 'channel_not_found', 'access_denied', 'invalid_auth'
+          logger.warn "Channel info for #{channel} failed with #{e.message}, disabling."
+          channel.update_attributes!(enabled: false)
+        else
+          logger.warn "Channel info for #{channel} failed with #{e.message}."
+        end
+      rescue StandardError => e
+        logger.warn "Channel info for #{channel} failed with an unexpected error, #{e.message}."
+      end
+    end
 
     def invoke_with_criteria!(obj, &_block)
       obj.each do |obj|

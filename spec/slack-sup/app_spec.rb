@@ -73,4 +73,28 @@ describe SlackSup::App do
       subject.send(:sup!)
     end
   end
+  context 'check_channel_auth!' do
+    let(:team) { Fabricate(:team) }
+    let!(:channel1) { Fabricate(:channel, team: team) }
+    let!(:channel2) { Fabricate(:channel, team: team) }
+    let!(:channel3) { Fabricate(:channel, team: team) }
+    let!(:channel4) { Fabricate(:channel, team: team) }
+    it 'disables on account_inactive' do
+      allow_any_instance_of(Slack::Web::Client).to receive(:conversations_info) do |_, channel|
+        case channel[:channel]
+        when channel1.channel_id
+          raise Slack::Web::Api::Errors::SlackError, 'account_inactive'
+        when channel2.channel_id
+          raise Slack::Web::Api::Errors::SlackError, 'some_other_error'
+        when channel3.channel_id
+          raise StandardError, 'some_other_error'
+        end
+      end
+      subject.send(:check_channel_auth!)
+      expect(channel1.reload.enabled).to be false
+      expect(channel2.reload.enabled).to be true
+      expect(channel3.reload.enabled).to be true
+      expect(channel4.reload.enabled).to be true
+    end
+  end
 end
