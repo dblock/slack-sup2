@@ -288,7 +288,7 @@ describe SlackSup::Commands::Opt do
           end
           it 'requires an admin' do
             expect(message: "@sup opt in #{user.slack_mention}").to respond_with_slack_message(
-              "Sorry, only <@#{channel.inviter_id}> or a Slack team admin can opt users in and out."
+              "Sorry, only #{channel.channel_admins_slack_mentions} can opt users in and out."
             )
           end
         end

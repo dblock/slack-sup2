@@ -32,7 +32,7 @@ describe SlackSup::Commands::Sync do
       end
       it 'sets sync' do
         expect(message: '@sup sync').to respond_with_slack_message(
-          "Users will sync before the next round. Only <@#{channel.inviter_id}> or a Slack team admin can manually sync, sorry."
+          "Users will sync before the next round. Only #{channel.channel_admins_slack_mentions} can manually sync, sorry."
         )
       end
     end

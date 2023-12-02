@@ -73,7 +73,7 @@ class User
   def update_info_attributes!(info)
     update_attributes!(
       is_organizer: channel.inviter_id == user_id,
-      is_admin: info.is_admin,
+      is_admin: is_admin || info.is_admin,
       is_owner: info.is_owner,
       user_name: info.name,
       real_name: info.real_name,

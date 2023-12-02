@@ -1,6 +1,56 @@
 require 'spec_helper'
 
 describe Channel do
+  context 'channel_admins' do
+    let!(:channel) { Fabricate(:channel) }
+    it 'has no inviter' do
+      expect(channel.channel_admins).to eq([])
+    end
+    context 'with an inviter' do
+      let!(:user) { Fabricate(:user, channel: channel) }
+      before do
+        channel.update_attributes!(inviter_id: user.user_id)
+      end
+      it 'has an admin' do
+        expect(channel.channel_admins).to eq([user])
+        expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+      end
+      context 'with another admin' do
+        let!(:another) { Fabricate(:user, channel: channel, is_admin: true) }
+        it 'has two admins' do
+          expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+        end
+      end
+      context 'with a team admin' do
+        let!(:another) { Fabricate(:user, channel: channel, is_admin: false) }
+        before do
+          channel.team.update_attributes!(activated_user_id: another.user_id)
+        end
+        it 'has two admins' do
+          expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+        end
+      end
+      context 'with a different team admin' do
+        let!(:team_admin) { Fabricate(:user, channel: channel, is_admin: false) }
+        let!(:another) { Fabricate(:user, channel: channel, is_admin: true) }
+        before do
+          channel.team.update_attributes!(activated_user_id: team_admin.user_id)
+        end
+        it 'has three admins' do
+          expect(channel.channel_admins.to_a.sort).to eq([user, team_admin, another].sort)
+        end
+      end
+      context 'with another owner' do
+        let!(:another) { Fabricate(:user, channel: channel, is_owner: true) }
+        it 'has two admins' do
+          expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+        end
+      end
+    end
+  end
   context 'days of week' do
     {
       DateTime.parse('2017/1/2 3:00 PM EST').utc => { wday: Date::TUESDAY, followup_wday: Date::THURSDAY },

@@ -106,6 +106,14 @@ class Channel
     user
   end
 
+  def channel_admins
+    users.in(user_id: [inviter_id, team.activated_user_id].uniq.compact).or(is_admin: true).or(is_owner: true)
+  end
+
+  def channel_admins_slack_mentions
+    (["<@#{inviter_id}>"] + channel_admins.map(&:slack_mention)).uniq.or
+  end
+
   def self.parse_slack_mention(mention)
     channel_match = mention.match(/^<#(?<id>.*)\|(?<name>.*)>$/)
     channel_match ||= mention.match(/^<#(?<id>.*)>$/)

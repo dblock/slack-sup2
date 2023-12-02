@@ -26,9 +26,9 @@ module SlackSup
           if user_ids.any? && channel.nil?
             raise SlackSup::Error, "Sorry, only <@#{data.team.activated_user_id}> or a Slack team admin can opt users in or out." unless data.team.is_admin?(data.user)
           elsif channel && user && user_ids.any?
-            raise SlackSup::Error, "Sorry, only <@#{channel.inviter_id}> or a Slack team admin can opt users in and out." unless user.channel_admin?
+            raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions} can opt users in and out." unless user.channel_admin?
           elsif channel && user && channel_ids.any?
-            raise SlackSup::Error, "Please DM @#{data.team.name} to opt users in and out of channels." unless user.channel_admin?
+            raise SlackSup::Error, "Please DM #{data.team.bot_name} to opt users in and out of channels." unless user.channel_admin?
           end
 
           user_ids << data.user if user_ids.none?

@@ -527,12 +527,12 @@ describe SlackSup::Commands::Set do
       context 'api' do
         it 'cannot set opt' do
           expect(message: '@sup set opt out').to respond_with_slack_message(
-            "Users are opted in by default. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Users are opted in by default. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'cannot set api' do
           expect(message: '@sup set api true').to respond_with_slack_message(
-            "Channel data access via the API is on. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel data access via the API is on. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see api value' do
@@ -549,20 +549,20 @@ describe SlackSup::Commands::Set do
         it 'rotate api token' do
           channel.update_attributes!(api: true, api_token: 'old')
           expect(message: '@sup rotate api token').to respond_with_slack_message(
-            "Channel data access via the API is on with an access token visible to admins. Only <@#{channel.inviter_id}> or a Slack team admin can rotate it, sorry."
+            "Channel data access via the API is on with an access token visible to admins. Only #{channel.channel_admins_slack_mentions} can rotate it, sorry."
           )
           expect(channel.reload.api_token).to eq 'old'
         end
         it 'unsets api token' do
           channel.update_attributes!(api: true, api_token: 'old')
           expect(message: '@sup unset api token').to respond_with_slack_message(
-            "Channel data access via the API is on with an access token visible to admins. Only <@#{channel.inviter_id}> or a Slack team admin can unset it, sorry."
+            "Channel data access via the API is on with an access token visible to admins. Only #{channel.channel_admins_slack_mentions} can unset it, sorry."
           )
           expect(channel.reload.api_token).to eq 'old'
         end
         it 'cannot set day' do
           expect(message: '@sup set day tuesday').to respond_with_slack_message(
-            "Channel S'Up is on Monday. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up is on Monday. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see sup day' do
@@ -572,7 +572,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set time' do
           expect(message: '@sup set time 11:00 AM').to respond_with_slack_message(
-            "Channel S'Up is after 9:00 AM #{tzs}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up is after 9:00 AM #{tzs}. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see time' do
@@ -582,7 +582,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set weeks' do
           expect(message: '@sup set weeks 2').to respond_with_slack_message(
-            "Channel S'Up is every week. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up is every week. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see weeks' do
@@ -592,7 +592,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set followup day' do
           expect(message: '@sup set followup 2').to respond_with_slack_message(
-            "Channel S'Up followup day is on Thursday. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up followup day is on Thursday. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see followup day' do
@@ -602,7 +602,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set recency' do
           expect(message: '@sup set recency 2').to respond_with_slack_message(
-            "Taking special care to not pair the same people more than every 12 weeks. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Taking special care to not pair the same people more than every 12 weeks. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see recency' do
@@ -612,7 +612,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set size' do
           expect(message: '@sup set size 2').to respond_with_slack_message(
-            "Channel S'Up connects groups of 3 people. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up connects groups of 3 people. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see size' do
@@ -622,7 +622,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set timezone' do
           expect(message: '@sup set tz Hawaii').to respond_with_slack_message(
-            "Channel S'Up timezone is #{ActiveSupport::TimeZone.new('Eastern Time (US & Canada)')}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Channel S'Up timezone is #{ActiveSupport::TimeZone.new('Eastern Time (US & Canada)')}. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see timezone' do
@@ -632,7 +632,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set custom profile team field' do
           expect(message: '@sup set team field Artsy Team').to respond_with_slack_message(
-            "Custom profile team field is _not set_. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Custom profile team field is _not set_. Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see custom profile team field' do
@@ -642,7 +642,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set message' do
           expect(message: '@sup set message Custom message.').to respond_with_slack_message(
-            "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+            "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only #{channel.channel_admins_slack_mentions} can change that, sorry."
           )
         end
         it 'can see custom sup message' do
@@ -663,7 +663,7 @@ describe SlackSup::Commands::Set do
         end
         it 'cannot set sync now' do
           expect(message: '@sup set sync now').to respond_with_slack_message(
-            "Users will sync before the next round. #{channel.next_sup_at_text} Only <@#{channel.inviter_id}> or a Slack team admin can manually sync, sorry."
+            "Users will sync before the next round. #{channel.next_sup_at_text} Only #{channel.channel_admins_slack_mentions} can manually sync, sorry."
           )
         end
       end

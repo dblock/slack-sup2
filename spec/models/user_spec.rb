@@ -25,6 +25,27 @@ describe User do
         expect(user.custom_team_name).to eq 'Engineering'
       end
     end
+    context 'admin' do
+      it 'does not demote an admin' do
+        user.update_attributes!(is_admin: true)
+        allow_any_instance_of(Slack::Web::Client).to receive(:users_info).and_return(Hashie::Mash.new(
+                                                                                       user: {
+                                                                                         is_admin: false
+                                                                                       }
+                                                                                     ))
+        user.sync!
+        expect(user.reload.is_admin).to be true
+      end
+      it 'promotes an admin' do
+        allow_any_instance_of(Slack::Web::Client).to receive(:users_info).and_return(Hashie::Mash.new(
+                                                                                       user: {
+                                                                                         is_admin: true
+                                                                                       }
+                                                                                     ))
+        user.sync!
+        expect(user.reload.is_admin).to be true
+      end
+    end
   end
   context '#find_or_create_user!' do
     let!(:channel) { Fabricate(:channel) }

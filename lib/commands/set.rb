@@ -13,7 +13,7 @@ module SlackSup
           elsif v
             message = [
               "Users are opted #{channel.opt_in_s} by default.",
-              "Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+              "Only #{channel.channel_admins_slack_mentions} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
@@ -33,7 +33,7 @@ module SlackSup
           elsif v
             message = [
               channel_data_access_message(user),
-              "Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+              "Only #{channel.channel_admins_slack_mentions} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
@@ -65,7 +65,7 @@ module SlackSup
           elsif !channel.api_token
             message = [
               channel_data_access_message(user),
-              "Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry."
+              "Only #{channel.channel_admins_slack_mentions} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
@@ -97,7 +97,7 @@ module SlackSup
           else
             message = [
               channel_data_access_message(user),
-              "Only <@#{channel.inviter_id}> or a Slack team admin can unset it, sorry."
+              "Only #{channel.channel_admins_slack_mentions} can unset it, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           end
@@ -117,7 +117,7 @@ module SlackSup
           else
             message = [
               channel_data_access_message(user),
-              "Only <@#{channel.inviter_id}> or a Slack team admin can rotate it, sorry."
+              "Only #{channel.channel_admins_slack_mentions} can rotate it, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           end
@@ -232,7 +232,7 @@ module SlackSup
             channel.update_attributes(sup_wday: wday)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now on #{channel.sup_day}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is on #{channel.sup_day}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is on #{channel.sup_day}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is on #{channel.sup_day}.")
           end
@@ -255,7 +255,7 @@ module SlackSup
             channel.update_attributes!(sup_time_of_day: DateTime.parse(v).seconds_since_midnight)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now after #{channel.sup_time_of_day_s} #{channel.sup_tzone_s}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is after #{channel.sup_time_of_day_s} #{channel.sup_tzone_s}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is after #{channel.sup_time_of_day_s} #{channel.sup_tzone_s}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is after #{channel.sup_time_of_day_s} #{channel.sup_tzone_s}.")
           end
@@ -269,7 +269,7 @@ module SlackSup
             channel.update_attributes(sup_followup_wday: Date.parse(v).wday)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up followup day is now on #{channel.sup_followup_day}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up followup day is on #{channel.sup_followup_day}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up followup day is on #{channel.sup_followup_day}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up followup day is on #{channel.sup_followup_day}.")
           end
@@ -283,7 +283,7 @@ module SlackSup
             channel.update_attributes!(sup_every_n_weeks: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now every #{channel.sup_every_n_weeks_s}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is every #{channel.sup_every_n_weeks_s}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is every #{channel.sup_every_n_weeks_s}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is every #{channel.sup_every_n_weeks_s}.")
           end
@@ -297,7 +297,7 @@ module SlackSup
             channel.update_attributes!(sup_size: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{channel.sup_size} people.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_size} people. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_size} people. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_size} people.")
           end
@@ -311,7 +311,7 @@ module SlackSup
             channel.update_attributes!(sup_odd: v.to_b)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people.")
           elsif !v.nil?
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people.")
           end
@@ -326,7 +326,7 @@ module SlackSup
             channel.update_attributes!(sup_tz: timezone.name)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up timezone is now #{channel.sup_tzone}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up timezone is #{channel.sup_tzone}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up timezone is #{channel.sup_tzone}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up timezone is #{channel.sup_tzone}.")
           end
@@ -338,7 +338,7 @@ module SlackSup
             channel.update_attributes!(team_field_label: v)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is now _#{channel.team_field_label}_.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is _#{channel.team_field_label || 'not set'}_. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is _#{channel.team_field_label || 'not set'}_. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is _#{channel.team_field_label || 'not set'}_.")
           end
@@ -350,7 +350,7 @@ module SlackSup
             channel.update_attributes!(team_field_label: nil)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Custom profile team field is now _not set_.')
           else
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is _#{channel.team_field_label || 'not set'}_. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is _#{channel.team_field_label || 'not set'}_. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           end
           logger.info "UNSET: #{channel}, user=#{data.user}, team_field_label=#{channel.team_field_label || '(not set)'}."
         end
@@ -360,9 +360,9 @@ module SlackSup
             channel.update_attributes!(sup_message: v.to_s)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now using a custom S'Up message. _#{channel.sup_message}_")
           elsif v && channel.sup_message
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using a custom S'Up message. _#{channel.sup_message}_ Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using a custom S'Up message. _#{channel.sup_message}_ Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           elsif v && !channel.sup_message
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           elsif channel.sup_message
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using a custom S'Up message. _#{channel.sup_message}_")
           else
@@ -376,9 +376,9 @@ module SlackSup
             channel.update_attributes!(sup_message: nil)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_")
           elsif channel.sup_message
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using a custom S'Up message. _#{channel.sup_message}_ Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using a custom S'Up message. _#{channel.sup_message}_ Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_ Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           end
           logger.info "UNSET: #{channel}, user=#{data.user}, sup_message=#{channel.sup_message || '(not set)'}."
         end
@@ -388,7 +388,7 @@ module SlackSup
             channel.update_attributes!(sup_recency: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now taking special care to not pair the same people more than every #{channel.sup_recency_s}.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Taking special care to not pair the same people more than every #{channel.sup_recency_s}. Only <@#{channel.inviter_id}> or a Slack team admin can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Taking special care to not pair the same people more than every #{channel.sup_recency_s}. Only #{channel.channel_admins_slack_mentions} can change that, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Taking special care to not pair the same people more than every #{channel.sup_recency_s}.")
           end
@@ -407,7 +407,7 @@ module SlackSup
             end
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{channel.last_sync_at_text} Come back and run `set sync` or `stats` in a bit.")
           elsif v
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{channel.last_sync_at_text} Only <@#{channel.inviter_id}> or a Slack team admin can manually sync, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{channel.last_sync_at_text} Only #{channel.channel_admins_slack_mentions} can manually sync, sorry.")
           else
             data.team.slack_client.chat_postMessage(channel: data.channel, text: channel.last_sync_at_text)
           end
