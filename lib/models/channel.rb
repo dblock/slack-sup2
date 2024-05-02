@@ -107,7 +107,10 @@ class Channel
   end
 
   def channel_admins
-    users.in(user_id: [inviter_id, team.activated_user_id].uniq.compact).or(is_admin: true).or(is_owner: true)
+    users
+      .in(channel_id: id, user_id: [inviter_id, team.activated_user_id].uniq.compact)
+      .or(channel_id: id, is_admin: true)
+      .or(channel_id: id, is_owner: true)
   end
 
   def channel_admins_slack_mentions

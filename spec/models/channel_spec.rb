@@ -22,6 +22,13 @@ describe Channel do
           expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
         end
       end
+      context 'with an admin in another channel' do
+        let!(:another) { Fabricate(:user, channel: Fabricate(:channel), is_admin: true) }
+        it 'has one admin' do
+          expect(channel.channel_admins).to eq([user])
+          expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+        end
+      end
       context 'with a team admin' do
         let!(:another) { Fabricate(:user, channel: channel, is_admin: false) }
         before do

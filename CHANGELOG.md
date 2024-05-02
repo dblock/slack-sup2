@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2024/05/02: Fix incorrect list of admins listed in `set` errors - [@dblock](https://github.com/dblock).
 * 2023/12/01: Added `promote` and `demote @someone` - [@dblock](https://github.com/dblock).
 * 2023/07/28: Default channel S'Up to tomorrow when created - [@dblock](https://github.com/dblock).
 * 2023/07/28: Add `set day today` - [@dblock](https://github.com/dblock).
