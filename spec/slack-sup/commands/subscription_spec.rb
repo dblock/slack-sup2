@@ -73,11 +73,21 @@ describe SlackSup::Commands::Subscription do
       end
       context 'subscribed team without a customer ID' do
         before do
-          team.update_attributes!(subscribed: true, stripe_customer_id: nil)
+          team.update_attributes!(stripe_customer_id: nil)
         end
         it 'reports subscribed' do
           expect(message: '@sup subscription', channel: 'DM').to respond_with_slack_message(
             'Team is subscribed.'
+          )
+        end
+      end
+      context 'subscribed since' do
+        before do
+          team.update_attributes!(subscribed_at: team.created_at)
+        end
+        it 'reports subscribed' do
+          expect(message: '@sup subscription', channel: 'DM').to respond_with_slack_message(
+            "Subscriber since #{team.subscribed_at.strftime('%B %d, %Y')}."
           )
         end
       end

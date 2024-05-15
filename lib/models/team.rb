@@ -111,9 +111,7 @@ class Team
   end
 
   def subscriber_text
-    return unless subscribed_at
-
-    "Subscriber since #{subscribed_at.strftime('%B %d, %Y')}."
+    subscribed_at ? "Subscriber since #{subscribed_at.strftime('%B %d, %Y')}." : 'Team is subscribed.'
   end
 
   def enabled_channels_text

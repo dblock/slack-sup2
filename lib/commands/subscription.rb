@@ -12,7 +12,7 @@ module SlackSup
             subscription_info.concat(data.team.stripe_customer_invoices_info)
             subscription_info.concat(data.team.stripe_customer_sources_info)
             subscription_info << data.team.update_cc_text
-          elsif data.team.subscribed && data.team.subscribed_at
+          elsif data.team.subscribed
             subscription_info << data.team.subscriber_text
           else
             subscription_info << data.team.trial_message
