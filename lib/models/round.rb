@@ -46,12 +46,18 @@ class Round
 
   def ask?
     return false if asked_at
+
     # do not ask within 24 hours
     return false if Time.now.utc < (ran_at + 24.hours)
 
     # only ask on sup_followup_day
     now_in_tz = Time.now.utc.in_time_zone(channel.sup_tzone)
-    now_in_tz.wday == channel.sup_followup_wday
+    return false unless now_in_tz.wday == channel.sup_followup_wday
+
+    # do not bother people before S'Up time
+    return false if now_in_tz < now_in_tz.beginning_of_day + channel.sup_time_of_day
+
+    true
   end
 
   def ask!
@@ -65,8 +71,14 @@ class Round
     # don't remind if already tried to record outcome
     return false if asked_at || reminded_at
 
-    # remind after 24 hours
-    Time.now.utc > (ran_at + 24.hours)
+    # do not remind before 24 hours
+    return false unless Time.now.utc > (ran_at + 24.hours)
+
+    # do not bother people before S'Up time
+    now_in_tz = Time.now.utc.in_time_zone(channel.sup_tzone)
+    return false if now_in_tz < now_in_tz.beginning_of_day + channel.sup_time_of_day
+
+    true
   end
 
   def remind!

@@ -382,12 +382,13 @@ describe Round do
         before do
           channel.update_attributes!(sup_wday: Date::TUESDAY, sup_followup_wday: Date::FRIDAY)
         end
-        let(:wednesday_est) { DateTime.parse('2042/1/8 3:00 PM EST').utc }
+        let(:wednesday_est_before_time_of_day) { DateTime.parse('2042/1/8 8:00 AM EST').utc }
+        let(:wednesday_est_after_time_of_day) { DateTime.parse('2042/1/8 3:00 PM EST').utc }
         let(:thursday_morning_utc) { DateTime.parse('2042/1/9 0:00 AM UTC').utc }
         let(:thursday_est) { DateTime.parse('2042/1/9 3:00 PM EST').utc }
         let(:friday_est) { DateTime.parse('2042/1/10 3:00 PM EST').utc }
         it 'is false for Wednesday eastern time' do
-          Timecop.travel(wednesday_est) do
+          Timecop.travel(wednesday_est_after_time_of_day) do
             expect(round.ask?).to be false
           end
         end
@@ -406,11 +407,19 @@ describe Round do
             expect(round.ask?).to be true
           end
         end
-        it 'is true for Wednesday when channel.followup_day is 3' do
-          channel.update_attributes!(sup_followup_wday: Date::WEDNESDAY)
-
-          Timecop.travel(wednesday_est) do
-            expect(round.ask?).to be true
+        context 'channel.followup_day Wednesday' do
+          before do
+            channel.update_attributes!(sup_followup_wday: Date::WEDNESDAY)
+          end
+          it 'is true after sup time of day' do
+            Timecop.travel(wednesday_est_after_time_of_day) do
+              expect(round.ask?).to be true
+            end
+          end
+          it 'is false before sup time of day' do
+            Timecop.travel(wednesday_est_before_time_of_day) do
+              expect(round.ask?).to be false
+            end
           end
         end
       end
@@ -439,6 +448,8 @@ describe Round do
       end
     end
     context '#remind?' do
+      let(:wednesday_est_before_time_of_day) { DateTime.parse('2042/1/8 8:00 AM EST').utc }
+      let(:wednesday_est_after_time_of_day) { DateTime.parse('2042/1/8 3:00 PM EST').utc }
       it 'is false immediately after the round' do
         expect(round.remind?).to be false
       end
@@ -451,6 +462,16 @@ describe Round do
         it 'is true 24 hours later' do
           Timecop.travel(round.created_at + 25.hours) do
             expect(round.remind?).to be true
+          end
+        end
+        it 'is true after sup time of day' do
+          Timecop.travel(wednesday_est_after_time_of_day) do
+            expect(round.remind?).to be true
+          end
+        end
+        it 'is false before sup time of day' do
+          Timecop.travel(wednesday_est_before_time_of_day) do
+            expect(round.remind?).to be false
           end
         end
       end
