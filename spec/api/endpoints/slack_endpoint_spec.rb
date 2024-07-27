@@ -26,60 +26,38 @@ describe Api::Endpoints::SlackEndpoint do
       }
     end
 
-    context 'none' do
-      it 'updates outcome' do
-        expect(Faraday).to receive(:post).with('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', {
-          response_type: 'in_channel',
-          thread_ts: '1467321295.000010',
-          text: 'Thanks for letting me know.',
-          attachments: [
-            text: '',
-            attachment_type: 'default',
+    {
+      'all' => 'Glad you all met! Thanks for letting me know.',
+      'some' => 'Glad to hear that some of you could meet! Thanks for letting me know.',
+      'later' => "Thanks, I'll ask again in a couple of days.",
+      'none' => "Sorry to hear that you couldn't meet. Thanks for letting me know."
+    }.each_pair do |key, message|
+      context 'none' do
+        it 'updates outcome' do
+          expect(Faraday).to receive(:post).with('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', {
+            response_type: 'in_channel',
+            thread_ts: '1467321295.000010',
+            text: message,
+            attachments: [
+              text: '',
+              attachment_type: 'default',
+              actions: [
+                { name: 'outcome', text: 'We All Met', type: 'button', value: 'all', style: key == 'all' ? 'primary' : 'default' },
+                { name: 'outcome', text: 'Some of Us Met', type: 'button', value: 'some', style: key == 'some' ? 'primary' : 'default' },
+                { name: 'outcome', text: "We Haven't Met Yet", type: 'button', value: 'later', style: key == 'later' ? 'primary' : 'default' },
+                { name: 'outcome', text: "We Couldn't Meet", type: 'button', value: 'none', style: key == 'none' ? 'primary' : 'default' }
+              ],
+              callback_id: sup.id.to_s
+            ]
+          }.to_json, 'Content-Type' => 'application/json')
+          post '/api/slack/action', payload: payload.merge(
             actions: [
-              { name: 'outcome', text: 'We All Met', type: 'button', value: 'all', style: 'default' },
-              { name: 'outcome', text: 'Some of Us Met', type: 'button', value: 'some', style: 'default' },
-              { name: 'outcome', text: "We Haven't Met Yet", type: 'button', value: 'later', style: 'default' },
-              { name: 'outcome', text: "We Couldn't Meet", type: 'button', value: 'none', style: 'primary' }
-            ],
-            callback_id: sup.id.to_s
-          ]
-        }.to_json, 'Content-Type' => 'application/json')
-        post '/api/slack/action', payload: payload.merge(
-          actions: [
-            { name: 'outcome', type: 'button', value: 'none' }
-          ]
-        ).to_json
-        expect(last_response.status).to eq 204
-        expect(sup.reload.outcome).to eq 'none'
-      end
-    end
-
-    context 'later' do
-      it 'delays reminding by 48 hours' do
-        expect(Faraday).to receive(:post).with('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', {
-          response_type: 'in_channel',
-          thread_ts: '1467321295.000010',
-          text: "Thanks, I'll ask again in a couple of days.",
-          attachments: [
-            text: '',
-            attachment_type: 'default',
-            actions: [
-              { name: 'outcome', text: 'We All Met', type: 'button', value: 'all', style: 'default' },
-              { name: 'outcome', text: 'Some of Us Met', type: 'button', value: 'some', style: 'default' },
-              { name: 'outcome', text: "We Haven't Met Yet", type: 'button', value: 'later', style: 'primary' },
-              { name: 'outcome', text: "We Couldn't Meet", type: 'button', value: 'none', style: 'default' }
-            ],
-            callback_id: sup.id.to_s
-          ]
-        }.to_json, 'Content-Type' => 'application/json')
-
-        post '/api/slack/action', payload: payload.merge(
-          'actions': [
-            { name: 'outcome', type: 'button', value: 'later' }
-          ]
-        ).to_json
-        expect(last_response.status).to eq 204
-        expect(sup.reload.outcome).to eq 'later'
+              { name: 'outcome', type: 'button', value: key }
+            ]
+          ).to_json
+          expect(last_response.status).to eq 204
+          expect(sup.reload.outcome).to eq key
+        end
       end
     end
   end

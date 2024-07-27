@@ -18,12 +18,7 @@ SlackRubyBotServer::Events.configure do |config|
         a[:style] = a[:value] == sup.outcome ? 'primary' : 'default'
       end
 
-      message[:text] = case sup.outcome
-                       when 'later'
-                         "Thanks, I'll ask again in a couple of days."
-                       else
-                         'Thanks for letting me know.'
-                      end
+      message[:text] = Sup::RESPOND_TO_ASK_MESSAGES[sup.outcome]
 
       Faraday.post(payload[:response_url], {
         response_type: 'in_channel',
