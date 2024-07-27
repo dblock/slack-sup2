@@ -150,9 +150,9 @@ class Round
   def solve(remaining_users)
     combination = group(remaining_users)
     Ambit.clear! if ran_at + Round::TIMEOUT.seconds < Time.now.utc
+    Ambit.fail! if meeting_already?(combination)
     Ambit.fail! if same_team?(combination)
     Ambit.fail! if met_recently?(combination)
-    Ambit.fail! if meeting_already?(combination)
     Sup.create!(round: self, channel: channel, users: combination)
     logger.info "   Creating sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
     Ambit.clear! if sups.count * channel.sup_size == channel.users.suppable.count
@@ -192,7 +192,9 @@ class Round
 
   def meeting_already?(users)
     users.any? do |user|
-      sups.where(user_ids: user.id).exists?
+      sups.any? do |sup|
+        sup.user_ids.include? user.id
+      end
     end
   end
 
