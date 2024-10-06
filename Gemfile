@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-ruby '2.7.7'
+ruby '3.3.5'
 
 gem 'ambit'
 gem 'chronic'
@@ -28,6 +28,9 @@ group :development, :test do
   gem 'foreman'
   gem 'rake', '~> 12.3'
   gem 'rubocop'
+  gem 'rubocop-capybara'
+  gem 'rubocop-rake'
+  gem 'rubocop-rspec'
 end
 
 group :development do

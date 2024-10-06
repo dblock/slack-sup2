@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Stats do
   let(:stats) { Stats.new }
+
   it 'reports counts' do
     expect(stats.rounds_count).to eq 0
     expect(stats.sups_count).to eq 0

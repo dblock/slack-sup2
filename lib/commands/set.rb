@@ -504,7 +504,7 @@ module SlackSup
           m['expression']
             .gsub(/^team field/, 'teamfield')
             .gsub(/^api token/, 'apitoken')
-            .split(/[\s]+/, 2)
+            .split(/\s+/, 2)
         end
 
         def channel_data_access_message(user, updated_api = false, updated_token = false)
@@ -529,66 +529,64 @@ module SlackSup
       end
 
       user_command 'unset' do |channel, user, data|
-        if !data.match['expression']
-          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
-          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
-        else
+        if data.match['expression']
           k, = parse_expression(data.match)
           if channel && user
             channel_unset channel, data, user, k
           else
             team_unset data.team, data, user, k
           end
+        else
+          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
+          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
         end
       end
 
       user_command 'set' do |channel, user, data|
-        if !data.match['expression']
-          if channel && user
-            message = [
-              "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
-              "Channel users are _opted #{channel.opt_in_s}_ by default.",
-              "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
-              channel_data_access_message(user),
-              channel.api_url
-            ].compact.join("\n")
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
-            logger.info "SET: #{channel}, user=#{user.user_id}"
-          elsif user
-            team = data.team
-            message = [
-              team.enabled_channels_text,
-              team_data_access_message(team, user),
-              team.api_url
-            ].compact.join("\n")
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
-            logger.info "SET: #{team}, channel=#{data.channel}, user=#{user}"
-          else
-            raise 'expected user'
-          end
-        else
+        if data.match['expression']
           k, v = parse_expression(data.match)
           if channel && user
             channel_set channel, data, user, k, v
           elsif user
             team_set data.team, data, user, k, v
           end
+        elsif channel && user
+          message = [
+            "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
+            "Channel users are _opted #{channel.opt_in_s}_ by default.",
+            "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
+            channel_data_access_message(user),
+            channel.api_url
+          ].compact.join("\n")
+          data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
+          logger.info "SET: #{channel}, user=#{user.user_id}"
+        elsif user
+          team = data.team
+          message = [
+            team.enabled_channels_text,
+            team_data_access_message(team, user),
+            team.api_url
+          ].compact.join("\n")
+          data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
+          logger.info "SET: #{team}, channel=#{data.channel}, user=#{user}"
+        else
+          raise 'expected user'
         end
       rescue SlackSup::Error => e
         data.team.slack_client.chat_postMessage(channel: data.channel, text: e.message)
       end
 
       user_command 'rotate' do |channel, user, data|
-        if !data.match['expression']
-          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
-          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
-        else
+        if data.match['expression']
           k, = parse_expression(data.match)
           if channel && user
             channel_rotate channel, data, user, k
           elsif user
             team_rotate data.team, data, user, k
           end
+        else
+          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
+          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
         end
       end
     end

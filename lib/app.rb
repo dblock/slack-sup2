@@ -44,7 +44,7 @@ module SlackSup
       end
     end
 
-    def invoke_with_criteria!(obj, &_block)
+    def invoke_with_criteria!(obj, &)
       obj.each do |obj|
         yield obj
       rescue StandardError => e
@@ -53,8 +53,8 @@ module SlackSup
       end
     end
 
-    def invoke!(&_block)
-      invoke_with_criteria!(Channel.enabled, &_block)
+    def invoke!(&)
+      invoke_with_criteria!(Channel.enabled, &)
     end
 
     def ask!

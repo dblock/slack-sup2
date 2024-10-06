@@ -10,7 +10,7 @@ module SlackSup
           channel_ids = []
           op = nil
 
-          parts = data.match['expression'].split(/[\s]+/) if data.match['expression']
+          parts = data.match['expression'].split(/\s+/) if data.match['expression']
           parts&.each do |part|
             if part == 'in' || part == 'out'
               op = part
@@ -45,19 +45,19 @@ module SlackSup
             myself = (user_id == data.user)
 
             channel_ids.each do |channel_id|
-              channel = data.team.channels.where(channel_id: channel_id).first
+              channel = data.team.channels.where(channel_id:).first
               raise SlackSup::Error, "Sorry, I can't find an existing S'Up channel <##{channel_id}>." unless channel
 
-              user = channel.users.where(user_id: user_id).first
+              user = channel.users.where(user_id:).first
               if user && op
                 case op
-                when 'in' then
+                when 'in'
                   unless user.opted_in
                     updated = true
                     user.update_attributes!(opted_in: true)
                   end
                   opted_in << channel.slack_mention
-                when 'out' then
+                when 'out'
                   if user.opted_in
                     updated = true
                     user.update_attributes!(opted_in: false)

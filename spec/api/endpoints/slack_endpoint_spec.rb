@@ -69,8 +69,7 @@ describe Api::Endpoints::SlackEndpoint do
   end
 
   it 'requires payload with actions' do
-    post '/api/slack/action', payload: {
-    }.to_json
+    post '/api/slack/action', payload: {}.to_json
     expect(last_response.status).to eq 400
     expect(JSON.parse(last_response.body)['type']).to eq 'param_error'
   end

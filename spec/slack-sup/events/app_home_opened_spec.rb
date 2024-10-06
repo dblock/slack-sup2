@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'events/app_home_opened' do
-  include_context :event
+  include_context 'event'
 
   let(:event) do
     {
@@ -47,7 +47,8 @@ describe 'events/app_home_opened' do
   end
 
   context 'with some channels' do
-    let!(:channel) { Fabricate(:channel, team: team) }
+    let!(:channel) { Fabricate(:channel, team:) }
+
     it 'welcomes user' do
       expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
         channel: 'DM', text: /Hi there! I'm your team's S'Up bot. I connect your teammates in 1 channel/

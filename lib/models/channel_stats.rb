@@ -2,13 +2,7 @@ class ChannelStats
   include ActiveModel::Model
   include SlackSup::Models::Mixins::Pluralize
 
-  attr_accessor :rounds_count
-  attr_accessor :sups_count
-  attr_accessor :users_in_sups_count
-  attr_accessor :users_opted_in_count
-  attr_accessor :users_count
-  attr_accessor :outcomes
-  attr_accessor :channel
+  attr_accessor :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :channel
 
   def initialize(channel)
     @channel = channel
@@ -51,10 +45,10 @@ class ChannelStats
                 end
     if sups_count > 0
       messages << "Facilitated #{pluralize(sups_count, 'S\'Up')} " \
-        "in #{pluralize(rounds_count, 'round')} " \
-        "for #{pluralize(users_in_sups_count, 'user')} " \
-        "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
-        "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
+                  "in #{pluralize(rounds_count, 'round')} " \
+                  "for #{pluralize(users_in_sups_count, 'user')} " \
+                  "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
+                  "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
     end
     messages.join("\n")
   end

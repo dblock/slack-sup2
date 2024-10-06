@@ -3,7 +3,7 @@ SlackRubyBotServer::Events.configure do |config|
 
   def parse_team_event(event)
     team = Team.where(team_id: event[:event][:team]).first || raise("Cannot find team with ID #{event[:event][:team]}.")
-    data = Slack::Messages::Message.new(event[:event]).merge(team: team)
+    data = Slack::Messages::Message.new(event[:event]).merge(team:)
     return nil unless data.user == data.team.bot_user_id
 
     data
@@ -11,7 +11,7 @@ SlackRubyBotServer::Events.configure do |config|
 
   def parse_user_event(event)
     team = Team.where(team_id: event[:team_id]).first || raise("Cannot find team with ID #{event[:team_id]}.")
-    Slack::Messages::Message.new(event[:event]).merge(team: team)
+    Slack::Messages::Message.new(event[:event]).merge(team:)
   end
 
   config.on :event, 'event_callback', 'member_joined_channel' do |event|
@@ -28,7 +28,7 @@ SlackRubyBotServer::Events.configure do |config|
       "Type `#{data.team.bot_name} help` for instructions and `#{data.team.bot_name} stats` for S'Up info."
     ].join(' ')
 
-    data.team.slack_client.chat_postMessage(channel: data.channel, text: text)
+    data.team.slack_client.chat_postMessage(channel: data.channel, text:)
 
     { ok: true }
   end
@@ -62,7 +62,7 @@ SlackRubyBotServer::Events.configure do |config|
     ].join(' ')
 
     Api::Middleware.logger.info "#{data.team.name}: user opened bot home ##{data.channel}."
-    data.team.slack_client.chat_postMessage(channel: data.channel, text: text)
+    data.team.slack_client.chat_postMessage(channel: data.channel, text:)
 
     { ok: true }
   end

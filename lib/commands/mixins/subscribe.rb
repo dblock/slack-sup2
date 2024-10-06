@@ -5,7 +5,7 @@ module SlackSup
         extend ActiveSupport::Concern
 
         module ClassMethods
-          def subscribe_command(*values, &_block)
+          def subscribe_command(*values, &)
             mention(*values) do |data|
               next if data.user == data.team.bot_user_id
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SlackSup::Commands::Rounds do
   context 'team' do
-    include_context :team
+    include_context 'team'
 
     it 'requires a subscription' do
       expect(message: '@sup rounds').to respond_with_slack_message(team.subscribe_text)
@@ -10,22 +10,24 @@ describe SlackSup::Commands::Rounds do
   end
 
   context 'dm' do
-    include_context :subscribed_team
+    include_context 'subscribed team'
 
     it 'empty stats' do
       expect(message: '@sup rounds', channel: 'DM').to respond_with_slack_message(
         "Team S'Up facilitated 0 rounds in 0 channels."
       )
     end
+
     context 'with outcomes' do
-      let!(:channel1) { Fabricate(:channel, team: team) }
+      let!(:channel1) { Fabricate(:channel, team:) }
       let!(:channel1_user1) { Fabricate(:user, channel: channel1) }
       let!(:channel1_user2) { Fabricate(:user, channel: channel1) }
       let!(:channel1_user3) { Fabricate(:user, channel: channel1) }
-      let!(:channel2) { Fabricate(:channel, team: team) }
+      let!(:channel2) { Fabricate(:channel, team:) }
       let!(:channel2_user1) { Fabricate(:user, channel: channel2) }
       let!(:channel2_user2) { Fabricate(:user, channel: channel2) }
       let!(:channel2_user3) { Fabricate(:user, channel: channel2) }
+
       before do
         allow_any_instance_of(Channel).to receive(:sync!)
         allow_any_instance_of(Channel).to receive(:inform!)
@@ -41,6 +43,7 @@ describe SlackSup::Commands::Rounds do
           channel2.sup!
         end
       end
+
       it 'reports counts' do
         Timecop.travel(Time.now + 731.days)
         expect(message: '@sup rounds 4', channel: 'DM').to respond_with_slack_message([
@@ -55,7 +58,7 @@ describe SlackSup::Commands::Rounds do
   end
 
   context 'channel' do
-    include_context :channel
+    include_context 'channel'
 
     before do
       allow_any_instance_of(Slack::Web::Client).to receive(:conversations_info)
@@ -66,10 +69,12 @@ describe SlackSup::Commands::Rounds do
         "Channel S'Up facilitated 0 rounds."
       )
     end
+
     context 'with outcomes' do
-      let!(:user1) { Fabricate(:user, channel: channel) }
-      let!(:user2) { Fabricate(:user, channel: channel) }
-      let!(:user3) { Fabricate(:user, channel: channel) }
+      let!(:user1) { Fabricate(:user, channel:) }
+      let!(:user2) { Fabricate(:user, channel:) }
+      let!(:user3) { Fabricate(:user, channel:) }
+
       before do
         allow(channel).to receive(:sync!)
         allow(channel).to receive(:inform!)
@@ -82,6 +87,7 @@ describe SlackSup::Commands::Rounds do
           channel.sup!
         end
       end
+
       it 'reports counts' do
         Timecop.travel(Time.now + 731.days)
         expect(message: '@sup rounds 2').to respond_with_slack_message(
@@ -91,14 +97,16 @@ describe SlackSup::Commands::Rounds do
         )
       end
     end
+
     context 'with opt outs and misses' do
-      let!(:user1) { Fabricate(:user, channel: channel) }
-      let!(:user2) { Fabricate(:user, channel: channel) }
-      let!(:user3) { Fabricate(:user, channel: channel) }
-      let!(:user4) { Fabricate(:user, channel: channel, opted_in: false) }
-      let!(:user5) { Fabricate(:user, channel: channel, enabled: false) }
-      let!(:user6) { Fabricate(:user, channel: channel) }
-      let!(:user7) { Fabricate(:user, channel: channel) }
+      let!(:user1) { Fabricate(:user, channel:) }
+      let!(:user2) { Fabricate(:user, channel:) }
+      let!(:user3) { Fabricate(:user, channel:) }
+      let!(:user4) { Fabricate(:user, channel:, opted_in: false) }
+      let!(:user5) { Fabricate(:user, channel:, enabled: false) }
+      let!(:user6) { Fabricate(:user, channel:) }
+      let!(:user7) { Fabricate(:user, channel:) }
+
       before do
         channel.update_attributes!(sup_odd: false)
         allow(channel).to receive(:sync!)
@@ -106,6 +114,7 @@ describe SlackSup::Commands::Rounds do
         allow_any_instance_of(Sup).to receive(:dm!)
         channel.sup!
       end
+
       it 'reports counts' do
         expect(message: '@sup rounds 2').to respond_with_slack_message(
           "Channel S'Up facilitated 1 round.\n" \

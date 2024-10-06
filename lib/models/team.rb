@@ -75,7 +75,7 @@ class Team
   end
 
   def slack_client
-    @client ||= Slack::Web::Client.new(token: token)
+    @client ||= Slack::Web::Client.new(token:)
   end
 
   def slack_client_with_activated_user_access
@@ -193,8 +193,8 @@ class Team
     channel_info = slack_client.conversations_info(channel: channel_id)
     return nil if channel_info && (channel_info.channel.is_im || channel_info.channel.is_mpim)
 
-    channel = channels.where(channel_id: channel_id).first
-    channel ||= channels.create!(channel_id: channel_id, enabled: true, sync: true, inviter_id: user_id)
+    channel = channels.where(channel_id:).first
+    channel ||= channels.create!(channel_id:, enabled: true, sync: true, inviter_id: user_id)
     channel
   end
 
@@ -204,14 +204,14 @@ class Team
   end
 
   def join_channel!(channel_id, inviter_id)
-    channel = channels.where(channel_id: channel_id).first
-    channel ||= channels.create!(channel_id: channel_id)
-    channel.update_attributes!(enabled: true, sync: true, inviter_id: inviter_id)
+    channel = channels.where(channel_id:).first
+    channel ||= channels.create!(channel_id:)
+    channel.update_attributes!(enabled: true, sync: true, inviter_id:)
     channel
   end
 
   def leave_channel!(channel_id)
-    channel = channels.where(channel_id: channel_id).first
+    channel = channels.where(channel_id:).first
     channel&.update_attributes!(enabled: false, sync: false)
     channel || false
   end
@@ -249,13 +249,14 @@ class Team
     'Thanks for being a customer!'.freeze
 
   def subscribed!
-    return unless subscribed? && subscribed_changed?
+    return unless subscribed? && (subscribed_changed? || saved_change_to_subscribed?)
 
     inform! SUBSCRIBED_TEXT
   end
 
   def activated!
     return unless active? && activated_user_id && bot_user_id
-    return unless active_changed? || activated_user_id_changed?
+
+    nil unless (active_changed? || saved_change_to_active?) || (activated_user_id_changed? || saved_change_to_activated_user_id?)
   end
 end

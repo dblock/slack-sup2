@@ -2,15 +2,7 @@ class TeamStats
   include ActiveModel::Model
   include SlackSup::Models::Mixins::Pluralize
 
-  attr_accessor :channels_count
-  attr_accessor :channels_enabled_count
-  attr_accessor :rounds_count
-  attr_accessor :sups_count
-  attr_accessor :users_in_sups_count
-  attr_accessor :users_opted_in_count
-  attr_accessor :users_count
-  attr_accessor :outcomes
-  attr_accessor :team
+  attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :team
 
   def initialize(team)
     @team = team
@@ -54,10 +46,10 @@ class TeamStats
     messages << "Team S'Up has #{users_opted_in_count_percent}% (#{users_opted_in_count}/#{users_count}) of users opted in." if users_count > 0 && users_opted_in_count > 0
     if sups_count > 0
       messages << "Facilitated #{pluralize(sups_count, 'S\'Up')} " \
-        "in #{pluralize(rounds_count, 'round')} " \
-        "for #{pluralize(users_count, 'user')} " \
-        "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
-        "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
+                  "in #{pluralize(rounds_count, 'round')} " \
+                  "for #{pluralize(users_count, 'user')} " \
+                  "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
+                  "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
     end
     messages.join("\n")
   end

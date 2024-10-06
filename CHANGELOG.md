@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2024/10/05: Upgraded to Ruby 3.3.5 - [@dblock](https://github.com/dblock).
 * 2024/07/27: Only send reminders after S'Up time of day - [@dblock](https://github.com/dblock).
 * 2024/05/02: Fix incorrect list of admins listed in `set` errors - [@dblock](https://github.com/dblock).
 * 2023/12/01: Added `promote` and `demote @someone` - [@dblock](https://github.com/dblock).

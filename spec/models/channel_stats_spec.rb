@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Stats do
   let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_followup_wday: Date::THURSDAY) }
   let(:stats) { ChannelStats.new(channel) }
+
   it 'reports counts' do
     expect(stats.rounds_count).to eq 0
     expect(stats.sups_count).to eq 0
@@ -18,8 +19,10 @@ describe Stats do
       "There's only 1 user in this channel. Invite some more users to this channel to get started!"
     ].join("\n")
   end
+
   context 'with one user' do
-    let!(:user1) { Fabricate(:user, channel: channel) }
+    let!(:user1) { Fabricate(:user, channel:) }
+
     it 'reports stats' do
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
@@ -27,9 +30,11 @@ describe Stats do
       ].join("\n")
     end
   end
+
   context 'with two users' do
-    let!(:user1) { Fabricate(:user, channel: channel) }
-    let!(:user2) { Fabricate(:user, channel: channel) }
+    let!(:user1) { Fabricate(:user, channel:) }
+    let!(:user2) { Fabricate(:user, channel:) }
+
     it 'reports stats' do
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
@@ -37,10 +42,12 @@ describe Stats do
       ].join("\n")
     end
   end
+
   context 'with three user' do
-    let!(:user1) { Fabricate(:user, channel: channel) }
-    let!(:user2) { Fabricate(:user, channel: channel) }
-    let!(:user3) { Fabricate(:user, channel: channel) }
+    let!(:user1) { Fabricate(:user, channel:) }
+    let!(:user2) { Fabricate(:user, channel:) }
+    let!(:user3) { Fabricate(:user, channel:) }
+
     it 'reports stats' do
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
@@ -48,10 +55,12 @@ describe Stats do
       ].join("\n")
     end
   end
+
   context 'with three users and one opted out' do
-    let!(:user1) { Fabricate(:user, channel: channel) }
-    let!(:user2) { Fabricate(:user, channel: channel) }
-    let!(:user3) { Fabricate(:user, channel: channel, opted_in: false) }
+    let!(:user1) { Fabricate(:user, channel:) }
+    let!(:user2) { Fabricate(:user, channel:) }
+    let!(:user3) { Fabricate(:user, channel:, opted_in: false) }
+
     it 'reports stats' do
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
@@ -59,14 +68,16 @@ describe Stats do
       ].join("\n")
     end
   end
+
   context 'with outcomes' do
-    let!(:user1) { Fabricate(:user, channel: channel) }
-    let!(:user2) { Fabricate(:user, channel: channel) }
-    let!(:user3) { Fabricate(:user, channel: channel) }
+    let!(:user1) { Fabricate(:user, channel:) }
+    let!(:user2) { Fabricate(:user, channel:) }
+    let!(:user3) { Fabricate(:user, channel:) }
     let!(:channel2) { Fabricate(:channel, team: channel.team) }
     let!(:channel2_user1) { Fabricate(:user, channel: channel2) }
     let!(:channel2_user2) { Fabricate(:user, channel: channel2) }
     let!(:channel2_user3) { Fabricate(:user, channel: channel2) }
+
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
       allow_any_instance_of(Channel).to receive(:inform!)
@@ -78,6 +89,7 @@ describe Stats do
       end
       Sup.first.update_attributes!(outcome: 'all')
     end
+
     it 'reports counts' do
       expect(stats.rounds_count).to eq 2
       expect(stats.sups_count).to eq 2

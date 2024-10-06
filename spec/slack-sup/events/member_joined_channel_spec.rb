@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'events/member_joined_channel' do
-  include_context :event
+  include_context 'event'
 
   let(:event) do
     {
@@ -28,7 +28,7 @@ describe 'events/member_joined_channel' do
   end
 
   context 'when the bot is already a member of a channel' do
-    let!(:channel) { Fabricate(:channel, team: team, channel_id: 'channel_id') }
+    let!(:channel) { Fabricate(:channel, team:, channel_id: 'channel_id') }
 
     it 'welcomes the bot again' do
       expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
@@ -39,7 +39,7 @@ describe 'events/member_joined_channel' do
         post '/api/slack/event', event_envelope
         expect(last_response.status).to eq 201
         expect(JSON.parse(last_response.body)).to eq('ok' => true)
-      end.to_not change(Channel, :count)
+      end.not_to change(Channel, :count)
     end
   end
 end

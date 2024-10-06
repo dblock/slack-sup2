@@ -2,11 +2,12 @@ require 'spec_helper'
 
 describe SlackSup::Commands::GCal do
   context 'dm' do
-    include_context :subscribed_team
+    include_context 'subscribed team'
 
     before do
       ENV['GOOGLE_API_CLIENT_ID'] = 'client-id'
     end
+
     after do
       ENV.delete('GOOGLE_API_CLIENT_ID')
     end
@@ -20,13 +21,14 @@ describe SlackSup::Commands::GCal do
 
   context 'team' do
     let!(:team) { Fabricate(:team) }
+
     it 'requires a subscription' do
       expect(message: '@sup gcal').to respond_with_slack_message(team.subscribe_text)
     end
   end
 
   context 'channel' do
-    include_context :channel
+    include_context 'channel'
 
     before do
       allow(channel).to receive(:inform!)
@@ -38,13 +40,16 @@ describe SlackSup::Commands::GCal do
           'Missing GOOGLE_API_CLIENT_ID.'
         )
       end
+
       context 'with GOOGLE_API_CLIENT_ID' do
         before do
           ENV['GOOGLE_API_CLIENT_ID'] = 'client-id'
         end
+
         after do
           ENV.delete('GOOGLE_API_CLIENT_ID')
         end
+
         context 'outside of a sup' do
           it 'requires a sup DM' do
             expect(message: '@sup gcal', channel: 'invalid').to respond_with_slack_message(
@@ -52,17 +57,21 @@ describe SlackSup::Commands::GCal do
             )
           end
         end
+
         context 'inside a sup' do
           before do
             allow_any_instance_of(Channel).to receive(:inform!)
           end
-          let!(:sup) { Fabricate(:sup, channel: channel, conversation_id: 'sup-channel-id') }
+
+          let!(:sup) { Fabricate(:sup, channel:, conversation_id: 'sup-channel-id') }
           let(:monday) { DateTime.parse('2017/1/2 8:00 AM EST').utc }
+
           it 'requires a date/time' do
             expect(message: '@sup gcal', channel: 'sup-channel-id').to respond_with_slack_message(
               'Please specify a date/time, eg. `@sup gcal tomorrow 5pm`.'
             )
           end
+
           it 'creates a link' do
             Timecop.travel(monday).freeze do
               Chronic.time_class = channel.sup_tzone

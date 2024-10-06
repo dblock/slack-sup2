@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'events/member_left_channel' do
-  include_context :event
+  include_context 'event'
 
   let(:event) do
     {
@@ -22,7 +22,7 @@ describe 'events/member_left_channel' do
   end
 
   context 'with a channel' do
-    let!(:channel) { Fabricate(:channel, team: team, channel_id: event[:channel]) }
+    let!(:channel) { Fabricate(:channel, team:, channel_id: event[:channel]) }
 
     it 'removes bot from channel' do
       expect(channel.enabled).to be true

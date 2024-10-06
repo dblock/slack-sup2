@@ -128,8 +128,8 @@ class Channel
   end
 
   def find_or_create_user!(user_id)
-    user = users.where(user_id: user_id).first
-    user || users.create!(user_id: user_id, sync: true, opted_in: opt_in)
+    user = users.where(user_id:).first
+    user || users.create!(user_id:, sync: true, opted_in: opt_in)
   end
 
   def sync!
@@ -138,7 +138,7 @@ class Channel
     slack_client.conversations_members(channel: channel_id) do |page|
       page.members.each do |user_id|
         user_info = slack_client.users_info(user: user_id).user
-        existing_user = users.where(user_id: user_id).first
+        existing_user = users.where(user_id:).first
         if User.suppable_user?(user_info)
           if existing_user
             existing_user.enabled = true
@@ -146,7 +146,7 @@ class Channel
             logger.info "Team #{team}: #{existing_user} updated in #{channel_id}."
             updated_user_ids << existing_user.id
           else
-            new_user = users.new(user_id: user_id, opted_in: opt_in)
+            new_user = users.new(user_id:, opted_in: opt_in)
             new_user.update_info_attributes!(user_info)
             logger.info "Team #{team}: #{new_user} added to #{channel_id}."
             updated_user_ids << new_user.id
@@ -314,7 +314,7 @@ class Channel
   private
 
   def validate_team_field_label
-    return unless team_field_label && team_field_label_changed?
+    return unless team_field_label && (team_field_label_changed? || saved_change_to_team_field_label?)
 
     profile_fields = team.slack_client_with_activated_user_access.team_profile_get.profile.fields
     label = profile_fields.detect { |field| field.label.casecmp(team_field_label.downcase).zero? }
@@ -357,22 +357,22 @@ class Channel
   def set_sup_wday_to_tomorrow
     if sup_wday == -1
       tomorrow_wday = tomorrow.wday
-      case tomorrow_wday
-      when Date::SATURDAY, Date::SUNDAY
-        self.sup_wday = Date::MONDAY
-      else
-        self.sup_wday = tomorrow_wday
-      end
+      self.sup_wday = case tomorrow_wday
+                      when Date::SATURDAY, Date::SUNDAY
+                        Date::MONDAY
+                      else
+                        tomorrow_wday
+                      end
     end
     if sup_followup_wday == -1
-      case sup_wday
-      when Date::WEDNESDAY
-        self.sup_followup_wday = Date::FRIDAY
-      when Date::THURSDAY, Date::FRIDAY
-        self.sup_followup_wday = Date::TUESDAY
-      else
-        self.sup_followup_wday = Date::THURSDAY
-      end
+      self.sup_followup_wday = case sup_wday
+                               when Date::WEDNESDAY
+                                 Date::FRIDAY
+                               when Date::THURSDAY, Date::FRIDAY
+                                 Date::TUESDAY
+                               else
+                                 Date::THURSDAY
+                               end
     end
   end
 end

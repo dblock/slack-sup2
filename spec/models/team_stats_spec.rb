@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe Stats do
-  include_context :subscribed_team
+  include_context 'subscribed team'
   let(:stats) { TeamStats.new(team) }
+
   it 'reports counts' do
     expect(stats.rounds_count).to eq 0
     expect(stats.sups_count).to eq 0
@@ -14,14 +15,17 @@ describe Stats do
     expect(stats.team).to eq team
     expect(stats.to_s).to eq "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
   end
-  context 'in a channel with no users' do
-    include_context :subscribed_team
 
-    let!(:channel1) { Fabricate(:channel, team: team) }
+  context 'in a channel with no users' do
+    include_context 'subscribed team'
+
+    let!(:channel1) { Fabricate(:channel, team:) }
+
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
       allow_any_instance_of(Channel).to receive(:inform!)
     end
+
     it 'reports counts' do
       expect(stats.rounds_count).to eq 0
       expect(stats.sups_count).to eq 0
@@ -36,14 +40,15 @@ describe Stats do
       ].join("\n")
     end
   end
-  context 'with outcomes' do
-    include_context :subscribed_team
 
-    let!(:channel1) { Fabricate(:channel, team: team) }
+  context 'with outcomes' do
+    include_context 'subscribed team'
+
+    let!(:channel1) { Fabricate(:channel, team:) }
     let!(:channel1_user1) { Fabricate(:user, channel: channel1) }
     let!(:channel1_user2) { Fabricate(:user, channel: channel1, user_id: 'slack1') }
     let!(:channel1_user3) { Fabricate(:user, channel: channel1) }
-    let!(:channel2) { Fabricate(:channel, team: team) }
+    let!(:channel2) { Fabricate(:channel, team:) }
     let!(:channel2_user1) { Fabricate(:user, channel: channel2) }
     let!(:channel2_user2) { Fabricate(:user, channel: channel2, user_id: 'slack1') }
     let!(:channel2_user3) { Fabricate(:user, channel: channel2, opted_in: false) }
@@ -51,6 +56,7 @@ describe Stats do
     let!(:channel3_user1) { Fabricate(:user, channel: channel3) }
     let!(:channel3_user2) { Fabricate(:user, channel: channel3, user_id: 'slack1') }
     let!(:channel3_user3) { Fabricate(:user, channel: channel3) }
+
     before do
       allow_any_instance_of(Channel).to receive(:sync!)
       allow_any_instance_of(Channel).to receive(:inform!)
@@ -63,6 +69,7 @@ describe Stats do
       end
       Sup.first.update_attributes!(outcome: 'all')
     end
+
     it 'reports counts' do
       expect(stats.rounds_count).to eq 4
       expect(stats.sups_count).to eq 4

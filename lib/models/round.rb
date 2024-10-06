@@ -153,7 +153,7 @@ class Round
     Ambit.fail! if meeting_already?(combination)
     Ambit.fail! if same_team?(combination)
     Ambit.fail! if met_recently?(combination)
-    Sup.create!(round: self, channel: channel, users: combination)
+    Sup.create!(round: self, channel:, users: combination)
     logger.info "   Creating sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
     Ambit.clear! if sups.count * channel.sup_size == channel.users.suppable.count
     solve(remaining_users - combination)
@@ -176,7 +176,7 @@ class Round
           !met_recently?(remaining_users)
 
       # pair remaining
-      Sup.create!(round: self, channel: channel, users: remaining_users)
+      Sup.create!(round: self, channel:, users: remaining_users)
     end
   end
 

@@ -1,4 +1,4 @@
-RSpec.shared_context :event do
+RSpec.shared_context 'event' do
   include Rack::Test::Methods
 
   def app
@@ -77,7 +77,7 @@ RSpec::Matchers.define :respond_with_slack_message do |expected|
     end
 
     matcher = have_received(:chat_postMessage).once
-    matcher = matcher.with(hash_including(channel: channel, text: expected)) if channel && expected
+    matcher = matcher.with(hash_including(channel:, text: expected)) if channel && expected
 
     expect(team.slack_client).to matcher
 

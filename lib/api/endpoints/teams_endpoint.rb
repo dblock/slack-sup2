@@ -44,8 +44,8 @@ module Api
           raise 'Missing SLACK_CLIENT_ID or SLACK_CLIENT_SECRET.' unless ENV.key?('SLACK_CLIENT_ID') && ENV.key?('SLACK_CLIENT_SECRET')
 
           options = {
-            client_id: ENV['SLACK_CLIENT_ID'],
-            client_secret: ENV['SLACK_CLIENT_SECRET'],
+            client_id: ENV.fetch('SLACK_CLIENT_ID', nil),
+            client_secret: ENV.fetch('SLACK_CLIENT_SECRET', nil),
             code: params[:code]
           }
 
@@ -73,19 +73,19 @@ module Api
             raise 'invalid OAuth version'
           end
 
-          team = Team.where(token: token).first
-          team ||= Team.where(team_id: team_id, oauth_version: oauth_version).first
-          team ||= Team.where(team_id: team_id).first
+          team = Team.where(token:).first
+          team ||= Team.where(team_id:, oauth_version:).first
+          team ||= Team.where(team_id:).first
 
           if team
             team.ping_if_active!
 
             team.update_attributes!(
-              oauth_version: oauth_version,
-              oauth_scope: oauth_scope,
+              oauth_version:,
+              oauth_scope:,
               activated_user_id: user_id,
               activated_user_access_token: access_token,
-              bot_user_id: bot_user_id
+              bot_user_id:
             )
 
             raise "Team #{team.name} is already registered." if team.active?
@@ -93,14 +93,14 @@ module Api
             team.activate!(token)
           else
             team = Team.create!(
-              token: token,
-              oauth_version: oauth_version,
-              oauth_scope: oauth_scope,
-              team_id: team_id,
+              token:,
+              oauth_version:,
+              oauth_scope:,
+              team_id:,
               name: team_name,
               activated_user_id: user_id,
               activated_user_access_token: access_token,
-              bot_user_id: bot_user_id
+              bot_user_id:
             )
           end
 
