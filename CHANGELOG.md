@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2024/10/26: Added `data` in DMs and channels - [@dblock](https://github.com/dblock).
 * 2024/10/26: Added collections of missed and matched users to rounds API - [@dblock](https://github.com/dblock).
 * 2024/10/26: Added captain's username to sups API - [@dblock](https://github.com/dblock).
 * 2024/10/26: Added round stats to API - [@dblock](https://github.com/dblock).

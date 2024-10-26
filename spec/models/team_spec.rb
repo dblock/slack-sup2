@@ -359,4 +359,41 @@ describe Team do
       expect(team.stats_s).to eq "Team S'Up is not in any channels. Invite S'Up to a channel with some users to get started!"
     end
   end
+
+  describe '#export' do
+    let(:team) { Fabricate(:team) }
+
+    include_context 'uses temp dir'
+
+    before do
+      team.export!(tmp)
+    end
+
+    %w[channels rounds stats sups team users].each do |csv|
+      it "creates #{csv}.csv" do
+        expect(File.exist?(File.join(tmp, "#{csv}.csv"))).to be true
+      end
+    end
+
+    context 'team.csv' do
+      let(:csv) { CSV.read(File.join(tmp, 'team.csv'), headers: true) }
+
+      it 'generates teams.csv' do
+        expect(csv.headers).to eq(%w[id team_id name domain active subscribed subscribed_at created_at updated_at])
+        expect(csv[0]['team_id']).to eq(team.team_id)
+      end
+    end
+  end
+
+  describe '#export_zip!' do
+    let(:team) { Fabricate(:team) }
+    let!(:zip) { team.export_zip!(tmp) }
+
+    include_context 'uses temp dir'
+
+    it 'exists' do
+      expect(File.exist?(zip)).to be true
+      expect(File.size(zip)).not_to eq 0
+    end
+  end
 end

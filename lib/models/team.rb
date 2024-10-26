@@ -1,5 +1,6 @@
 class Team
   include SlackSup::Models::Mixins::ShortLivedToken
+  include SlackSup::Models::Mixins::Export
 
   field :stripe_customer_id, type: String
   field :subscribed, type: Boolean, default: false
@@ -22,6 +23,10 @@ class Team
 
   def sups
     Sup.where(:channel_id.in => channels.distinct(:_id))
+  end
+
+  def users
+    User.where(:channel_id.in => channels.distinct(:_id))
   end
 
   def tags
@@ -232,6 +237,22 @@ class Team
 
   def stats_s
     stats.to_s
+  end
+
+  def export_zip!(root)
+    super(root, team_id)
+  end
+
+  def export!(root)
+    super
+    stats.export!(root, 'stats', Api::Presenters::TeamStatsPresenter)
+    super(root, 'channels', Api::Presenters::ChannelPresenter, channels)
+    super(root, 'users', Api::Presenters::UserPresenter, users)
+    super(root, 'rounds', Api::Presenters::RoundPresenter, rounds)
+    super(root, 'sups', Api::Presenters::SupPresenter, sups)
+    channels.each do |channel|
+      channel.export!(File.join(root, File.join('channels', channel.channel_id)))
+    end
   end
 
   private

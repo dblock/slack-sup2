@@ -1,6 +1,7 @@
 class User
   include Mongoid::Document
   include Mongoid::Timestamps
+  include SlackSup::Models::Mixins::Export
 
   field :sync, type: Boolean, default: false
   field :last_sync_at, type: DateTime

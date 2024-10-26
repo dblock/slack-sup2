@@ -1,6 +1,7 @@
 class TeamStats
   include ActiveModel::Model
   include SlackSup::Models::Mixins::Pluralize
+  include SlackSup::Models::Mixins::Export
 
   attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :team
 

@@ -3,6 +3,7 @@ class Channel
   include Mongoid::Timestamps
   include SlackSup::Models::Mixins::Pluralize
   include SlackSup::Models::Mixins::ShortLivedToken
+  include SlackSup::Models::Mixins::Export
 
   field :channel_id, type: String
   field :inviter_id, type: String
@@ -14,6 +15,7 @@ class Channel
   # enable API for this channel
   field :api, type: Boolean, default: false
   field :api_token, type: String
+  field :token, type: String, default: -> { SecureRandom.hex }
 
   # sup size
   field :sup_size, type: Integer, default: 3
@@ -83,10 +85,6 @@ class Channel
 
   def slack_client
     team.slack_client
-  end
-
-  def token
-    team.token
   end
 
   def info
@@ -309,6 +307,21 @@ class Channel
 
   def inform!(message)
     slack_client.chat_postMessage(text: message, channel: channel_id, as_user: true)
+  end
+
+  def export_zip!(root)
+    super(root, channel_id)
+  end
+
+  def export!(root)
+    super
+    stats.export!(root, 'stats', Api::Presenters::ChannelStatsPresenter)
+    super(root, 'users', Api::Presenters::UserPresenter, users)
+    super(root, 'rounds', Api::Presenters::RoundPresenter, rounds)
+    super(root, 'sups', Api::Presenters::SupPresenter, sups)
+    rounds.each do |round|
+      round.export!(File.join(root, File.join('rounds', round.ran_at&.strftime('%F') || round.id)))
+    end
   end
 
   private

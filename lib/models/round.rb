@@ -2,6 +2,7 @@
 class Round
   include Mongoid::Document
   include Mongoid::Timestamps
+  include SlackSup::Models::Mixins::Export
 
   TIMEOUT = 60
 
@@ -88,6 +89,11 @@ class Round
 
   def stats
     @stats ||= RoundStats.new(self)
+  end
+
+  def export!(root)
+    super
+    super(root, 'sups', Api::Presenters::SupPresenter, sups)
   end
 
   def matched_users

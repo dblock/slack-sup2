@@ -12,6 +12,7 @@ require_relative 'commands/gcal'
 require_relative 'commands/sync'
 require_relative 'commands/promote'
 require_relative 'commands/demote'
+require_relative 'commands/data'
 
 SlackRubyBotServer::Events::AppMentions.configure do |config|
   config.handlers = [
@@ -27,6 +28,7 @@ SlackRubyBotServer::Events::AppMentions.configure do |config|
     SlackSup::Commands::GCal,
     SlackSup::Commands::Sync,
     SlackSup::Commands::Promote,
-    SlackSup::Commands::Demote
+    SlackSup::Commands::Demote,
+    SlackSup::Commands::Data
   ]
 end

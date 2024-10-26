@@ -1,9 +1,9 @@
 module Api
   module Helpers
     module AuthHelpers
-      def authorize_short_lived_token!(channel)
-        jwt_token = headers['X-Access-Token']
-        error!('Access Denied', 401) unless channel.short_lived_token_valid?(jwt_token)
+      def authorize_short_lived_token!(resource)
+        jwt_token = headers['X-Access-Token'] || params['access_token']
+        error!('Access Denied', 401) unless resource.short_lived_token_valid?(jwt_token)
       end
 
       def authorize_channel!(channel)
