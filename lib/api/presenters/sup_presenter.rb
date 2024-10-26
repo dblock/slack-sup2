@@ -9,6 +9,7 @@ module Api
       property :outcome, type: String, desc: "S'up outcome."
       property :created_at, type: DateTime, desc: "Date/time when the S'Up was created."
       property :updated_at, type: DateTime, desc: "Date/time when the S'Up was updated."
+      property :captain_user_name, type: String, desc: 'Captain user name.'
 
       collection :users, extend: UserPresenter, as: :users, embedded: true
 

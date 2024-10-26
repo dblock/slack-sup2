@@ -12,6 +12,10 @@ class Sup
 
   belongs_to :captain, class_name: 'User', inverse_of: nil, optional: true
 
+  def captain_user_name
+    captain&.user_name
+  end
+
   index(round: 1, user_ids: 1)
 
   PLEASE_SUP_MESSAGE =
