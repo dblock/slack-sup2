@@ -90,6 +90,14 @@ class Round
     @stats ||= RoundStats.new(self)
   end
 
+  def matched_users
+    User.find(sups.distinct(:user_ids))
+  end
+
+  def missed_users
+    channel.users - matched_users
+  end
+
   private
 
   def run!

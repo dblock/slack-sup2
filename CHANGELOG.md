@@ -1,6 +1,7 @@
 ### Changelog
 
-* 2024/10/26: Added captain's username to S'Up API - [@dblock](https://github.com/dblock).
+* 2024/10/26: Added collections of missed and matched users to rounds API - [@dblock](https://github.com/dblock).
+* 2024/10/26: Added captain's username to sups API - [@dblock](https://github.com/dblock).
 * 2024/10/26: Added round stats to API - [@dblock](https://github.com/dblock).
 * 2024/10/05: Upgraded to Ruby 3.3.5 - [@dblock](https://github.com/dblock).
 * 2024/07/27: Only send reminders after S'Up time of day - [@dblock](https://github.com/dblock).
