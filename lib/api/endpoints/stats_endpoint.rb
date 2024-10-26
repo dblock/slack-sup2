@@ -10,7 +10,8 @@ module Api
         params do
           optional :team_id, type: String, desc: 'Optional team ID.'
           optional :channel_id, type: String, desc: 'Optional channel ID.'
-          mutually_exclusive :channel_id, :team_id
+          optional :round_id, type: String, desc: 'Optional round ID.'
+          mutually_exclusive :channel_id, :team_id, :round_id
         end
         get do
           if params[:team_id]
@@ -21,6 +22,10 @@ module Api
             channel = Channel.find(_id: params[:channel_id]) || error!('Not Found', 404)
             authorize_channel! channel
             present ChannelStats.new(channel), with: Api::Presenters::ChannelStatsPresenter
+          elsif params[:round_id]
+            round = Round.find(_id: params[:round_id]) || error!('Not Found', 404)
+            authorize_channel! round.channel
+            present RoundStats.new(round), with: Api::Presenters::RoundStatsPresenter
           else
             present Stats.new, with: Api::Presenters::StatsPresenter
           end

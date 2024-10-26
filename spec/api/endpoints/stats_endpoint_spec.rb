@@ -170,5 +170,63 @@ describe Api::Endpoints::StatsEndpoint do
         end
       end
     end
+
+    context 'round' do
+      let(:round) { channel.rounds.last }
+
+      it 'reports counts for a round' do
+        stats = client.stats(round_id: round.id)
+        expect(stats.positive_outcomes_count).to eq 0
+        expect(stats.reported_outcomes_count).to eq 0
+      end
+
+      it 'reports counts for another round' do
+        stats = client.stats(round_id: Fabricate(:round).id)
+        expect(stats.positive_outcomes_count).to eq 0
+        expect(stats.reported_outcomes_count).to eq 0
+      end
+
+      context 'with a team api token' do
+        before do
+          client.headers.update('X-Access-Token' => 'token')
+          team.update_attributes!(api_token: 'token')
+        end
+
+        it 'returns stats' do
+          stats = client.stats(round_id: round.id)
+          round.sups.last.update_attributes!(outcome: 'all')
+          expect(stats.positive_outcomes_count).to eq 1
+          expect(stats.reported_outcomes_count).to eq 1
+        end
+      end
+
+      context 'a channel with an api token' do
+        before do
+          channel.update_attributes!(api_token: 'token', api: true)
+        end
+
+        it 'cannot return stats without a token' do
+          expect { client.stats(round_id: round.id).resource }.to raise_error Faraday::ClientError do |e|
+            json = JSON.parse(e.response[:body])
+            expect(json['error']).to eq 'Access Denied'
+          end
+        end
+
+        it 'cannot return stats with an invalid a token' do
+          client.headers.update('X-Access-Token' => 'invalid')
+          expect { client.stats(round_id: round.id).resource }.to raise_error Faraday::ClientError do |e|
+            json = JSON.parse(e.response[:body])
+            expect(json['error']).to eq 'Access Denied'
+          end
+        end
+
+        it 'returns stats' do
+          client.headers.update('X-Access-Token' => 'token')
+          stats = client.stats(round_id: round.id)
+          expect(stats.positive_outcomes_count).to eq 0
+          expect(stats.reported_outcomes_count).to eq 0
+        end
+      end
+    end
   end
 end

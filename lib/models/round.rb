@@ -22,8 +22,6 @@ class Round
 
   after_create :run!
 
-  index(round_id: 1, user_ids: 1, created_at: 1)
-
   def to_s
     "id=#{id}, #{channel}"
   end
@@ -86,6 +84,10 @@ class Round
 
     update_attributes!(reminded_at: Time.now.utc)
     sups.each(&:remind!)
+  end
+
+  def stats
+    @stats ||= RoundStats.new(self)
   end
 
   private
