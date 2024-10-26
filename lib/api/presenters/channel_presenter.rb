@@ -20,29 +20,39 @@ module Api
       property :sup_size, type: Integer, desc: "The number of people that meet for each S'Up."
 
       link :team do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/teams/#{team.id}"
       end
 
       link :users do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/users?channel_id=#{id}"
       end
 
       link :rounds do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/rounds?channel_id=#{id}"
       end
 
       link :stats do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/stats?channel_id=#{id}"
       end
 
       link :self do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/channels/#{id}"
       end
     end
   end
-  end
+end

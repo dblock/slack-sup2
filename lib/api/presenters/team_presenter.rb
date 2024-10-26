@@ -16,16 +16,22 @@ module Api
       property :updated_at, type: DateTime, desc: 'Date/time when the team was updated.'
 
       link :channels do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/channels?team_id=#{id}"
       end
 
       link :stats do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/stats?team_id=#{id}"
       end
 
       link :self do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/teams/#{id}"
       end

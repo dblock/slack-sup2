@@ -6,6 +6,8 @@ module Api
       include Grape::Roar::Representer
 
       link :self do |opts|
+        next unless opts.key?(:env)
+
         "#{base_url(opts)}/api/stats"
       end
 

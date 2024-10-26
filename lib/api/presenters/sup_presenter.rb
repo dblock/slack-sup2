@@ -14,17 +14,22 @@ module Api
 
       link :captain do |opts|
         next unless captain_id
+        next unless opts.key?(:env)
 
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/users/#{captain_id}"
       end
 
       link :round do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/rounds/#{round_id}"
       end
 
       link :self do |opts|
+        next unless opts.key?(:env)
+
         request = Grape::Request.new(opts[:env])
         "#{request.base_url}/api/sups/#{id}"
       end
