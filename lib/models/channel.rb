@@ -309,6 +309,10 @@ class Channel
     slack_client.chat_postMessage(text: message, channel: channel_id, as_user: true)
   end
 
+  def export_filename(root)
+    super(root, channel_id)
+  end
+
   def export_zip!(root)
     super(root, channel_id)
   end

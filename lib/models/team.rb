@@ -239,6 +239,10 @@ class Team
     stats.to_s
   end
 
+  def export_filename(root)
+    super(root, team_id)
+  end
+
   def export_zip!(root)
     super(root, team_id)
   end

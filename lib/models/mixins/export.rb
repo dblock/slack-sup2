@@ -4,6 +4,11 @@ module SlackSup
       module Export
         extend ActiveSupport::Concern
 
+        def export_filename(root, name)
+          data_path = File.join(root, name)
+          File.join(data_path, "#{name}.zip")
+        end
+
         def export_zip!(root, name)
           data_path = File.join(root, name)
           data_zip = File.join(data_path, "#{name}.zip")
