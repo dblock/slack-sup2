@@ -18,11 +18,21 @@ describe Api::Endpoints::SupsEndpoint do
     it_behaves_like 'a channel token api', Sup
 
     context 'sup' do
-      let(:existing_sup) { Fabricate(:sup, round:) }
+      let!(:user1) { Fabricate(:user, channel:) }
+      let!(:user2) { Fabricate(:user, channel:) }
+      let!(:user3) { Fabricate(:user, channel:) }
+      let(:existing_sup) { Fabricate(:sup, round:, users: [user1, user2, user3]) }
+
+      before do
+        allow(channel).to receive(:sync!)
+        allow(existing_sup).to receive(:dm!)
+        existing_sup.sup!
+      end
 
       it 'returns a sup' do
         sup = client.sup(id: existing_sup.id)
         expect(sup.id).to eq existing_sup.id.to_s
+        expect(sup.captain_user_name).to eq existing_sup.captain_user_name
         expect(sup._links.self._url).to eq "http://example.org/api/sups/#{existing_sup.id}"
       end
 
