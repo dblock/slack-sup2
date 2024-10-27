@@ -4,6 +4,7 @@ module Api
       include Roar::JSON::HAL
       include Roar::Hypermedia
       include Grape::Roar::Representer
+      include BasePresenter
 
       property :id, type: String, desc: 'Channel ID.'
       property :enabled, type: Grape::API::Boolean, desc: 'Channel is enabled.'
@@ -20,38 +21,23 @@ module Api
       property :sup_size, type: Integer, desc: "The number of people that meet for each S'Up."
 
       link :team do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/teams/#{team.id}"
+        "#{base_url(opts)}/api/teams/#{team.id}"
       end
 
       link :users do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/users?channel_id=#{id}"
+        "#{base_url(opts)}/api/users?channel_id=#{id}"
       end
 
       link :rounds do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/rounds?channel_id=#{id}"
+        "#{base_url(opts)}/api/rounds?channel_id=#{id}"
       end
 
       link :stats do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/stats?channel_id=#{id}"
+        "#{base_url(opts)}/api/stats?channel_id=#{id}"
       end
 
       link :self do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/channels/#{id}"
+        "#{base_url(opts)}/api/channels/#{id}"
       end
     end
   end

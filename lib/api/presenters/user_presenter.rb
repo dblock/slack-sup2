@@ -4,6 +4,7 @@ module Api
       include Roar::JSON::HAL
       include Roar::Hypermedia
       include Grape::Roar::Representer
+      include BasePresenter
 
       property :id, type: String, desc: 'User ID.'
       property :user_id, type: String, desc: 'Slack user ID.'
@@ -17,17 +18,11 @@ module Api
       property :updated_at, type: DateTime, desc: 'Date/time when the user was updated.'
 
       link :channel do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/channels/#{channel_id}"
+        "#{base_url(opts)}/api/channels/#{channel_id}"
       end
 
       link :self do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/users/#{id}"
+        "#{base_url(opts)}/api/users/#{id}"
       end
     end
   end

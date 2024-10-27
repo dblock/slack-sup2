@@ -4,6 +4,7 @@ module Api
       include Roar::JSON::HAL
       include Roar::Hypermedia
       include Grape::Roar::Representer
+      include BasePresenter
 
       property :id, type: String, desc: 'Round ID.'
       property :total_users_count, desc: 'Total users.'
@@ -20,24 +21,19 @@ module Api
       collection :missed_users, extend: UserPresenter, embedded: true
 
       link :channel do |opts|
-        next unless opts.key?(:env)
+        "#{base_url(opts)}/api/channels/#{channel_id}"
+      end
 
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/channels/#{channel_id}"
+      link :stats do |opts|
+        "#{base_url(opts)}/api/stats?round_id=#{id}"
       end
 
       link :sups do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/sups?round_id=#{id}"
+        "#{base_url(opts)}/api/sups?round_id=#{id}"
       end
 
       link :self do |opts|
-        next unless opts.key?(:env)
-
-        request = Grape::Request.new(opts[:env])
-        "#{request.base_url}/api/rounds/#{id}"
+        "#{base_url(opts)}/api/rounds/#{id}"
       end
     end
   end

@@ -4,11 +4,14 @@ module Api
       include Roar::JSON::HAL
       include Roar::Hypermedia
       include Grape::Roar::Representer
+      include BasePresenter
 
       link :self do |opts|
-        next unless opts.key?(:env)
-
         "#{base_url(opts)}/api/stats?team_id=#{team.id}"
+      end
+
+      link :team do |opts|
+        "#{base_url(opts)}/api/teams/#{team.id}"
       end
 
       property :rounds_count
@@ -19,11 +22,6 @@ module Api
       property :channels_count
       property :channels_enabled_count
       property :outcomes
-
-      def base_url(opts)
-        request = Grape::Request.new(opts[:env])
-        request.base_url
-      end
     end
   end
 end

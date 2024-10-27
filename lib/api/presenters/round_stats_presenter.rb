@@ -4,19 +4,17 @@ module Api
       include Roar::JSON::HAL
       include Roar::Hypermedia
       include Grape::Roar::Representer
-
-      link :self do |opts|
-        next unless opts.key?(:env)
-
-        "#{base_url(opts)}/api/stats?round_id=#{round.id}"
-      end
+      include BasePresenter
 
       property :positive_outcomes_count
       property :reported_outcomes_count
 
-      def base_url(opts)
-        request = Grape::Request.new(opts[:env])
-        request.base_url
+      link :self do |opts|
+        "#{base_url(opts)}/api/stats?round_id=#{round.id}"
+      end
+
+      link :round do |opts|
+        "#{base_url(opts)}/api/rounds/#{round.id}"
       end
     end
   end
