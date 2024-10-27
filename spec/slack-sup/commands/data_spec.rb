@@ -11,8 +11,22 @@ describe SlackSup::Commands::Data do
       end
 
       it 'returns a link to download data' do
+        expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
+          channel: 'DM',
+          text: 'Click here to download your team data.',
+          attachments: [
+            text: '',
+            attachment_type: 'default',
+            actions: [{
+              type: 'button',
+              text: 'Download',
+              url: "https://sup2.playplay.io/api/data?team_id=#{team.id}&access_token=token"
+            }]
+          ]
+        )
+
         expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
-          "Here's a link to download your team data (valid 30 minutes): https://sup2.playplay.io/api/data?team_id=#{team.id}&access_token=token"
+          'Click here to download your team data.'
         )
       end
     end
@@ -43,11 +57,26 @@ describe SlackSup::Commands::Data do
       end
 
       it 'tells the user to check DMs' do
-        allow_any_instance_of(Slack::Web::Client).to receive(:conversations_open).with(
+        allow(team.slack_client).to receive(:conversations_open).with(
           users: 'user'
         ).and_return(Hashie::Mash.new('channel' => { 'id' => 'D1' }))
+
         expect(message: '@sup data').to respond_with_slack_message(
           'Hey <@user>, check your DMs for a link.'
+        )
+
+        expect(team.slack_client).to have_received(:chat_postMessage).with(
+          hash_including(
+            {
+              channel: 'D1',
+              text: 'Click here to download your <#channel> channel data.'
+            }
+          )
+        )
+
+        expect(team.slack_client).to have_received(:chat_postMessage).with(
+          channel: 'channel',
+          text: 'Hey <@user>, check your DMs for a link.'
         )
       end
     end

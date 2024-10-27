@@ -23,11 +23,11 @@ module Api
           if !File.exist?(filename) || (File.mtime(filename) + 1.hour < Time.now)
             FileUtils.rm_rf(path)
             FileUtils.makedirs(path)
-            Api::Middleware.logger.info "Generating data file for #{target} ..."
+            Api::Middleware.logger.info "Generating data file for #{target}."
             filename = target.export_zip!(path)
           end
 
-          Api::Middleware.logger.info "Sending #{ByteSize.new(File.size(filename))} data file for #{target} ..."
+          Api::Middleware.logger.info "Sending #{ByteSize.new(File.size(filename))} data file for #{target}."
           content_type 'application/zip'
           header['Content-Disposition'] = "attachment; filename=#{File.basename(filename)}"
           File.binread filename
