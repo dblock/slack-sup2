@@ -662,14 +662,14 @@ describe Round do
               asked_at
               created_at
               updated_at
-              matched_users
+              paired_users
               missed_users
             ]
           )
           row = csv[0]
           expect(row['total_users_count']).to eq '3'
           expect(row['missed_users']).to eq round.missed_users.map(&:user_name).join("\n")
-          expect(row['matched_users']).to eq round.matched_users.map(&:user_name).join("\n")
+          expect(row['paired_users']).to eq round.paired_users.map(&:user_name).join("\n")
         end
       end
     end

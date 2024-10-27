@@ -96,12 +96,12 @@ class Round
     super(root, 'sups', Api::Presenters::SupPresenter, sups)
   end
 
-  def matched_users
+  def paired_users
     User.find(sups.distinct(:user_ids))
   end
 
   def missed_users
-    channel.users - matched_users
+    channel.users - paired_users
   end
 
   private
