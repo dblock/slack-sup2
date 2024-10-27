@@ -15,6 +15,8 @@ module SlackSup
               else
                 yield data
               end
+            rescue SlackSup::Error => e
+              data.team.slack_client.chat_postMessage(channel: data.channel, text: e.message)
             end
           end
         end

@@ -572,8 +572,6 @@ module SlackSup
         else
           raise 'expected user'
         end
-      rescue SlackSup::Error => e
-        data.team.slack_client.chat_postMessage(channel: data.channel, text: e.message)
       end
 
       user_command 'rotate' do |channel, user, data|

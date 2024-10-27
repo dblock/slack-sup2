@@ -72,11 +72,33 @@ describe SlackSup::Commands::GCal do
             )
           end
 
-          it 'creates a link' do
-            Timecop.travel(monday).freeze do
-              Chronic.time_class = channel.sup_tzone
+          context 'monday' do
+            before do
+              Timecop.travel(monday).freeze
+              allow_any_instance_of(Channel).to receive(:short_lived_token).and_return('token')
+            end
+
+            it 'creates a link' do
+              expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
+                {
+                  channel: 'sup-channel-id',
+                  text: 'Click the button below to create a gcal for Monday, January 02, 2017 at 5:00 pm.',
+                  attachments: [
+                    {
+                      text: '',
+                      attachment_type: 'default',
+                      actions: [{
+                        type: 'button',
+                        text: 'Add to Calendar',
+                        url: "https://sup2.playplay.io/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=token"
+                      }]
+                    }
+                  ]
+                }
+              )
+
               expect(message: '@sup gcal today 5pm', channel: 'sup-channel-id').to respond_with_slack_message(
-                "Click this link to create a gcal for Monday, January 02, 2017 at 5:00 pm: https://sup2.playplay.io/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{team.short_lived_token}"
+                'Click the button below to create a gcal for Monday, January 02, 2017 at 5:00 pm.'
               )
             end
           end
