@@ -249,7 +249,7 @@ class Team
 
   def export!(root)
     super
-    stats.export!(root, 'stats', Api::Presenters::TeamStatsPresenter)
+    stats.export!(root)
     super(root, 'channels', Api::Presenters::ChannelPresenter, channels)
     super(root, 'users', Api::Presenters::UserPresenter, users)
     super(root, 'rounds', Api::Presenters::RoundPresenter, rounds)

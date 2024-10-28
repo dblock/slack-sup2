@@ -3,7 +3,7 @@ class TeamStats
   include SlackSup::Models::Mixins::Pluralize
   include SlackSup::Models::Mixins::Export
 
-  attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :pairs, :outcomes, :team
+  attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :pairs, :pairs_of_user_names, :outcomes, :team
 
   def initialize(team)
     @team = team
@@ -18,34 +18,18 @@ class TeamStats
     @outcomes = Hash[
       Sup.collection.aggregate(
         [
-          { '$match' => { channel_id: { '$in' => channel_ids } } },
-          { '$group' => { _id: { outcome: '$outcome' }, count: { '$sum' => 1 } } }
-        ]
+          { '$match' => { channel_id: { '$in' => channel_ids } } }
+        ] + Stats::OUTCOMES_PIPELINE
       ).map do |row|
         [(row['_id']['outcome'] || 'unknown').to_sym, row['count']]
       end
     ]
-
-    # https://stackoverflow.com/questions/37456062/how-to-get-combinations-of-items-in-an-array-field-in-mongodb
-
     pairs_pipeline = [
-      { '$match': { channel_id: { '$in' => team.channels.distinct(:_id) } } },
-      { '$unwind': '$user_ids' },
-      { '$lookup': { from: 'sups', localField: '_id', foreignField: '_id', as: 'users' } },
-      { '$unwind': '$users' },
-      { '$unwind': '$users.user_ids' },
-      { '$redact': { '$cond': { if: { '$cmp': ['$user_ids', '$users.user_ids'] }, then: '$$DESCEND', else: '$$PRUNE' } } },
-      { '$group': { _id: { k1: '$user_ids', k2: '$users.user_ids' }, users: { '$sum': 0.5 } } },
-      { '$sort': { _id: 1 } },
-      { '$project':
-        { _id: 1, users: 1,
-          a: { '$cond': { if: { '$eq': [{ '$cmp': ['$_id.k1', '$_id.k2'] }, 1] }, then: '$_id.k2', else: '$_id.k1' } },
-          b: { '$cond': { if: { '$eq': [{ '$cmp': ['$_id.k1', '$_id.k2'] }, -1] }, then: '$_id.k2', else: '$_id.k1' } } } },
-      { '$group': { _id: { k1: '$a', k2: '$b' }, users: { '$sum': '$users' } } },
-      { '$project': { _id: 0, user1: '$_id.k1', user2: '$_id.k2', count: { '$convert': { input: '$users', to: 'int' } } } }
-    ]
-
+      { '$match': { channel_id: { '$in' => channel_ids } } }
+    ] + Stats::PAIRS_PIPELINE
     @pairs = Sup.collection.aggregate(pairs_pipeline)
+    pairs_user_name_pipeline = pairs_pipeline + Stats::PAIRS_TO_USERNAMES_PIPELINE
+    @pairs_of_user_names = Sup.collection.aggregate(pairs_user_name_pipeline).map { |doc| ChannelStatsPair.new(doc) }
   end
 
   def positive_outcomes_count
@@ -58,6 +42,11 @@ class TeamStats
 
   def unique_pairs_count
     pairs.count
+  end
+
+  def export!(root)
+    super(root, 'stats', Api::Presenters::TeamStatsPresenter)
+    super(root, 'pairs', Api::Presenters::ChannelStatsPairPresenter, pairs_of_user_names)
   end
 
   def to_s
