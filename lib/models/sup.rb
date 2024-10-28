@@ -193,7 +193,7 @@ class Sup
     return unless new_users.any?
 
     [
-      channel.sup_size == 3 ? 'The most valuable relationships are not made of 2 people, they’re made of 3.' : nil,
+      channel.sup_size == 3 ? "The most valuable relationships are not made of 2 people, they're made of 3." : nil,
       "Channel S'Up connects groups of #{channel.sup_size} people from #{channel.slack_mention} on #{channel.sup_day} every #{channel.sup_every_n_weeks_s}.",
       "Welcome #{new_users.sort_by(&:id).map(&:slack_mention).and}, excited for your first S'Up!"
     ].compact.join(' ')

@@ -6,9 +6,9 @@ S'Up v2 for Slack Channels
 
 ### What's This?
 
-The most valuable relationships are not made of two people, they’re made of three. A third person will always stabilize and grow the relationship between the other two. It’s called a [triad](http://www.culturesync.net/toolbox/intro-to-triads), and the more you create, the stronger your network.
+The most valuable relationships are not made of two people, they're made of three. A third person will always stabilize and grow the relationship between the other two. It's called a [triad](http://www.culturesync.net/toolbox/intro-to-triads), and the more you create, the stronger your network.
 
-This bot passively generates fresh triads of channel members to meet every week in an informal standup, or S'Up.
+This bot passively generates fresh triads of channel members to meet for coffee every week in an informal standup, or S'Up.
 
 ### Install
 

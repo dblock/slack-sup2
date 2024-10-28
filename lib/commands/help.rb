@@ -7,7 +7,7 @@ module SlackSup
         ```
         Hi there! I'm your team's S'Up bot.
 
-        The most valuable relationships are not made of two people, they’re made of three.
+        The most valuable relationships are not made of two people, they're made of three.
 
         In a DM
         -------

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta name="description" content="S'Up for Slack Teams. Facilitate informal standups across a company.">
-        <meta name="og:description" content="S'Up for Slack Teams. Facilitate informal standups across a company.">
-        <meta name="keywords" content="slack,scrum,standup,triads,teams,organizations">
-        <title>S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet Every Week</title>
+        <meta name="description" content="S'Up for Slack Teams. Facilitate informal standups and coffee meetings across a company.">
+        <meta name="og:description" content="S'Up for Slack Teams. Facilitate informal standups and coffee meetings across a company.">
+        <meta name="keywords" content="slack,scrum,standup,triads,teams,organizations,donut,coffee">
+        <title>S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week</title>
         <%= partial 'public/partials/_head.html' %>
     </head>
     <body id="page-top" class="index">
@@ -59,8 +59,8 @@
                         <img class='icon' src="img/icon.png">
                     </div>
                     <div class="intro-lead-in">
-                        <p>The most valuable relationships are not made of two people, they’re made of three.</p>
-                        Generates fresh triads of team members to meet every week in an informal standup, or S'Up.
+                        <p>The most valuable relationships are not made of two people, they're made of three.</p>
+                        Generates fresh triads of team members to meet for coffee every week in an informal standup, or S'Up.
                         <br><br>
                         <a class="add-to-slack" href="<%= SlackRubyBotServer::Config.oauth_authorize_url %>?scope=<%= SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',') %>&amp;client_id=<%= ENV['SLACK_CLIENT_ID'] %>"><img alt="Add S'Up to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"></a>
                     </div>
@@ -78,7 +78,7 @@
                         <h3 class="section-subheading text-muted">
                             <p>
                                 A third person will always stabilize and grow the relationship between the other two.
-                                It’s called a <a href='http://www.culturesync.net/toolbox/intro-to-triads' target='_blank'>triad</a>, and the more you create, the stronger your network.
+                                It's called a <a href='http://www.culturesync.net/toolbox/intro-to-triads' target='_blank'>triad</a>, and the more you create, the stronger your network.
                             </p>
                             <p>
                                 Don't care about triads and just want to use S'Up to pair team members? S'Up can be customized to introduce any number of people.
@@ -89,7 +89,7 @@
                             <p>
                                 First, invite the bot to a Slack channel.
                                 <br>
-                                It will then generate fresh triads of members of the Slack channel to meet every week in an informal standup, or <i>S'Up</i>.
+                                It will then generate fresh triads of members of the Slack channel to meet for coffee every week in an informal standup, or <i>S'Up</i>.
                                 <br>
                                 It also introduces itself to new team members and can help setup a GCal meeting.
                             </p>
@@ -112,7 +112,8 @@
                                 <br>the <b>day of the week</b> and <b>time</b> to S'Up (e.g. <code>@sup set day Monday</code> and <code>@sup set time 9AM</code>)
                                 <br><b>how often</b> S'Ups are created (e.g. <code>@sup set weeks 1</code>),
                                 <br><b>how long to avoid</b> meeting with the same people (e.g. <code>@sup set recency 12</code>),
-                                <br>whether to <b>generate odd-sized groups</b> (e.g. <code>@sup set odd no</code>)
+                                <br>whether to <b>generate odd-sized groups</b> (e.g. <code>@sup set odd no</code>),
+                                <br>can <b>download all data</b> for analysis with <code>@sup data</code>,
                                 <br>and more (try <code>@sup help</code> for all options).
                             </p>
                             <p>
@@ -144,7 +145,7 @@
                         <h3 class="section-heading">Open-Source</h3>
                         <h3 class="section-subheading text-muted">
                             <p><a href="https://github.com/dblock/slack-sup2" target="_blank"><img src="img/sup-oss.png" width="75%"></a></p>
-                            <p>The bot service is open-source under the MIT license.</p>
+                            <p>The bot Ruby code is open-source under the MIT license.</p>
                             <p><a href="https://github.com/dblock/slack-sup2" target="_blank">Fork us on Github</a></p>
                         </h3>
                     </div>
@@ -157,7 +158,7 @@
                     <div class="col-lg-12 text-center">
                         <h3 class="setion-heading">Hypermedia API</h3>
                         <h3 class="section-subheading text-muted">
-                            <p>Your team's data belongs to you and is available via a Hypermedia API.</p>
+                            <p>Your team's data belongs to you and is available for download in CSV format with <code>data</code> and via a Hypermedia API.</p>
                             <p><a href="<%= SlackRubyBotServer::Service.api_url %>" target="_blank"><img src="img/sup-api.png" width="75%"></a></p>
                             <p>See <a href="https://github.com/dblock/slack-sup2/blob/master/API.md" target="_blank">API documentation</a> and <a href="https://github.com/dblock/slack-sup2/blob/master/samples">samples</a> for details.</p>
                         </h3>
@@ -180,11 +181,11 @@
                                 <br>
                                 Subscribe for $39.99/yr thereafter.
                                 <br>
-                                You can unsubscribe any time by DMing the bot "unsubscribe".
+                                You can unsubscribe any time by DMing the bot <code>unsubscribe</code>.
                                 <br>
                                 We're not trying to make money, but we need it for hosting.
                                 <br>
-                                We also give a lifetime subscriptions to <a href='https://github.com/dblock/slack-sup2/issues' target='_blank'>contributors to our open-source code</a>.
+                                We also offer a lifetime subscriptions to <a href='https://github.com/dblock/slack-sup2/issues' target='_blank'>major contributors to our open-source code</a>.
                             </p>
                         </h3>
                     </div>
@@ -209,7 +210,7 @@
                             <p>
                                 S'Up for Slack is made possible with the generous support of team <a href="https://www.artsy.net">Artsy</a>.
                                 <br>
-                                Written by <a href='https://twitter.com/dblockdotorg' target="_blank">@dblockdotorg</a> during <a href='http://artsy.github.io'>@ArtsyOpenSource</a> Hackathon 5.0.
+                                Originally written by <a href='https://twitter.com/dblockdotorg' target="_blank">@dblockdotorg</a> during <a href='http://artsy.github.io'>@ArtsyOpenSource</a> Hackathon 5.0.
                             </p>
                             <p>
                                 <img src="img/artsy.png">
@@ -221,7 +222,7 @@
                                 or <a href="mailto:dblock[at]vestris[dot]com'>e-mail dblock[at]vestris[dot]com</a>.
                             </p>
                             <p>
-                                <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they’re made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
+                                <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they're made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
                             </p>
                             <p>
                                 tl;dr: S'Up for Slack does not want to know who you are and tries to collect just enough data to enable our services. Read our <a href='/privacy' target="_blank">Privacy Policy</a>.
@@ -243,7 +244,7 @@
                         <div class="alert">
                             Having trouble? Please e-mail <b>dblock[at]vestris[dot]com</b>.
                             <br><br>
-                            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they’re made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
+                            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they're made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
                             <br><br>
                             <a href='<%= SlackRubyBotServer::Service.url %>'>Go back to playplay.io.</a>
                         </div>

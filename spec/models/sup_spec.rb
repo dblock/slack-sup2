@@ -103,7 +103,7 @@ describe Sup do
           it 'everyone is new' do
             sup.users.each { |u| u.update_attributes!(introduced_sup_at: nil) }
             expect(sup.send(:intro_message)).to eq(
-              'The most valuable relationships are not made of 2 people, they’re made of 3. ' \
+              "The most valuable relationships are not made of 2 people, they're made of 3. " \
               "Channel S'Up connects groups of 3 people from <##{sup.channel.channel_id}> on Monday every week. " \
               "Welcome #{sup.users.asc(:_id).map(&:slack_mention).and}, excited for your first S'Up!"
             )
@@ -113,7 +113,7 @@ describe Sup do
             users = sup.users.take(2).sort_by(&:id)
             users.each { |u| u.update_attributes!(introduced_sup_at: nil) }
             expect(sup.send(:intro_message)).to eq(
-              'The most valuable relationships are not made of 2 people, they’re made of 3. ' \
+              "The most valuable relationships are not made of 2 people, they're made of 3. " \
               "Channel S'Up connects groups of 3 people from <##{sup.channel.channel_id}> on Monday every week. " \
               "Welcome #{users.map(&:slack_mention).and}, excited for your first S'Up!"
             )
@@ -122,7 +122,7 @@ describe Sup do
           it 'one is new' do
             sup.users.first.update_attributes!(introduced_sup_at: nil)
             expect(sup.send(:intro_message)).to eq(
-              'The most valuable relationships are not made of 2 people, they’re made of 3. ' \
+              "The most valuable relationships are not made of 2 people, they're made of 3. " \
               "Channel S'Up connects groups of 3 people from <##{sup.channel.channel_id}> on Monday every week. " \
               "Welcome #{sup.users.first.slack_mention}, excited for your first S'Up!"
             )
