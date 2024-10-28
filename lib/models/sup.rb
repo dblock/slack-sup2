@@ -7,6 +7,8 @@ class Sup
   field :outcome, type: String
   field :conversation_id, type: String
   field :gcal_html_link, type: String
+  field :gcal_message_ts, type: String
+
   belongs_to :channel
   belongs_to :round
   has_and_belongs_to_many :users
@@ -158,22 +160,36 @@ class Sup
   def notify_gcal_html_link_changed!
     return unless (gcal_html_link_changed? || saved_change_to_gcal_html_link?) && gcal_html_link
 
-    dm!(
-      {
-        text: "I've added this S'Up to your Google Calendar.",
-        attachments: [
-          {
-            text: '',
-            attachment_type: 'default',
-            actions: [{
-              type: 'button',
-              text: 'Google Calendar',
-              url: gcal_html_link
-            }]
-          }
-        ]
-      }
-    )
+    message = {
+      text: "I've added this S'Up to your Google Calendar.",
+      attachments: [
+        {
+          text: '',
+          attachment_type: 'default',
+          actions: [{
+            type: 'button',
+            text: 'Google Calendar',
+            url: gcal_html_link
+          }]
+        }
+      ]
+    }
+
+    if gcal_message_ts && conversation_id
+      begin
+        channel.slack_client.chat_update(
+          message.merge(
+            channel: conversation_id,
+            ts: gcal_message_ts
+          )
+        )
+      rescue Slack::Web::Api::Errors::SlackError => e
+        logger.warn "Error updating message #{gcal_message_ts} in #{self}: #{e}"
+        dm!(message)
+      end
+    else
+      dm!(message)
+    end
   end
 
   def select_best_captain

@@ -100,6 +100,8 @@ describe SlackSup::Commands::GCal do
               expect(message: '@sup gcal today 5pm', channel: 'sup-channel-id').to respond_with_slack_message(
                 'Click the button below to create a gcal for Monday, January 02, 2017 at 5:00 pm.'
               )
+
+              expect(sup.reload.gcal_message_ts).not_to be_nil
             end
           end
         end

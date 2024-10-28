@@ -135,7 +135,7 @@ describe SlackSup::Commands::Set do
         end
 
         it 'rotate api token' do
-          expect(SecureRandom).to receive(:hex).and_return('new')
+          allow(SecureRandom).to receive(:hex).and_return('new')
           channel.update_attributes!(api: true, api_token: 'old')
           expect(message: '@sup rotate api token').to respond_with_slack_message(
             "Channel data access via the API is on with a new access token `new`.\n#{channel.api_url}"
@@ -889,7 +889,7 @@ describe SlackSup::Commands::Set do
         end
 
         it 'rotate api token' do
-          expect(SecureRandom).to receive(:hex).and_return('new')
+          allow(SecureRandom).to receive(:hex).and_return('new')
           team.update_attributes!(api: true, api_token: 'old')
           expect(message: '@sup rotate api token', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
             "Team data access via the API is on with a new access token `new`.\n#{team.api_url}"
@@ -1070,7 +1070,6 @@ describe SlackSup::Commands::Set do
         end
 
         it 'cannot rotate api token' do
-          expect(SecureRandom).not_to receive(:hex)
           team.update_attributes!(api: true, api_token: 'old')
           expect(message: '@sup rotate api token', channel: 'DM').to respond_with_slack_message(
             "Team data access via the API is on with an access token visible to admins. Only <@#{team.activated_user_id}> or a Slack team admin can rotate it, sorry."

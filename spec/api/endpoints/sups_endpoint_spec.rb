@@ -67,6 +67,39 @@ describe Api::Endpoints::SupsEndpoint do
         expect(existing_sup.reload.gcal_html_link).to eq 'updated'
       end
 
+      context 'with a gcal message' do
+        before do
+          existing_sup.update_attributes!(
+            conversation_id: 'channel',
+            gcal_message_ts: SecureRandom.hex
+          )
+        end
+
+        it 'updates a sup html link and DMs sup' do
+          expect_any_instance_of(Slack::Web::Client).to receive(:chat_update).with(
+            {
+              channel: existing_sup.conversation_id,
+              ts: existing_sup.gcal_message_ts,
+              text: "I've added this S'Up to your Google Calendar.",
+              attachments: [
+                {
+                  text: '',
+                  attachment_type: 'default',
+                  actions: [{
+                    type: 'button',
+                    text: 'Google Calendar',
+                    url: 'updated'
+                  }]
+                }
+              ]
+            }
+          )
+          client.headers.update('X-Access-Token' => channel.short_lived_token)
+          client.sup(id: existing_sup.id)._put(gcal_html_link: 'updated')
+          expect(existing_sup.reload.gcal_html_link).to eq 'updated'
+        end
+      end
+
       context 'with a team api token' do
         before do
           client.headers.update('X-Access-Token' => 'token')

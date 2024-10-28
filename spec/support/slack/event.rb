@@ -49,6 +49,11 @@ RSpec::Matchers.define :respond_with_slack_message do |expected|
     allow(team.slack_client).to receive(:chat_postMessage) do |options|
       @messages ||= []
       @messages.push options
+
+      Slack::Messages::Message.new(
+        ts: SecureRandom.hex,
+        channel: options['channel']
+      )
     end
 
     begin
