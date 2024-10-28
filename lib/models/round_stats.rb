@@ -12,9 +12,8 @@ class RoundStats
     @outcomes = Hash[
       Sup.collection.aggregate(
         [
-          { '$match' => { round_id: round.id } },
-          { '$group' => { _id: { outcome: '$outcome' }, count: { '$sum' => 1 } } }
-        ]
+          { '$match' => { round_id: round.id } }
+        ] + Stats::OUTCOMES_PIPELINE
       ).map do |row|
         [(row['_id']['outcome'] || 'unknown').to_sym, row['count']]
       end

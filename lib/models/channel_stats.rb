@@ -3,7 +3,7 @@ class ChannelStats
   include SlackSup::Models::Mixins::Pluralize
   include SlackSup::Models::Mixins::Export
 
-  attr_accessor :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :channel
+  attr_accessor :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :pairs, :pairs_of_user_names, :channel
 
   def initialize(channel)
     @channel = channel
@@ -15,13 +15,20 @@ class ChannelStats
     @outcomes = Hash[
       Sup.collection.aggregate(
         [
-          { '$match' => { channel_id: channel.id } },
-          { '$group' => { _id: { outcome: '$outcome' }, count: { '$sum' => 1 } } }
-        ]
+          { '$match' => { channel_id: channel.id } }
+        ] + Stats::OUTCOMES_PIPELINE
       ).map do |row|
         [(row['_id']['outcome'] || 'unknown').to_sym, row['count']]
       end
     ]
+
+    pairs_pipeline = [
+      { '$match': { channel_id: channel.id } }
+    ] + Stats::PAIRS_PIPELINE
+    @pairs = Sup.collection.aggregate(pairs_pipeline)
+
+    pairs_user_name_pipeline = pairs_pipeline + Stats::PAIRS_TO_USERNAMES_PIPELINE
+    @pairs_of_user_names = Sup.collection.aggregate(pairs_user_name_pipeline).map { |doc| ChannelStatsPair.new(doc) }
   end
 
   def positive_outcomes_count
@@ -30,6 +37,15 @@ class ChannelStats
 
   def reported_outcomes_count
     outcomes.values.sum - (outcomes[:unknown] || 0)
+  end
+
+  def unique_pairs_count
+    pairs.count
+  end
+
+  def export!(root)
+    super(root, 'stats', Api::Presenters::ChannelStatsPresenter)
+    super(root, 'pairs', Api::Presenters::ChannelStatsPairPresenter, pairs_of_user_names)
   end
 
   def to_s
@@ -48,6 +64,7 @@ class ChannelStats
       messages << "Facilitated #{pluralize(sups_count, 'S\'Up')} " \
                   "in #{pluralize(rounds_count, 'round')} " \
                   "for #{pluralize(users_in_sups_count, 'user')} " \
+                  "creating #{pluralize(unique_pairs_count, 'unique connections')} " \
                   "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
                   "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
     end

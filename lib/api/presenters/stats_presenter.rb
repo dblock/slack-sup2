@@ -14,6 +14,7 @@ module Api
       property :sups_count
       property :users_opted_in_count
       property :users_count
+      property :unique_pairs_count
       property :outcomes
 
       link :self do |opts|

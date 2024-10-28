@@ -21,6 +21,7 @@ module Api
       property :users_count
       property :channels_count
       property :channels_enabled_count
+      property :unique_pairs_count
       property :outcomes
     end
   end

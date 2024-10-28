@@ -49,7 +49,7 @@ describe SlackSup::Commands::Stats do
         expect(message: '@sup stats').to respond_with_slack_message(
           "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.\n" \
           "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!\n" \
-          "Facilitated 2 S'Ups in 2 rounds for 3 users with 50% positive outcomes from 50% outcomes reported."
+          "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported."
         )
       end
     end

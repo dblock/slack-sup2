@@ -103,7 +103,7 @@ describe Stats do
       expect(stats.to_s).to eq [
         "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
         "This channel S'Up started 2 years ago and has 100% (3/3) of users opted in.",
-        "Facilitated 2 S'Ups in 2 rounds for 3 users with 50% positive outcomes from 50% outcomes reported."
+        "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported."
       ].join("\n")
     end
   end
