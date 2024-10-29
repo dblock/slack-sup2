@@ -4,7 +4,7 @@ class Round
   include Mongoid::Timestamps
   include SlackSup::Models::Mixins::Export
 
-  TIMEOUT = 60
+  TIMEOUT = 10
 
   field :ran_at, type: DateTime
   field :asked_at, type: DateTime
@@ -112,27 +112,47 @@ class Round
     notify!
   end
 
+  def solve!
+    solutions = []
+    all_users = channel.users.suppable.to_a.shuffle
+    3.times do
+      Ambit.clear!
+
+      solution = solve(all_users, [], solutions)
+      next unless solution
+      return solution if all_users.length == solution.flatten.length
+
+      solutions << solution if solution.any?
+    end
+    solutions.max_by(&:length)
+  ensure
+    Ambit.clear!
+  end
+
   def group!
     return if ran_at
 
     update_attributes!(ran_at: Time.now.utc)
     logger.info "Generating sups for #{channel} of #{channel.users.suppable.count} users."
-    all_users = channel.users.suppable.to_a.shuffle
-    begin
-      solve(all_users)
-      Ambit.fail!
-    rescue Ambit::ChoicesExhausted
-      solve_remaining(all_users - sups.map(&:users).flatten) if channel.sup_odd?
-      paired_count = sups.distinct(:user_ids).count
-      update_attributes!(
-        total_users_count: channel.users.enabled.count,
-        opted_in_users_count: channel.users.opted_in.count,
-        opted_out_users_count: channel.users.opted_out.count,
-        paired_users_count: paired_count,
-        missed_users_count: all_users.count - paired_count
-      )
-      logger.info "Finished round for #{channel}, users=#{total_users_count}, opted out=#{opted_out_users_count}, paired=#{paired_users_count}, missed=#{missed_users_count}."
+
+    solve!&.each do |combination|
+      logger.info "   Creating sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
+      Sup.create!(round: self, channel:, users: combination)
     end
+
+    all_users = channel.users.suppable.to_a.shuffle
+    solve_remaining(all_users - sups.map(&:users).flatten) if channel.sup_odd?
+
+    paired_count = sups.distinct(:user_ids).count
+    update_attributes!(
+      total_users_count: channel.users.enabled.count,
+      opted_in_users_count: channel.users.opted_in.count,
+      opted_out_users_count: channel.users.opted_out.count,
+      paired_users_count: paired_count,
+      missed_users_count: all_users.count - paired_count
+    )
+
+    logger.info "Finished round for #{channel}, users=#{total_users_count}, opted out=#{opted_out_users_count}, paired=#{paired_users_count}, missed=#{missed_users_count}."
   end
 
   def dm!
@@ -163,16 +183,23 @@ class Round
     logger.warn "Error notifying #{channel} #{self} #{e.message}."
   end
 
-  def solve(remaining_users)
+  def solve(remaining_users, candidates, previous_solutions)
+    Ambit.assert(previous_solutions.none? { |p| (p & candidates).length.positive? })
+    return candidates if remaining_users.size < channel.sup_size
+
+    if ran_at + Round::TIMEOUT.seconds < Time.now.utc
+      logger.info "Timed out in #{self} with #{previous_solutions.length} previous solution(s)."
+      return candidates
+    end
+
     combination = group(remaining_users)
-    Ambit.clear! if ran_at + Round::TIMEOUT.seconds < Time.now.utc
-    Ambit.fail! if meeting_already?(combination)
-    Ambit.fail! if same_team?(combination)
-    Ambit.fail! if met_recently?(combination)
-    Sup.create!(round: self, channel:, users: combination)
-    logger.info "   Creating sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
-    Ambit.clear! if sups.count * channel.sup_size == channel.users.suppable.count
-    solve(remaining_users - combination)
+
+    Ambit.assert !same_team?(combination)
+    Ambit.assert !met_recently?(combination)
+
+    solve(remaining_users - combination, candidates + [combination], previous_solutions)
+  rescue Ambit::ChoicesExhausted
+    nil
   end
 
   def solve_remaining(remaining_users)
@@ -183,7 +210,6 @@ class Round
 
         logger.info "   Adding #{remaining_users.map(&:user_name).and} to #{sup.users.map(&:user_name)}."
         sup.users.concat(remaining_users)
-        sup.save!
         return
       end
       logger.info "   Failed to pair #{remaining_users.map(&:user_name).and}."
@@ -201,16 +227,7 @@ class Round
       combination
     else
       user = Ambit.choose(remaining_users)
-      Ambit.fail! if combination.include?(user)
       group(remaining_users - [user], combination + [user])
-    end
-  end
-
-  def meeting_already?(users)
-    users.any? do |user|
-      sups.any? do |sup|
-        sup.user_ids.include? user.id
-      end
     end
   end
 

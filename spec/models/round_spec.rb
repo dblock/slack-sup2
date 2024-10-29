@@ -10,7 +10,6 @@ describe Round do
   end
 
   describe '#run' do
-    pending 'times out after Round::TIMEOUT'
     context 'without users' do
       it 'does not generate a sup' do
         expect do
@@ -79,6 +78,28 @@ describe Round do
       end
     end
 
+    context 'with 12 users' do
+      before do
+        12.times { Fabricate(:user, channel:) }
+      end
+
+      context 'with 2 previous sups' do
+        before do
+          2.times { channel.sup! }
+        end
+
+        it 'is able to find a new combination' do
+          expect do
+            round = channel.sup!
+            expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
+          end.to change(Sup, :count).by(4)
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 4 S'Ups, pairing all of 12 users."
+          ).exactly(3).times
+        end
+      end
+    end
+
     context 'with enough users' do
       let!(:user1) { Fabricate(:user, channel:) }
       let!(:user2) { Fabricate(:user, channel:) }
@@ -102,6 +123,21 @@ describe Round do
         expect(round.opted_out_users_count).to eq 0
         expect(round.paired_users_count).to eq 3
         expect(round.missed_users_count).to eq 0
+      end
+
+      context 'timeout' do
+        before do
+          stub_const 'Round::TIMEOUT', 1
+        end
+
+        it 'times out Round::TIMEOUT' do
+          allow_any_instance_of(Round).to receive(:solve).and_wrap_original do |method, *args|
+            sleep Round::TIMEOUT
+            method.call(*args)
+          end
+          round = channel.sup!
+          expect(round.sups.map(&:users).flatten.size).to eq 0
+        end
       end
 
       context 'with sup_size of 3' do
@@ -145,9 +181,8 @@ describe Round do
           3.times { Fabricate(:user, channel:) } # 3 more users so we can have at least 1 non-met group
           expect do
             round = channel.sup!
-            # https://github.com/dblock/slack-sup2/issues/6
-            expect([channel.users.size, channel.users.size - 4]).to include round.sups.map(&:users).flatten.size
-          end.to change(Sup, :count).by_at_least(3)
+            expect(round.sups.map(&:users).flatten.size).to eq channel.users.size
+          end.to change(Sup, :count).by(4)
           expect(channel).to have_received(:inform!).with(
             "Hi! I have created a new round with 4 S'Ups, pairing all of 13 users."
           )
@@ -326,38 +361,6 @@ describe Round do
     let!(:user2) { Fabricate(:user, channel:) }
     let!(:user3) { Fabricate(:user, channel:) }
     let!(:round) { channel.sup! }
-
-    describe '#meeting_already' do
-      context 'in the same round' do
-        it 'is true for multiple users' do
-          expect(round.send(:meeting_already?, [user1, user2])).to be true
-        end
-
-        it 'is true for one user' do
-          expect(round.send(:meeting_already?, [user1])).to be true
-        end
-
-        it 'is false for another user' do
-          expect(round.send(:meeting_already?, [Fabricate(:user, channel:)])).to be false
-        end
-      end
-
-      context 'in a new round immediate after a previous one' do
-        let!(:round2) { channel.sup! }
-
-        it 'is false for multiple users' do
-          expect(round2.send(:meeting_already?, [user1, user2])).to be false
-        end
-
-        it 'is false for one user' do
-          expect(round2.send(:meeting_already?, [user1])).to be false
-        end
-
-        it 'is false for another user' do
-          expect(round2.send(:meeting_already?, [Fabricate(:user, channel:)])).to be false
-        end
-      end
-    end
 
     describe '#met_recently?' do
       let!(:round2) { channel.sup! }
