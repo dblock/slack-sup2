@@ -38,7 +38,7 @@ describe 'Subscribe', :js, type: :feature do
 
     it 'subscribes team' do
       visit "/subscribe?team_id=#{team.team_id}"
-      expect(find_by_id('messages')).to have_text("Subscribe team #{team.name} for $39.99 a year.")
+      expect(find_by_id('messages')).to have_text("Subscribe team #{team.name} for $39.99/yr.")
 
       expect_any_instance_of(Team).to receive(:inform!).with(Team::SUBSCRIBED_TEXT)
 
@@ -67,6 +67,26 @@ describe 'Subscribe', :js, type: :feature do
       team.reload
       expect(team.subscribed).to be true
       expect(team.stripe_customer_id).to eq 'customer_id'
+    end
+  end
+
+  [
+    Faker::Lorem.word,
+    "#{Faker::Lorem.word}'s",
+    '💥 team',
+    'команда',
+    "\"#{Faker::Lorem.word}'s\"",
+    "#{Faker::Lorem.word}\n#{Faker::Lorem.word}",
+    "<script>alert('xss');</script>",
+    '<script>alert("xss");</script>'
+  ].each do |team_name|
+    context "team #{team_name}" do
+      let!(:team) { Fabricate(:team, name: team_name) }
+
+      it 'displays subscribe page' do
+        visit "/subscribe?team_id=#{team.team_id}"
+        expect(find_by_id('messages')).to have_text("Subscribe team #{team.name.gsub("\n", ' ')} for $39.99/yr.")
+      end
     end
   end
 end
