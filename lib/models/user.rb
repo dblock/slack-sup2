@@ -38,7 +38,7 @@ class User
   end
 
   def activated_user?
-    channel.team.activated_user_id && channel.team.activated_user_id == user_id
+    channel.team.is_admin?(user_id)
   end
 
   def team_admin?

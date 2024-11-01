@@ -521,7 +521,7 @@ module SlackSup
           channel = team.channels.where(channel_id: target).first
           if channel.nil?
             raise SlackSup::Error, "Sorry, <##{target}> is not a S'Up channel."
-          elsif !team.is_admin?(user) && channel.users.where(user_id: user).none?
+          elsif channel.users.where(user_id: user).none? && !team.is_admin?(user)
             raise SlackSup::Error, "Sorry, only members of #{channel.slack_mention}, <@#{team.activated_user_id}>, or a Slack team admin can do that."
           else
             channel

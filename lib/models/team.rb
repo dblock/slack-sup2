@@ -44,7 +44,7 @@ class Team
   end
 
   def is_admin?(user_id)
-    return true if activated_user_id == user_id
+    return true if activated_user_id && activated_user_id == user_id
 
     user_info = slack_client.users_info(user: user_id).user
     return true if user_info.is_admin? || user_info.is_owner?
