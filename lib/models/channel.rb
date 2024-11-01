@@ -328,6 +328,15 @@ class Channel
     end
   end
 
+  def is_admin?(user_or_user_id)
+    user_id = user_or_user_id.is_a?(User) ? user_or_user_id.user_id : user_or_user_id
+    user = user_or_user_id.is_a?(User) ? user_or_user_id : users.where(user_id: user_or_user_id).first
+
+    return true if user&.channel_admin?
+
+    team.is_admin?(user_id)
+  end
+
   private
 
   def validate_team_field_label

@@ -7,7 +7,7 @@ module SlackSup
         def set_opt_in(channel, data, user, v = nil)
           raise ArgumentError, "Invalid value: #{v}." unless ['in', 'out', nil].include?(v)
 
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(opt_in: v == 'in')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Users are now opted #{v} by default.")
           elsif v
@@ -23,22 +23,22 @@ module SlackSup
         end
 
         def set_api(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(api: v.to_b)
             message = [
-              channel_data_access_message(user.reload, true),
+              channel_data_access_message(channel, user, true),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           elsif v
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               "Only #{channel.channel_admins_slack_mentions} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
@@ -49,28 +49,28 @@ module SlackSup
         def set_api_token(channel, data, user)
           if !channel.api?
             set_api(channel, data, user)
-          elsif user.channel_admin? && !channel.api_token
+          elsif channel.is_admin?(user) && !channel.api_token
             channel.update_attributes!(api_token: SecureRandom.hex)
             message = [
-              channel_data_access_message(user.reload, false, true),
+              channel_data_access_message(channel, user, false, true),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
-          elsif user.channel_admin? && channel.api_token
+          elsif channel.is_admin?(user) && channel.api_token
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           elsif !channel.api_token
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               "Only #{channel.channel_admins_slack_mentions} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               channel.api_url
             ].join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
@@ -81,22 +81,22 @@ module SlackSup
         def unset_api_token(channel, data, user)
           if !channel.api?
             set_api(channel, data, user)
-          elsif user.channel_admin? && channel.api_token
+          elsif channel.is_admin?(user) && channel.api_token
             channel.update_attributes!(api_token: nil)
             message = [
-              channel_data_access_message(user.reload, true),
+              channel_data_access_message(channel, user, true),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
-          elsif user.channel_admin? && !channel.api_token
+          elsif channel.is_admin?(user) && !channel.api_token
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               "Only #{channel.channel_admins_slack_mentions} can unset it, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
@@ -107,16 +107,16 @@ module SlackSup
         def rotate_api_token(channel, data, user)
           if !channel.api?
             set_api(channel, data, user)
-          elsif user.channel_admin?
+          elsif channel.is_admin?(user)
             channel.update_attributes!(api_token: SecureRandom.hex)
             message = [
-              channel_data_access_message(user.reload, false, true),
+              channel_data_access_message(channel, user, false, true),
               channel.api_url
             ].compact.join("\n")
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
             message = [
-              channel_data_access_message(user),
+              channel_data_access_message(channel, user),
               "Only #{channel.channel_admins_slack_mentions} can rotate it, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
@@ -227,7 +227,7 @@ module SlackSup
         end
 
         def set_day(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             wday = v.to_s.downcase == 'today' ? channel.now.wday : Date.parse(v).wday
             channel.update_attributes(sup_wday: wday)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now on #{channel.sup_day}.")
@@ -242,7 +242,7 @@ module SlackSup
         end
 
         def set_time(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             # attempt to parse a timezone right to left
             z = []
             tz = nil
@@ -265,7 +265,7 @@ module SlackSup
         end
 
         def set_followup_day(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes(sup_followup_wday: Date.parse(v).wday)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up followup day is now on #{channel.sup_followup_day}.")
           elsif v
@@ -279,7 +279,7 @@ module SlackSup
         end
 
         def set_weeks(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(sup_every_n_weeks: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now every #{channel.sup_every_n_weeks_s}.")
           elsif v
@@ -293,7 +293,7 @@ module SlackSup
         end
 
         def set_size(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(sup_size: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{channel.sup_size} people.")
           elsif v
@@ -307,7 +307,7 @@ module SlackSup
         end
 
         def set_odd(channel, data, user, v = nil)
-          if user.channel_admin? && !v.nil?
+          if channel.is_admin?(user) && !v.nil?
             channel.update_attributes!(sup_odd: v.to_b)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people.")
           elsif !v.nil?
@@ -319,7 +319,7 @@ module SlackSup
         end
 
         def set_timezone(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             timezone = ActiveSupport::TimeZone.new(v)
             raise SlackSup::Error, "TimeZone _#{v}_ is invalid, see https://github.com/rails/rails/blob/v#{ActiveSupport.gem_version}/activesupport/lib/active_support/values/time_zone.rb#L30 for a list. Channel S'Up timezone is currently #{channel.sup_tzone}." unless timezone
 
@@ -334,7 +334,7 @@ module SlackSup
         end
 
         def set_custom_profile_team_field(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(team_field_label: v)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Custom profile team field is now _#{channel.team_field_label}_.")
           elsif v
@@ -346,7 +346,7 @@ module SlackSup
         end
 
         def unset_custom_profile_team_field(channel, data, user)
-          if user.channel_admin?
+          if channel.is_admin?(user)
             channel.update_attributes!(team_field_label: nil)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Custom profile team field is now _not set_.')
           else
@@ -356,7 +356,7 @@ module SlackSup
         end
 
         def set_message(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(sup_message: v.to_s)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now using a custom S'Up message. _#{channel.sup_message}_")
           elsif v && channel.sup_message
@@ -372,7 +372,7 @@ module SlackSup
         end
 
         def unset_message(channel, data, user)
-          if user.channel_admin?
+          if channel.is_admin?(user)
             channel.update_attributes!(sup_message: nil)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now using the default S'Up message. _#{Sup::PLEASE_SUP_MESSAGE}_")
           elsif channel.sup_message
@@ -384,7 +384,7 @@ module SlackSup
         end
 
         def set_recency(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             channel.update_attributes!(sup_recency: v.to_i)
             data.team.slack_client.chat_postMessage(channel: data.channel, text: "Now taking special care to not pair the same people more than every #{channel.sup_recency_s}.")
           elsif v
@@ -398,7 +398,7 @@ module SlackSup
         end
 
         def set_sync(channel, data, user, v = nil)
-          if user.channel_admin? && v
+          if channel.is_admin?(user) && v
             case v
             when 'now'
               channel.update_attributes!(sync: true)
@@ -500,67 +500,67 @@ module SlackSup
           end
         end
 
-        def parse_expression(m)
-          m['expression']
+        def normalize_expression(expression)
+          expression
             .gsub(/^team field/, 'teamfield')
             .gsub(/^api token/, 'apitoken')
             .split(/\s+/, 2)
         end
 
-        def channel_data_access_message(user, updated_api = false, updated_token = false)
-          if user.channel.api? && user.channel_admin? && user.channel.api_token
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token `#{user.channel.api_token}`."
-          elsif user.channel.api? && !user.channel_admin? && user.channel.api_token
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
+        def parse_expression(m)
+          expression = m['expression']
+          parts = expression.split(/\s+/, 2)
+          if parsed_channel = Channel.parse_slack_mention(parts.first)
+            [parsed_channel].concat(normalize_expression(parts[1..].join(' ')))
           else
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}#{user.channel.api_s}."
+            [nil].concat(normalize_expression(expression))
           end
         end
 
-        def team_data_access_message(team, user_id, updated_api = false, updated_token = false)
-          if team.api? && team.is_admin?(user_id) && team.api_token
+        def access_target_channel(team, target, user)
+          channel = team.channels.where(channel_id: target).first
+          if channel.nil?
+            raise SlackSup::Error, "Sorry, <##{target}> is not a S'Up channel."
+          elsif !team.is_admin?(user) && channel.users.where(user_id: user).none?
+            raise SlackSup::Error, "Sorry, only members of #{channel.slack_mention}, <@#{team.activated_user_id}>, or a Slack team admin can do that."
+          else
+            channel
+          end
+        end
+
+        def channel_data_access_message(channel, user, updated_api = false, updated_token = false)
+          if channel.api? && channel.is_admin?(user) && channel.api_token
+            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token `#{channel.api_token}`."
+          elsif channel.api? && !channel.is_admin?(user) && channel.api_token
+            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
+          else
+            "Channel data access via the API is #{updated_api ? 'now ' : nil}#{channel.api_s}."
+          end
+        end
+
+        def team_data_access_message(team, user, updated_api = false, updated_token = false)
+          if team.api? && team.is_admin?(user) && team.api_token
             "Team data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token `#{team.api_token}`."
-          elsif team.api? && !team.is_admin?(user_id) && team.api_token
+          elsif team.api? && !team.is_admin?(user) && team.api_token
             "Team data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
           else
             "Team data access via the API is #{updated_api ? 'now ' : nil}#{team.api_s}."
           end
         end
-      end
 
-      user_command 'unset' do |channel, user, data|
-        if data.match['expression']
-          k, = parse_expression(data.match)
-          if channel && user
-            channel_unset channel, data, user, k
-          else
-            team_unset data.team, data, user, k
-          end
-        else
-          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
-          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
-        end
-      end
-
-      user_command 'set' do |channel, user, data|
-        if data.match['expression']
-          k, v = parse_expression(data.match)
-          if channel && user
-            channel_set channel, data, user, k, v
-          elsif user
-            team_set data.team, data, user, k, v
-          end
-        elsif channel && user
+        def channel_info(data, channel, user)
           message = [
-            "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
+            "Channel #{channel.slack_mention} S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
             "Channel users are _opted #{channel.opt_in_s}_ by default.",
             "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
-            channel_data_access_message(user),
+            channel_data_access_message(channel, user),
             channel.api_url
           ].compact.join("\n")
           data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
-          logger.info "SET: #{channel}, user=#{user.user_id}"
-        elsif user
+          logger.info "SET: #{channel}, user=#{user}"
+        end
+
+        def team_info(data, user)
           team = data.team
           message = [
             team.enabled_channels_text,
@@ -569,22 +569,40 @@ module SlackSup
           ].compact.join("\n")
           data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           logger.info "SET: #{team}, channel=#{data.channel}, user=#{user}"
+        end
+      end
+
+      user_command 'unset' do |channel, user, data|
+        target, k, = parse_expression(data.match) if data.match['expression']
+        channel = access_target_channel(data.team, target, user) if target
+        if k && channel && user
+          channel_unset channel, data, user, k
         else
-          raise 'expected user'
+          team_unset data.team, data, user, k
+        end
+      end
+
+      user_command 'set' do |channel, user, data|
+        target, k, v = parse_expression(data.match) if data.match['expression']
+        channel = access_target_channel(data.team, target, user) if target
+        if k && channel && user
+          channel_set channel, data, user, k, v
+        elsif k.nil? && channel && user
+          channel_info data, channel, user
+        elsif k && user
+          team_set data.team, data, user, k, v
+        else
+          team_info data, user
         end
       end
 
       user_command 'rotate' do |channel, user, data|
-        if data.match['expression']
-          k, = parse_expression(data.match)
-          if channel && user
-            channel_rotate channel, data, user, k
-          elsif user
-            team_rotate data.team, data, user, k
-          end
+        target, k, = parse_expression(data.match) if data.match['expression']
+        channel = access_target_channel(data.team, target, user) if target
+        if k && channel && user
+          channel_rotate channel, data, user, k
         else
-          data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Missing setting, see _help_ for available options.')
-          logger.info "UNSET: #{channel}, user=#{data.user}, failed, missing setting"
+          team_rotate data.team, data, user, k
         end
       end
     end

@@ -646,4 +646,64 @@ describe Channel do
       end
     end
   end
+
+  describe '#is_admin?' do
+    let(:channel) { Fabricate(:channel) }
+
+    it 'invalid' do
+      allow_any_instance_of(Slack::Web::Client).to receive(:users_info).and_return(
+        Hashie::Mash.new(
+          user: {
+            is_admin: false,
+            is_owner: false
+          }
+        )
+      )
+
+      expect(channel.is_admin?('invalid')).to be false
+    end
+
+    it 'a team admin' do
+      expect(channel.is_admin?(channel.team.activated_user_id)).to be true
+    end
+
+    context 'channel inviter' do
+      let!(:channel_inviter) { Fabricate(:user, channel:, user_id: channel.inviter_id) }
+
+      it 'by id' do
+        expect(channel.is_admin?(channel.inviter_id)).to be true
+      end
+
+      it 'by user_id' do
+        expect(channel.is_admin?(channel_inviter.user_id)).to be true
+      end
+
+      it 'by user' do
+        expect(channel.is_admin?(channel_inviter)).to be true
+      end
+    end
+
+    {
+      { is_admin: false, is_owner: false } => false,
+      { is_admin: true, is_owner: false } => true,
+      { is_admin: false, is_owner: true } => true,
+      { is_admin: true, is_owner: true } => true
+    }.each_pair do |u, expected|
+      context u do
+        before do
+          allow_any_instance_of(Slack::Web::Client).to receive(:users_info).with(
+            user: 'user'
+          ).and_return(
+            Hashie::Mash.new(
+              user: u
+            )
+          )
+        end
+
+        it 'correct' do
+          expect(channel.is_admin?('user')).to eq expected
+        end
+      end
+    end
+  end
 end

@@ -23,6 +23,9 @@ module SlackSup
         set api token              - require an access token in the X-Access-Token header for API access
         unset api token            - don't require an access token for API access
         rotate api token           - rotate the token required for API access
+        set #channel ...           - change a setting for a channel
+        unset #channel ...         - unset a setting for a channel
+        rotate #channel api token  - rotate a channel token for API access
         data                       - get a .zip of the team's data
 
         In a Channel
