@@ -14,10 +14,10 @@ jobs:
           mongodb-version: '5.0'
       - uses: browser-actions/setup-geckodriver@latest
         with:
-          geckodriver-version: '0.32.0'
-      - uses: browser-actions/setup-firefox@latest
+          geckodriver-version: '0.35.0'
+      - uses: browser-actions/setup-firefox@v1.5.2
         with:
-          firefox-version: '108.0'
+          firefox-version: '134.0.1'
       - uses: GabrielBB/xvfb-action@v1
         with:          
           run: |
