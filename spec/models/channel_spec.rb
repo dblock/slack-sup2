@@ -38,6 +38,15 @@ describe Channel do
         end
       end
 
+      context 'with a disabled admin' do
+        let!(:another) { Fabricate(:user, channel:, enabled: false, is_admin: true) }
+
+        it 'has one admin' do
+          expect(channel.channel_admins).to eq([user])
+          expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+        end
+      end
+
       context 'with a team admin' do
         let!(:another) { Fabricate(:user, channel:, is_admin: false) }
 

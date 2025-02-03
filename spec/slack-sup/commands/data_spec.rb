@@ -17,7 +17,7 @@ describe SlackSup::Commands::Data do
         end.to change(Export, :count).by(1)
       end
 
-      it 'erros on channel' do
+      it 'errors on channel' do
         expect do
           expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
             "Sorry, <#channel> is not a S'Up channel."
