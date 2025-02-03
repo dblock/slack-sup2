@@ -342,7 +342,9 @@ describe Channel do
     let(:t_in_time_zone) { Time.now.utc.in_time_zone(tz) }
     let(:wday) { t_in_time_zone.wday }
     let(:beginning_of_day) { t_in_time_zone.beginning_of_day }
-    let(:channel) { Fabricate(:channel, sup_wday: wday, sup_time_of_day: 0, sup_tz: tz) }
+    let(:eight_am) { 8 * 60 * 60 }
+    let(:channel) { Fabricate(:channel, sup_wday: wday, sup_time_of_day: eight_am, sup_tz: tz) }
+    let(:on_time_sup) { beginning_of_day + channel.sup_time_of_day }
 
     describe '#sup!' do
       before do
@@ -394,6 +396,7 @@ describe Channel do
       before do
         allow(channel).to receive(:sync!)
         allow(channel).to receive(:inform!)
+        Timecop.travel(on_time_sup)
       end
 
       context 'without rounds' do
@@ -402,7 +405,7 @@ describe Channel do
         end
       end
 
-      context 'with a round' do
+      context 'with a round on time' do
         before do
           channel.sup!
         end
@@ -413,7 +416,7 @@ describe Channel do
 
         context 'after less than a week' do
           before do
-            Timecop.travel(Time.now.utc + 6.days)
+            Timecop.travel(on_time_sup + 6.days)
           end
 
           it 'is false' do
@@ -423,7 +426,7 @@ describe Channel do
 
         context 'after more than a week' do
           before do
-            Timecop.travel(Time.now.utc + 7.days)
+            Timecop.travel(on_time_sup + 7.days)
           end
 
           it 'is true' do
@@ -448,7 +451,7 @@ describe Channel do
 
           context 'after more than a week' do
             before do
-              Timecop.travel(Time.now.utc + 7.days)
+              Timecop.travel(on_time_sup + 7.days)
             end
 
             it 'is true' do
@@ -458,7 +461,7 @@ describe Channel do
 
           context 'after more than two weeks' do
             before do
-              Timecop.travel(Time.now.utc + 14.days)
+              Timecop.travel(on_time_sup + 14.days)
             end
 
             it 'is true' do
@@ -469,7 +472,105 @@ describe Channel do
 
         context 'after more than a week on the wrong day of the week' do
           before do
-            Timecop.travel(Time.now.utc + 8.days)
+            Timecop.travel(on_time_sup + 8.days)
+          end
+
+          it 'is false' do
+            expect(channel.sup?).to be false
+          end
+        end
+      end
+
+      context 'with a round delayed by an hour' do
+        before do
+          Timecop.freeze(on_time_sup + 1.hour) do
+            channel.sup!
+          end
+        end
+
+        it 'is false' do
+          expect(channel.sup?).to be false
+        end
+
+        context 'after less than a week' do
+          before do
+            Timecop.travel(on_time_sup + 6.days)
+          end
+
+          it 'is false' do
+            expect(channel.sup?).to be false
+          end
+        end
+
+        context 'before sup time a week later' do
+          before do
+            Timecop.travel(on_time_sup + 7.days - 1.hour)
+          end
+
+          it 'is false' do
+            expect(channel.sup?).to be false
+          end
+        end
+
+        context 'on time a week later' do
+          before do
+            Timecop.travel(on_time_sup + 7.days)
+          end
+
+          it 'is true' do
+            expect(channel.sup?).to be true
+          end
+        end
+
+        context 'after more than a week' do
+          before do
+            Timecop.travel(on_time_sup + 7.days + 1.hour)
+          end
+
+          it 'is true' do
+            expect(channel.sup?).to be true
+          end
+
+          context 'and another round' do
+            before do
+              channel.sup!
+            end
+
+            it 'is false' do
+              expect(channel.sup?).to be false
+            end
+          end
+        end
+
+        context 'with a custom sup_every_n_weeks' do
+          before do
+            channel.update_attributes!(sup_every_n_weeks: 2)
+          end
+
+          context 'after more than a week' do
+            before do
+              Timecop.travel(on_time_sup + 7.days)
+            end
+
+            it 'is true' do
+              expect(channel.sup?).to be false
+            end
+          end
+
+          context 'after more than two weeks' do
+            before do
+              Timecop.travel(on_time_sup + 14.days)
+            end
+
+            it 'is true' do
+              expect(channel.sup?).to be true
+            end
+          end
+        end
+
+        context 'after more than a week on the wrong day of the week' do
+          before do
+            Timecop.travel(on_time_sup + 8.days)
           end
 
           it 'is false' do
