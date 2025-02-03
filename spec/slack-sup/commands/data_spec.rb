@@ -10,22 +10,39 @@ describe SlackSup::Commands::Data do
       end
 
       it 'prepares team data' do
-        expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
-          channel: 'DM',
-          text: 'Hey <@user>, we will prepare your team data in the next few minutes, please check your DMs for a link.'
-        )
+        expect do
+          expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
+            'Hey <@user>, we will prepare your team data in the next few minutes, please check your DMs for a link.'
+          )
+        end.to change(Export, :count).by(1)
+      end
+
+      it 'erros on channel' do
+        expect do
+          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
+            "Sorry, <#channel> is not a S'Up channel."
+          )
+        end.not_to change(Export, :count)
+      end
+
+      it 'does not allow for more than one active request' do
+        Export.create!(team: team, user_id: 'user', exported: false)
+
+        expect do
+          expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
+            'Hey <@user>, we are still working on your previous request.'
+          )
+        end.not_to change(Export, :count)
+      end
+
+      it 'allow for more than one active request once the previous one is completed' do
+        Export.create!(team: team, user_id: 'user', exported: true)
 
         expect do
           expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
             'Hey <@user>, we will prepare your team data in the next few minutes, please check your DMs for a link.'
           )
         end.to change(Export, :count).by(1)
-
-        expect do
-          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
-            "Sorry, <#channel> is not a S'Up channel."
-          )
-        end.not_to change(Export, :count)
       end
 
       context 'with a channel' do
@@ -79,6 +96,26 @@ describe SlackSup::Commands::Data do
       end
 
       it 'can download channel data via a DM' do
+        expect do
+          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
+            "Hey <@user>, we will prepare your #{user.channel.slack_mention} channel data in the next few minutes, please check your DMs for a link."
+          )
+        end.to change(Export, :count).by(1)
+      end
+
+      it 'does not allow for more than one active request' do
+        Export.create!(team: team, channel: channel, user_id: 'user', exported: false)
+
+        expect do
+          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
+            'Hey <@user>, we are still working on your previous request.'
+          )
+        end.not_to change(Export, :count)
+      end
+
+      it 'allows for more than one request once a previous one has completed' do
+        Export.create!(team: team, channel: channel, user_id: 'user', exported: true)
+
         expect do
           expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
             "Hey <@user>, we will prepare your #{user.channel.slack_mention} channel data in the next few minutes, please check your DMs for a link."

@@ -27,6 +27,7 @@ module SlackSup
 
         if channel
           raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions} can download raw data." unless channel.is_admin?(user)
+          raise SlackSup::Error, "Hey <@#{data.user}>, we are still working on your previous request." if Export.where(team: data.team, channel: channel, user_id: data.user, exported: false).exists?
 
           Export.create!(
             team: data.team,
@@ -42,6 +43,7 @@ module SlackSup
           logger.info "DATA: #{data.team}, channel=#{data.channel}, user=#{data.user}"
         else
           raise SlackSup::Error, "Sorry, only <@#{data.team.activated_user_id}> or a Slack team admin can download raw data." unless data.team.is_admin?(data.user)
+          raise SlackSup::Error, "Hey <@#{data.user}>, we are still working on your previous request." if Export.where(team: data.team, channel: nil, user_id: data.user, exported: false).exists?
 
           Export.create!(
             team: data.team,
