@@ -6,41 +6,37 @@ describe SlackSup::Commands::Data do
 
     context 'as admin' do
       before do
-        allow_any_instance_of(Team).to receive(:short_lived_token).and_return('token')
         allow_any_instance_of(Team).to receive(:is_admin?).and_return(true)
       end
 
-      it 'returns a link to download data' do
+      it 'prepares team data' do
         expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
           channel: 'DM',
-          text: 'Click here to download your team data.',
-          attachments: [
-            text: '',
-            attachment_type: 'default',
-            actions: [{
-              type: 'button',
-              text: 'Download',
-              url: "https://sup2.playplay.io/api/data?team_id=#{team.id}&access_token=token"
-            }]
-          ]
+          text: 'Hey <@user>, we will prepare your team data in the next few minutes, please check your DMs for a link.'
         )
 
-        expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
-          'Click here to download your team data.'
-        )
+        expect do
+          expect(message: '@sup data', channel: 'DM').to respond_with_slack_message(
+            'Hey <@user>, we will prepare your team data in the next few minutes, please check your DMs for a link.'
+          )
+        end.to change(Export, :count).by(1)
 
-        expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
-          "Sorry, <#channel> is not a S'Up channel."
-        )
+        expect do
+          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
+            "Sorry, <#channel> is not a S'Up channel."
+          )
+        end.not_to change(Export, :count)
       end
 
       context 'with a channel' do
         let(:channel) { Fabricate(:channel, team:) }
 
-        it 'downloads channel data' do
-          expect(message: "@sup data #{channel.slack_mention}", channel: 'DM').to respond_with_slack_message(
-            "Click here to download your #{channel.slack_mention} channel data."
-          )
+        it 'prepares team data' do
+          expect do
+            expect(message: "@sup data #{channel.slack_mention}", channel: 'DM').to respond_with_slack_message(
+              "Hey <@user>, we will prepare your #{channel.slack_mention} channel data in the next few minutes, please check your DMs for a link."
+            )
+          end.to change(Export, :count).by(1)
         end
       end
     end
@@ -75,29 +71,19 @@ describe SlackSup::Commands::Data do
           users: 'user'
         ).and_return(Hashie::Mash.new('channel' => { 'id' => 'D1' }))
 
-        expect(message: '@sup data').to respond_with_slack_message(
-          'Hey <@user>, check your DMs for a link.'
-        )
-
-        expect(team.slack_client).to have_received(:chat_postMessage).with(
-          hash_including(
-            {
-              channel: 'D1',
-              text: 'Click here to download your <#channel> channel data.'
-            }
+        expect do
+          expect(message: '@sup data').to respond_with_slack_message(
+            "Hey <@user>, we will prepare your #{user.channel.slack_mention} channel data in the next few minutes, please check your DMs for a link."
           )
-        )
-
-        expect(team.slack_client).to have_received(:chat_postMessage).with(
-          channel: 'channel',
-          text: 'Hey <@user>, check your DMs for a link.'
-        )
+        end.to change(Export, :count).by(1)
       end
 
       it 'can download channel data via a DM' do
-        expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
-          'Click here to download your <#channel> channel data.'
-        )
+        expect do
+          expect(message: '@sup data <#channel>', channel: 'DM').to respond_with_slack_message(
+            "Hey <@user>, we will prepare your #{user.channel.slack_mention} channel data in the next few minutes, please check your DMs for a link."
+          )
+        end.to change(Export, :count).by(1)
       end
     end
 

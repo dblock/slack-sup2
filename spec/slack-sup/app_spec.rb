@@ -147,4 +147,18 @@ describe SlackSup::App do
       end
     end
   end
+
+  context 'export_data!' do
+    include_context 'uses temp dir'
+
+    let!(:export1) { Fabricate(:team_export) }
+    let!(:export2) { Fabricate(:channel_export, exported: true) }
+
+    it 'exports' do
+      expect_any_instance_of(Export).to receive(:export!).once.and_call_original
+      expect_any_instance_of(Export).to receive(:notify!)
+      subject.send(:export_data!)
+      expect(export1.reload.exported).to be true
+    end
+  end
 end

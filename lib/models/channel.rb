@@ -45,6 +45,7 @@ class Channel
   has_many :users
   has_many :rounds, dependent: :destroy
   has_many :sups, dependent: :destroy
+  has_many :exports, dependent: :destroy
 
   before_validation :validate_team_field_label
   before_validation :validate_team_field_label_id

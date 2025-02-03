@@ -14,7 +14,7 @@ describe Api do
         '/api/channels',
         '/api/channels/{id}',
         '/api/credit_cards',
-        '/api/data',
+        '/api/data/{id}',
         '/api/rounds',
         '/api/rounds/{id}',
         '/api/slack/action',

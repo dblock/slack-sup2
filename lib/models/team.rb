@@ -13,6 +13,7 @@ class Team
   field :api_token, type: String
 
   has_many :channels, dependent: :destroy
+  has_many :exports, dependent: :destroy
 
   after_update :subscribed!
   after_save :activated!
