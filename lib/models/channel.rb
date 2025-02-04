@@ -113,7 +113,7 @@ class Channel
   end
 
   def channel_admins_slack_mentions
-    (["<@#{inviter_id}>"] + channel_admins.map(&:slack_mention)).uniq.or
+    (["<@#{inviter_id}>"] + channel_admins.map(&:slack_mention)).uniq
   end
 
   def self.parse_slack_mention(mention)

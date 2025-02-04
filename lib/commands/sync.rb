@@ -8,7 +8,7 @@ module SlackSup
           channel.update_attributes!(sync: true)
           data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{channel.last_sync_at_text} Come back and run `stats` in a bit.")
         elsif channel
-          data.team.slack_client.chat_postMessage(channel: data.channel, text: "Users will sync before the next round. Only #{channel.channel_admins_slack_mentions} can manually sync, sorry.")
+          data.team.slack_client.chat_postMessage(channel: data.channel, text: "Users will sync before the next round. Only #{channel.channel_admins_slack_mentions.or} can manually sync, sorry.")
         else
           data.team.slack_client.chat_postMessage(channel: data.channel, text: 'Please run this command in a channel.')
         end

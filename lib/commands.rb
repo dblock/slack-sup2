@@ -1,6 +1,7 @@
 require_relative 'commands/mixins'
 require_relative 'commands/help'
 require_relative 'commands/about'
+require_relative 'commands/admins'
 require_relative 'commands/subscription'
 require_relative 'commands/unsubscribe'
 require_relative 'commands/opt'
@@ -18,6 +19,7 @@ SlackRubyBotServer::Events::AppMentions.configure do |config|
   config.handlers = [
     SlackSup::Commands::Help,
     SlackSup::Commands::About,
+    SlackSup::Commands::Admins,
     SlackSup::Commands::Subscription,
     SlackSup::Commands::Unsubscribe,
     SlackSup::Commands::Set,

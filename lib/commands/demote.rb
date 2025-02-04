@@ -6,7 +6,7 @@ module SlackSup
 
       user_command 'demote' do |channel, user, data|
         if channel
-          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions} can demote users." unless user.channel_admin?
+          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions.or} can demote users." unless user.channel_admin?
 
           mention = data.match['expression']
           raise SlackSup::Error, 'Sorry, demote @someone.' if mention.blank?

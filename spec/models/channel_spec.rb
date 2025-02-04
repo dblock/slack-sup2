@@ -17,7 +17,7 @@ describe Channel do
 
       it 'has an admin' do
         expect(channel.channel_admins).to eq([user])
-        expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+        expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention])
       end
 
       context 'with another admin' do
@@ -25,7 +25,7 @@ describe Channel do
 
         it 'has two admins' do
           expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
-          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention])
         end
       end
 
@@ -34,7 +34,7 @@ describe Channel do
 
         it 'has one admin' do
           expect(channel.channel_admins).to eq([user])
-          expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention])
         end
       end
 
@@ -43,7 +43,7 @@ describe Channel do
 
         it 'has one admin' do
           expect(channel.channel_admins).to eq([user])
-          expect(channel.channel_admins_slack_mentions).to eq(user.slack_mention)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention])
         end
       end
 
@@ -56,7 +56,7 @@ describe Channel do
 
         it 'has two admins' do
           expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
-          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention])
         end
       end
 
@@ -78,7 +78,7 @@ describe Channel do
 
         it 'has two admins' do
           expect(channel.channel_admins.to_a.sort).to eq([user, another].sort)
-          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention].or)
+          expect(channel.channel_admins_slack_mentions).to eq([user.slack_mention, another.slack_mention])
         end
       end
     end

@@ -131,7 +131,7 @@ describe SlackSup::Commands::Data do
 
       it 'requires an admin' do
         expect(message: '@sup data').to respond_with_slack_message(
-          "Sorry, only #{channel.channel_admins_slack_mentions} can download raw data."
+          "Sorry, only #{channel.channel_admins_slack_mentions.or} can download raw data."
         )
       end
 

@@ -26,7 +26,7 @@ module SlackSup
         channel = access_target_channel(data.team, target, user) if target
 
         if channel
-          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions} can download raw data." unless channel.is_admin?(user)
+          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions.or} can download raw data." unless channel.is_admin?(user)
           raise SlackSup::Error, "Hey <@#{data.user}>, we are still working on your previous request." if Export.where(team: data.team, channel: channel, user_id: data.user, exported: false).exists?
 
           Export.create!(

@@ -1,5 +1,5 @@
 Fabricator(:export) do
-  user_id { Fabricate.sequence(:user_id) { |i| "U#{i}" } }
+  user_id { Fabricate.sequence(:user_id) { |i| "E#{i}" } }
 end
 
 Fabricator(:team_export, from: :export) do

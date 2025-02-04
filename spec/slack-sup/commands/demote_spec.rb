@@ -68,7 +68,7 @@ describe SlackSup::Commands::Demote do
 
       it 'requires an admin' do
         expect(message: '@sup demote someone').to respond_with_slack_message(
-          "Sorry, only #{channel.channel_admins_slack_mentions} can demote users."
+          "Sorry, only #{channel.channel_admins_slack_mentions.or} can demote users."
         )
       end
     end

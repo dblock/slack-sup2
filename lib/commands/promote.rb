@@ -6,7 +6,7 @@ module SlackSup
 
       user_command 'promote' do |channel, user, data|
         if channel
-          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions} can promote users." unless user.channel_admin?
+          raise SlackSup::Error, "Sorry, only #{channel.channel_admins_slack_mentions.or} can promote users." unless user.channel_admin?
 
           mention = data.match['expression']
           raise SlackSup::Error, 'Sorry, promote @someone.' if mention.blank?

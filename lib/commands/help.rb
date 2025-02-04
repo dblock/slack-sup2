@@ -27,6 +27,7 @@ module SlackSup
         unset #channel ...         - unset a setting for a channel
         rotate #channel api token  - rotate a channel token for API access
         data [#channel]            - get a .zip of the team or channel data
+        admins                     - show team admin
 
         In a Channel
         ------------
@@ -35,6 +36,7 @@ module SlackSup
         next                       - time of next round
         set                        - show all channel settings
         data                       - get DMed a link to a .zip of channel data
+        admins                     - show channel admins
 
         In a Channel (Admins)
         --------------

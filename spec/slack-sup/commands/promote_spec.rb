@@ -68,7 +68,7 @@ describe SlackSup::Commands::Promote do
 
       it 'requires an admin' do
         expect(message: '@sup promote someone').to respond_with_slack_message(
-          "Sorry, only #{channel.channel_admins_slack_mentions} can promote users."
+          "Sorry, only #{channel.channel_admins_slack_mentions.or} can promote users."
         )
       end
     end
