@@ -2,7 +2,7 @@ S'Up v2 for Slack Channels
 ==========================
 
 [![Tests](https://github.com/dblock/slack-sup2/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/slack-sup2/actions/workflows/test.yml)
-[![Code Climate](https://codeclimate.com/github/dblock/slack-sup.svg)](https://codeclimate.com/github/dblock/slack-sup)
+[![Code Climate](https://codeclimate.com/github/dblock/slack-sup2.svg)](https://codeclimate.com/github/dblock/slack-sup2)
 
 ### What's This?
 
