@@ -136,8 +136,8 @@ class Round
     logger.info "Generating sups for #{channel} of #{channel.users.suppable.count} users."
 
     solve!&.each do |combination|
-      logger.info "   Creating sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
       Sup.create!(round: self, channel:, users: combination)
+      logger.info "   Created sup for #{combination.map(&:user_name)}, #{sups.count * channel.sup_size} out of #{channel.users.suppable.count}."
     end
 
     all_users = channel.users.suppable.to_a.shuffle
