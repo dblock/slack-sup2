@@ -10,6 +10,8 @@ class Export
 
   validates_presence_of :team, :user_id
 
+  field :max_rounds_count, type: Integer
+
   field :filename, type: String
   field :exported, type: Boolean, default: false
 
@@ -38,7 +40,9 @@ class Export
     path = File.join(Dir.tmpdir, 'slack-sup2', _id)
     FileUtils.rm_rf(path)
     FileUtils.makedirs(path)
-    filename = target.export_zip!(path)
+    options = {}
+    options[:max_rounds_count] = max_rounds_count if max_rounds_count
+    filename = target.export_zip!(path, options)
     update_attributes!(filename: filename, exported: true)
     Api::Middleware.logger.info "Exported data for #{self}, filename=#{filename}."
     notify!

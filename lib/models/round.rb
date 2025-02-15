@@ -91,9 +91,9 @@ class Round
     @stats ||= RoundStats.new(self)
   end
 
-  def export!(root)
+  def export!(root, options = {})
     super
-    super(root, 'sups', Api::Presenters::SupPresenter, sups)
+    super(root, options.merge(name: 'sups', presenter: Api::Presenters::SupPresenter, coll: sups))
   end
 
   def paired_users

@@ -396,4 +396,29 @@ describe Team do
       expect(File.size(zip)).not_to eq 0
     end
   end
+
+  describe '#max_rounds_count' do
+    let(:team) { Fabricate(:team) }
+
+    it 'returns 0 without rounds' do
+      expect(team.max_rounds_count).to eq(0)
+    end
+
+    context 'with two channels' do
+      let!(:channel1) { Fabricate(:channel, team: team) }
+      let!(:channel2) { Fabricate(:channel, team: team) }
+      let!(:channel3) { Fabricate(:channel, team: team) }
+
+      before do
+        allow_any_instance_of(Channel).to receive(:sync!)
+        allow_any_instance_of(Channel).to receive(:inform!)
+        2.times { channel1.sup! }
+        channel2.sup!
+      end
+
+      it 'returns max count' do
+        expect(team.max_rounds_count).to eq 2
+      end
+    end
+  end
 end

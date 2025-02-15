@@ -44,9 +44,9 @@ class TeamStats
     pairs.count
   end
 
-  def export!(root)
-    super(root, 'stats', Api::Presenters::TeamStatsPresenter)
-    super(root, 'pairs', Api::Presenters::ChannelStatsPairPresenter, pairs_of_user_names)
+  def export!(root, options = {})
+    super(root, options.merge(name: 'stats', presenter: Api::Presenters::TeamStatsPresenter))
+    super(root, options.merge(name: 'pairs', presenter: Api::Presenters::ChannelStatsPairPresenter, coll: pairs_of_user_names))
   end
 
   def to_s

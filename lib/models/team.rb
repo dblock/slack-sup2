@@ -22,6 +22,10 @@ class Team
     Round.where(:channel_id.in => channels.distinct(:_id))
   end
 
+  def max_rounds_count
+    @max_rounds_count ||= channels.map { |c| c.rounds.size }.max || 0
+  end
+
   def sups
     Sup.where(:channel_id.in => channels.distinct(:_id))
   end
@@ -244,19 +248,22 @@ class Team
     super(root, team_id)
   end
 
-  def export_zip!(root)
-    super(root, team_id)
+  def export_zip!(root, options = {})
+    super(root, team_id, options)
   end
 
-  def export!(root)
+  def export!(root, options = {})
     super
-    stats.export!(root)
-    super(root, 'channels', Api::Presenters::ChannelPresenter, channels)
-    super(root, 'users', Api::Presenters::UserPresenter, users)
-    super(root, 'rounds', Api::Presenters::RoundPresenter, rounds)
-    super(root, 'sups', Api::Presenters::SupPresenter, sups)
+    stats.export!(root, options)
+    super(root, options.merge(name: 'channels', presenter: Api::Presenters::ChannelPresenter, coll: channels))
+    super(root, options.merge(name: 'users', presenter: Api::Presenters::UserPresenter, coll: users))
+    super(root, options.merge(name: 'rounds', presenter: Api::Presenters::RoundPresenter, coll: rounds))
+    super(root, options.merge(name: 'sups', presenter: Api::Presenters::SupPresenter, coll: sups))
     channels.each do |channel|
-      channel.export!(File.join(root, File.join('channels', channel.channel_id)))
+      channel.export!(
+        File.join(root, File.join('channels', channel.channel_id)),
+        options
+      )
     end
   end
 
