@@ -16,10 +16,12 @@ class User
   field :real_name, type: String
 
   field :introduced_sup_at, type: DateTime
+  field :vacation_until, type: DateTime
 
   field :opted_in, type: Boolean, default: true
   scope :opted_in, -> { where(enabled: true, opted_in: true) }
   scope :opted_out, -> { where(enabled: true, opted_in: false) }
+  scope :on_vacation, -> { where(enabled: true, opted_in: true, :vacation_until.gt => Time.now) }
 
   field :enabled, type: Boolean, default: true
   scope :enabled, -> { where(enabled: true) }
@@ -37,6 +39,10 @@ class User
     channel.slack_client
   end
 
+  def on_vacation?
+    !!(opted_in && vacation_until && vacation_until > Time.now)
+  end
+
   def activated_user?
     channel.team.is_admin?(user_id)
   end
@@ -51,6 +57,13 @@ class User
 
   def slack_mention
     "<@#{user_id}>"
+  end
+
+  def vacation_until_s
+    return unless vacation_until
+
+    vacation_until_in_tz = vacation_until.in_time_zone(channel.sup_tzone)
+    "#{vacation_until_in_tz.strftime('%A, %B %d, %Y')} #{vacation_until_in_tz.strftime('%l:%M %P').strip}"
   end
 
   def self.parse_slack_mention(mention)

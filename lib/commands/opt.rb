@@ -87,7 +87,7 @@ module SlackSup
         end
 
         data.team.slack_client.chat_postMessage(channel: data.channel, text: messages.join("\n"))
-        logger.info "OPT: #{data.team}, for=#{user}, channel=#{data.channel}, user=#{data.user}"
+        logger.info "OPT: #{data.team}, for=#{user_ids.join(',')}, in=#{channel_ids.join(',')}, channel=#{data.channel}, user=#{data.user}, op=#{op}"
       end
     end
   end

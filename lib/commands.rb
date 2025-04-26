@@ -5,6 +5,7 @@ require_relative 'commands/admins'
 require_relative 'commands/subscription'
 require_relative 'commands/unsubscribe'
 require_relative 'commands/opt'
+require_relative 'commands/vacation'
 require_relative 'commands/set'
 require_relative 'commands/stats'
 require_relative 'commands/next'
@@ -24,6 +25,7 @@ SlackRubyBotServer::Events::AppMentions.configure do |config|
     SlackSup::Commands::Unsubscribe,
     SlackSup::Commands::Set,
     SlackSup::Commands::Opt,
+    SlackSup::Commands::Vacation,
     SlackSup::Commands::Stats,
     SlackSup::Commands::Next,
     SlackSup::Commands::Rounds,

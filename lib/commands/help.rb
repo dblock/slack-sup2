@@ -15,6 +15,7 @@ module SlackSup
         about                      - more helpful info about this bot
         stats                      - team stats
         opt [in|out] [#channel]    - opt in/out
+        vacation [until] ...       - set yourself away for a time
         set                        - team settings
         next                       - time of all next rounds
         subscription               - show team subscription info
@@ -61,6 +62,7 @@ module SlackSup
         unset message              - reset the message users see when creating a S'Up DM to the default one
         opt [in|out] [@mention]    - opt users in/out by @mention
         promote|demote [@mention]  - promote or demote another user to/from channel admin
+        vacation [@mention]        - set someone away for a time
 
         S'Up
         ----

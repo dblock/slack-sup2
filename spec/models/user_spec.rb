@@ -187,4 +187,46 @@ describe User do
       expect { User.parse_slack_mention!('invalid') }.to raise_error SlackSup::Error, 'Invalid user mention invalid.'
     end
   end
+
+  describe '#on_vacation' do
+    let(:tuesday) { DateTime.parse('2017/1/3 3:00 PM EST') }
+
+    before do
+      Timecop.travel(tuesday)
+    end
+
+    it 'not on vacation' do
+      expect(Fabricate(:user).on_vacation?).to be false
+      expect(Fabricate(:user, opted_in: false, vacation_until: Time.now + 2.weeks).on_vacation?).to be false
+      expect(Fabricate(:user, vacation_until: Time.now - 2.weeks).on_vacation?).to be false
+    end
+
+    it 'on vacation' do
+      expect(Fabricate(:user, vacation_until: Time.now + 2.weeks).on_vacation?).to be true
+    end
+
+    context 'with users' do
+      let(:channel) { Fabricate(:channel) }
+      let!(:user1) { Fabricate(:user, channel:, vacation_until: Time.now - 2.weeks) }
+      let!(:user2) { Fabricate(:user, channel:, vacation_until: Time.now + 2.weeks) }
+      let!(:user3_opted_out) { Fabricate(:user, channel:, opted_in: false, vacation_until: Time.now) }
+      let!(:user4_disabled) { Fabricate(:user, channel:, enabled: false, vacation_until: Time.now) }
+
+      it 'returns vacationing users' do
+        expect(channel.users.on_vacation).to eq [user2]
+      end
+
+      it 'does not freeze time' do
+        expect(channel.users.on_vacation).to eq [user2]
+
+        Timecop.travel(Time.now - 3.weeks) do
+          expect(channel.users.on_vacation).to eq [user1, user2]
+        end
+
+        Timecop.travel(Time.now + 3.weeks) do
+          expect(channel.users.on_vacation).to eq []
+        end
+      end
+    end
+  end
 end

@@ -209,6 +209,20 @@ describe Round do
         end
       end
 
+      context 'with a user on vacation' do
+        before do
+          user2.update_attributes!(vacation_until: Time.now + 1.week)
+        end
+
+        it 'does not include the user on vacation' do
+          expect do
+            channel.sup!
+          end.to change(Sup, :count).by(1)
+          sup = Sup.first
+          expect(sup.users).to eq([user1, user3])
+        end
+      end
+
       context 'with one extra user' do
         let!(:user4) { Fabricate(:user, channel:) }
 
