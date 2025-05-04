@@ -118,7 +118,7 @@ describe SlackSup::Commands::Rounds do
       it 'reports counts' do
         expect(message: '@sup rounds 2').to respond_with_slack_message(
           "Channel S'Up facilitated 1 round.\n" \
-          "* in progress: 1 S'Up paired 3 users, no outcomes reported, 1 opt out and 2 missed users."
+          "* in progress: 1 S'Up paired 3 users, no outcomes reported, 1 user opted out and 2 users missed."
         )
       end
     end

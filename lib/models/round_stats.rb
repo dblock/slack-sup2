@@ -47,8 +47,8 @@ class RoundStats
       "paired #{pluralize(users_in_sups_count, 'user')}",
       sups_count && sups_count > 0 && reported_outcomes_count && reported_outcomes_count > 0 ? percent_s(positive_outcomes_count, sups_count) + ' positive outcomes' : nil,
       sups_count && sups_count > 0 ? percent_s(reported_outcomes_count, sups_count) + ' outcomes reported' : nil,
-      round.opted_out_users_count && round.opted_out_users_count > 0 ? pluralize(round.opted_out_users_count, 'opt out').to_s : nil,
-      round.missed_users_count && round.missed_users_count > 0 ? pluralize(round.missed_users_count, 'missed user').to_s : nil,
+      round.opted_out_users_count && round.opted_out_users_count > 0 ? "#{pluralize(round.opted_out_users_count, 'user')} opted out" : nil,
+      round.missed_users_count && round.missed_users_count > 0 ? "#{pluralize(round.missed_users_count, 'user')} missed" : nil,
       round.vacation_users_count && round.vacation_users_count > 0 ? "#{pluralize(round.vacation_users_count, 'user')} on vacation" : nil
     ].compact.and + '.'
   end
