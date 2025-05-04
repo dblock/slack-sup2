@@ -15,6 +15,7 @@ describe User do
       expect(user.user_name).to eq 'username'
       expect(user.real_name).to eq 'Real Name'
       expect(user.email).to eq 'user@example.com'
+      expect(user.vacation?).to be false
     end
 
     context 'with team field label' do
@@ -32,23 +33,53 @@ describe User do
     context 'admin' do
       it 'does not demote an admin' do
         user.update_attributes!(is_admin: true)
-        allow_any_instance_of(Slack::Web::Client).to receive(:users_info).and_return(Hashie::Mash.new(
-                                                                                       user: {
-                                                                                         is_admin: false
-                                                                                       }
-                                                                                     ))
+        allow_any_instance_of(Slack::Web::Client).to receive(:users_info)
+          .and_return(
+            Hashie::Mash.new(
+              user: {
+                is_admin: false
+              }
+            )
+          )
         user.sync!
         expect(user.reload.is_admin).to be true
       end
 
       it 'promotes an admin' do
-        allow_any_instance_of(Slack::Web::Client).to receive(:users_info).and_return(Hashie::Mash.new(
-                                                                                       user: {
-                                                                                         is_admin: true
-                                                                                       }
-                                                                                     ))
+        allow_any_instance_of(Slack::Web::Client).to receive(:users_info)
+          .and_return(
+            Hashie::Mash.new(
+              user: {
+                is_admin: true
+              }
+            )
+          )
         user.sync!
         expect(user.reload.is_admin).to be true
+      end
+    end
+
+    context 'vacationing' do
+      it 'sets vacation status' do
+        user.update_attributes!(vacation: false)
+        allow_any_instance_of(Slack::Web::Client).to receive(:users_info)
+          .and_return(
+            Hashie::Mash.new(
+              user: {
+                profile: {
+                  status_emoji: ':palm_tree:'
+                }
+              }
+            )
+          )
+        user.sync!
+        expect(user.reload.vacation).to be true
+      end
+
+      it 'resets vacation status' do
+        user.update_attributes!(vacation: true)
+        user.sync!
+        expect(user.reload.vacation).to be false
       end
     end
   end
@@ -138,8 +169,7 @@ describe User do
         is_restricted: false,
         is_ultra_restricted: false,
         name: 'Forrest Gump',
-        real_name: 'Real Forrest Gump',
-        profile: double(email: nil, status: nil, status_text: nil)
+        real_name: 'Real Forrest Gump'
       }
     end
 
@@ -159,8 +189,8 @@ describe User do
       expect(User.suppable_user?(Hashie::Mash.new(member_default_attr.merge(is_ultra_restricted: true)))).to be false
     end
 
-    it 'ooo' do
-      expect(User.suppable_user?(Hashie::Mash.new(member_default_attr.merge(name: 'member-name-on-ooo')))).to be false
+    it 'vacationing' do
+      expect(User.suppable_user?(Hashie::Mash.new(member_default_attr.merge(profile: { status_emoji: ':palm_tree:' })))).to be true
     end
 
     it 'default' do

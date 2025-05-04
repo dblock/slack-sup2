@@ -15,11 +15,15 @@ class Round
   validates_presence_of :channel
   has_many :sups, dependent: :destroy
 
+  has_and_belongs_to_many :missed_users, class_name: 'User'
+  has_and_belongs_to_many :vacation_users, class_name: 'User'
+
   field :total_users_count
   field :opted_in_users_count
   field :opted_out_users_count
   field :paired_users_count
   field :missed_users_count
+  field :vacation_users_count
 
   after_create :run!
 
@@ -100,10 +104,6 @@ class Round
     User.find(sups.distinct(:user_ids))
   end
 
-  def missed_users
-    channel.users - paired_users
-  end
-
   private
 
   def run!
@@ -148,11 +148,14 @@ class Round
       total_users_count: channel.users.enabled.count,
       opted_in_users_count: channel.users.opted_in.count,
       opted_out_users_count: channel.users.opted_out.count,
+      vacation_users_count: channel.users.vacation.count,
       paired_users_count: paired_count,
-      missed_users_count: all_users.count - paired_count
+      missed_users_count: all_users.count - paired_count,
+      missed_users: all_users.count - paired_count > 25 ? [] : all_users - paired_users,
+      vacation_users: channel.users.vacation.count > 25 ? [] : channel.users.vacation
     )
 
-    logger.info "Finished round for #{channel}, users=#{total_users_count}, opted out=#{opted_out_users_count}, paired=#{paired_users_count}, missed=#{missed_users_count}."
+    logger.info "Finished round for #{channel}, users=#{total_users_count}, opted out=#{opted_out_users_count}, vacation=#{vacation_users_count}, paired=#{paired_users_count}, missed=#{missed_users_count}."
   end
 
   def dm!
@@ -174,6 +177,8 @@ class Round
                 "Hi! Unfortunately I wasn't able to find groups for any of the #{pluralize(total_users_count, 'user')} in this channel. Consider increasing the value of `@sup set weeks`, or lowering the value of `@sup set recency`."
               elsif missed_users_count > 0
                 "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing #{pluralize(paired_users_count, 'user')}. Unfortunately, I wasn't able to find a group for the remaining #{missed_users_count}. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+              elsif vacation_users_count > 0
+                "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing all of #{pluralize(paired_users_count, 'user')}, not counting #{vacation_users_count} on vacation."
               else
                 "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing all of #{pluralize(paired_users_count, 'user')}."
               end

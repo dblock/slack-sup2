@@ -15,6 +15,9 @@ class User
   field :is_admin, type: Boolean, default: false
   field :real_name, type: String
 
+  field :vacation, type: Boolean, default: false
+  scope :vacation, -> { where(vacation: true, opted_in: true) }
+
   field :introduced_sup_at, type: DateTime
 
   field :opted_in, type: Boolean, default: true
@@ -24,7 +27,7 @@ class User
   field :enabled, type: Boolean, default: true
   scope :enabled, -> { where(enabled: true) }
 
-  scope :suppable, -> { where(enabled: true, opted_in: true) }
+  scope :suppable, -> { where(enabled: true, vacation: false, opted_in: true) }
   index(channel_id: 1, enabled: 1, opted_in: 1)
 
   belongs_to :channel, index: true
@@ -76,6 +79,7 @@ class User
       is_organizer: channel.inviter_id == user_id,
       is_admin: is_admin || info.is_admin,
       is_owner: info.is_owner,
+      vacation: info.profile&.status_emoji == ':palm_tree:',
       user_name: info.name,
       real_name: info.real_name,
       email: info.profile&.email,
@@ -86,7 +90,6 @@ class User
   end
 
   def sync!
-    tt = Time.now.utc
     info = slack_client.users_info(user: user_id).user
     update_info_attributes!(info)
   end
@@ -100,12 +103,7 @@ class User
       !user_info.deleted &&
       !user_info.is_restricted &&
       !user_info.is_ultra_restricted &&
-      !on_vacation?(user_info) &&
       user_info.id != 'USLACKBOT'
-  end
-
-  def self.on_vacation?(user_info)
-    [user_info.name, user_info.real_name, user_info&.profile&.status_text].compact.join =~ /(ooo|vacationing)/i
   end
 
   private

@@ -122,7 +122,7 @@ describe Channel do
         is_ultra_restricted: false,
         name: 'Forrest Gump',
         real_name: 'Real Forrest Gump',
-        profile: double(email: nil, status: nil, status_text: nil)
+        profile: { status_emoji: nil }
       }
     end
 
@@ -131,10 +131,9 @@ describe Channel do
       let(:deleted_member) { Hashie::Mash.new(member_default_attr.merge(id: 'deleted-user', deleted: true)) }
       let(:restricted_member) { Hashie::Mash.new(member_default_attr.merge(id: 'restricted-user', is_restricted: true)) }
       let(:ultra_restricted_member) { Hashie::Mash.new(member_default_attr.merge(id: 'ult-rest-user', is_ultra_restricted: true)) }
-      let(:ooo_member) { Hashie::Mash.new(member_default_attr.merge(id: 'ooo-user', name: 'member-name-on-ooo')) }
       let(:available_member) { Hashie::Mash.new(member_default_attr.merge(id: 'avaialable-user')) }
       let(:members) do
-        [bot_member, deleted_member, restricted_member, ultra_restricted_member, ooo_member, available_member]
+        [bot_member, deleted_member, restricted_member, ultra_restricted_member, available_member]
       end
 
       before do
@@ -164,12 +163,28 @@ describe Channel do
 
       it 'disables dead users' do
         available_user = Fabricate(:user, channel:, user_id: available_member.id, enabled: true)
-        to_be_disabled_users = [deleted_member, restricted_member, ultra_restricted_member, ooo_member].map do |member|
+        to_be_disabled_users = [deleted_member, restricted_member, ultra_restricted_member].map do |member|
           Fabricate(:user, channel:, user_id: member.id, enabled: true)
         end
         expect { channel.sync! }.not_to change(User, :count)
-        expect(to_be_disabled_users.map(&:reload).map(&:enabled)).to eq [false] * 4
+        expect(to_be_disabled_users.map(&:reload).map(&:enabled)).to eq [false] * 3
         expect(available_user.reload.enabled).to be true
+      end
+
+      context 'with an ooo member' do
+        let!(:ooo_member) { Hashie::Mash.new(member_default_attr.merge(id: 'ooo-user', name: 'member-name-on-ooo', profile: { status_emoji: ':palm_tree:' })) }
+
+        let(:members) do
+          [bot_member, deleted_member, restricted_member, ultra_restricted_member, available_member, ooo_member]
+        end
+
+        it 'adds the member and marks them ooo' do
+          expect { channel.sync! }.to change(User, :count).by(2)
+          new_user = User.asc(:_id).last
+          expect(new_user.user_id).to eq 'ooo-user'
+          expect(new_user.opted_in).to be true
+          expect(new_user.vacation).to be true
+        end
       end
 
       it 'reactivates users that are back' do

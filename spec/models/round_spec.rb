@@ -123,6 +123,7 @@ describe Round do
         expect(round.opted_out_users_count).to eq 0
         expect(round.paired_users_count).to eq 3
         expect(round.missed_users_count).to eq 0
+        expect(round.vacation_users_count).to eq 0
       end
 
       context 'timeout' do
@@ -269,26 +270,32 @@ describe Round do
       context 'with a recent sup and new users' do
         let!(:first_round) { channel.sup! }
 
-        before do
-          Fabricate(:user, channel:)
-          Fabricate(:user, channel:)
-        end
+        let!(:user4) { Fabricate(:user, channel:) }
+        let!(:user5) { Fabricate(:user, channel:) }
 
-        it 'generates a sup with new users and one old one' do
+        it 'generates a sup with all users' do
           expect(first_round.total_users_count).to eq 3
           expect(first_round.opted_in_users_count).to eq 3
           expect(first_round.opted_out_users_count).to eq 0
           expect(first_round.paired_users_count).to eq 3
           expect(first_round.missed_users_count).to eq 0
-          second_round = channel.sup!
-          expect(second_round.total_users_count).to eq 5
-          expect(second_round.opted_in_users_count).to eq 5
-          expect(second_round.opted_out_users_count).to eq 0
-          expect(second_round.paired_users_count).to eq 3
-          expect(second_round.missed_users_count).to eq 2
-          expect(channel).to have_received(:inform!).with(
-            "Hi! I have created a new round with 1 S'Up, pairing 3 users. Unfortunately, I wasn't able to find a group for the remaining 2. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
-          )
+        end
+
+        context 'with a second round' do
+          let!(:second_round) { channel.sup! }
+
+          it 'generates a sup with new users and one old one' do
+            expect(second_round.total_users_count).to eq 5
+            expect(second_round.opted_in_users_count).to eq 5
+            expect(second_round.opted_out_users_count).to eq 0
+            expect(second_round.paired_users_count).to eq 3
+            expect(second_round.missed_users_count).to eq 2
+            expect(second_round.vacation_users_count).to eq 0
+            expect(second_round.vacation_users).to eq []
+            expect(channel).to have_received(:inform!).with(
+              "Hi! I have created a new round with 1 S'Up, pairing 3 users. Unfortunately, I wasn't able to find a group for the remaining 2. Consider increasing the value of `@sup set weeks`, lowering the value of `@sup set recency`, or adjusting `@sup set odd`."
+            )
+          end
         end
       end
 
@@ -320,6 +327,10 @@ describe Round do
           expect(round.opted_out_users_count).to eq 1
           expect(round.paired_users_count).to eq 3
           expect(round.missed_users_count).to eq 0
+          expect(round.vacation_users_count).to eq 0
+          expect(round.paired_users).to eq [user1, user2, user4]
+          expect(round.missed_users).to eq []
+          expect(round.vacation_users).to eq []
         end
       end
 
@@ -350,6 +361,44 @@ describe Round do
           expect(round.opted_in_users_count).to eq 3
           expect(round.opted_out_users_count).to eq 0
           expect(round.paired_users_count).to eq 3
+          expect(round.missed_users_count).to eq 0
+          expect(round.paired_users).to eq [user1, user2, user4]
+          expect(round.missed_users).to eq []
+          expect(round.vacation_users).to eq []
+        end
+      end
+
+      context 'vacation' do
+        let!(:user4) { Fabricate(:user, channel:) }
+
+        before do
+          user3.update_attributes!(vacation: true)
+        end
+
+        it 'excludes vacationing users' do
+          expect do
+            channel.sup!
+          end.to change(Sup, :count).by(1)
+          sup = Sup.first
+          expect(sup.users).to eq([user1, user2, user4])
+          expect(channel).to have_received(:inform!).with(
+            "Hi! I have created a new round with 1 S'Up, pairing all of 3 users, not counting 1 on vacation."
+          )
+        end
+
+        it 'updates counts' do
+          expect do
+            channel.sup!
+          end.to change(Round, :count).by(1)
+          round = Round.first
+          expect(round.total_users_count).to eq 4
+          expect(round.opted_in_users_count).to eq 4
+          expect(round.opted_out_users_count).to eq 0
+          expect(round.paired_users_count).to eq 3
+          expect(round.vacation_users_count).to eq 1
+          expect(round.missed_users).to eq []
+          expect(round.paired_users).to eq [user1, user2, user4]
+          expect(round.vacation_users).to eq [user3]
           expect(round.missed_users_count).to eq 0
         end
       end
@@ -661,18 +710,21 @@ describe Round do
               opted_out_users_count
               paired_users_count
               missed_users_count
+              vacation_users_count
               ran_at
               asked_at
               created_at
               updated_at
               paired_users
               missed_users
+              vacation_users
             ]
           )
           row = csv[0]
           expect(row['total_users_count']).to eq '3'
           expect(row['missed_users']).to eq round.missed_users.map(&:user_name).join("\n")
           expect(row['paired_users']).to eq round.paired_users.map(&:user_name).join("\n")
+          expect(row['vacation_users']).to eq round.vacation_users.map(&:user_name).join("\n")
         end
       end
     end
