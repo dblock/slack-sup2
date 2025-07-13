@@ -610,7 +610,8 @@ describe Channel do
     let(:user) { Fabricate(:user, channel:) }
 
     it 'finds by slack id' do
-      expect(channel.find_user_by_slack_mention!("<@#{user.user_id}>")).to eq user
+      expect(channel.find_user_by_slack_mention!("<@#{user.user_id}>"))
+        .to eq user
     end
 
     it 'finds by username' do
@@ -631,6 +632,13 @@ describe Channel do
       expect do
         channel.find_user_by_slack_mention!('nobody')
       end.to raise_error SlackSup::Error, "I don't know who nobody is!"
+    end
+
+    it 'matches username with regex special characters exactly' do
+      special_name = 'user.name+test?*^$[](){}|'
+      special_user = Fabricate(:user, channel: channel, user_name: special_name)
+      expect(channel.find_user_by_slack_mention!(special_name)).to eq special_user
+      expect(channel.find_user_by_slack_mention!(special_name.upcase)).to eq special_user
     end
   end
 

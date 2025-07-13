@@ -97,7 +97,7 @@ class Channel
     user = if user_match
              find_or_create_user!(user_match[1])
            else
-             users.where({ user_name: ::Regexp.new("^#{user_name}$", 'i') }).first
+             users.where({ user_name: ::Regexp.new("^#{Regexp.escape(user_name)}$", 'i') }).first
            end
 
     raise SlackSup::Error, "I don't know who #{user_name} is!" unless user
