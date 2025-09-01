@@ -97,7 +97,7 @@ module SlackSup
     end
 
     def leave!
-      invoke_with_criteria!(Channel.enabled) do |channel|
+      invoke! do |channel|
         next if channel.bot_in_channel?
 
         logger.info "Removing bot from #{channel}."
