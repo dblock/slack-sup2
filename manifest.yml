@@ -31,6 +31,7 @@ settings:
       - app_mention
       - member_joined_channel
       - member_left_channel
+      - channel_left
       - message.im
       - message.mpim
       - app_home_opened

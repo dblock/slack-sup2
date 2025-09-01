@@ -222,7 +222,7 @@ class Team
 
   def leave_channel!(channel_id)
     channel = channels.where(channel_id:).first
-    channel&.update_attributes!(enabled: false, sync: false)
+    channel&.leave!
     channel || false
   end
 

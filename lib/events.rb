@@ -33,12 +33,16 @@ SlackRubyBotServer::Events.configure do |config|
     { ok: true }
   end
 
-  config.on :event, 'event_callback', 'member_left_channel' do |event|
-    data = parse_team_event(event)
+  config.on :event, 'event_callback', 'member_left_channel' do |_event|
+    { ok: true }
+  end
+
+  config.on :event, 'event_callback', 'channel_left' do |event|
+    data = parse_user_event(event)
     next { ok: false } unless data
 
-    Api::Middleware.logger.info "#{data.team.name}: bot left ##{data.channel}."
-    data.team.leave_channel!(data.channel)
+    Api::Middleware.logger.info "#{data.team.name}: bot left ##{event[:event][:channel]}."
+    data.team.leave_channel!(event[:event][:channel])
 
     { ok: true }
   end

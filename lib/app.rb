@@ -15,6 +15,7 @@ module SlackSup
           check_expired_subscriptions!
         end
         instance.once_and_every 60 * 15 do
+          leave!
           sync!
           sup!
         end
@@ -92,6 +93,15 @@ module SlackSup
         tt = Time.now.utc
         channel.sync!
         logger.info "Synced #{channel}, #{channel.users.where(:updated_at.gte => tt).count} user(s) updated."
+      end
+    end
+
+    def leave!
+      invoke_with_criteria!(Channel.enabled) do |channel|
+        next if channel.bot_in_channel?
+
+        logger.info "Removing bot from #{channel}."
+        channel.leave!
       end
     end
 

@@ -894,4 +894,47 @@ describe Channel do
       end
     end
   end
+
+  describe '#bot_in_channel?' do
+    let(:channel) { Fabricate(:channel) }
+    let(:bot_user_id) { 'BOT123' }
+
+    before do
+      channel.team.update_attributes!(bot_user_id: bot_user_id)
+    end
+
+    context 'when bot is in channel' do
+      before do
+        allow(channel.slack_client).to receive(:conversations_members)
+          .with(channel: channel.channel_id)
+          .and_yield(Hashie::Mash.new(members: ['USER1', bot_user_id, 'USER2']))
+      end
+
+      it 'returns true' do
+        expect(channel.bot_in_channel?).to be true
+      end
+    end
+
+    context 'when bot is not in channel' do
+      before do
+        allow(channel.slack_client).to receive(:conversations_members)
+          .with(channel: channel.channel_id)
+          .and_yield(Hashie::Mash.new(members: %w[USER1 USER2 USER3]))
+      end
+
+      it 'returns false' do
+        expect(channel.bot_in_channel?).to be false
+      end
+    end
+  end
+
+  describe '#leave!' do
+    let(:channel) { Fabricate(:channel, enabled: true, sync: true) }
+
+    it 'disables the channel and stops syncing' do
+      channel.leave!
+      expect(channel.reload.enabled).to be false
+      expect(channel.reload.sync).to be false
+    end
+  end
 end

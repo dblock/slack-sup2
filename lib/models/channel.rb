@@ -344,6 +344,17 @@ class Channel
     team.is_admin?(user_id)
   end
 
+  def bot_in_channel?
+    slack_client.conversations_members(channel: channel_id) do |response|
+      return true if response.members.include?(team.bot_user_id)
+    end
+    false
+  end
+
+  def leave!
+    update_attributes!(enabled: false, sync: false)
+  end
+
   private
 
   def validate_team_field_label

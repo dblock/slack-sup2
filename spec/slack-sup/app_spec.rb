@@ -92,6 +92,33 @@ describe SlackSup::App do
     end
   end
 
+  context 'leave!' do
+    let(:team) { Fabricate(:team) }
+    let!(:channel1) { Fabricate(:channel, team:) }
+    let!(:channel2) { Fabricate(:channel, team:) }
+
+    it 'removes bot from channel' do
+      expect(Channel).to receive(:enabled).and_return([channel1, channel2])
+
+      allow_any_instance_of(Channel).to receive(:bot_in_channel?) do |channel|
+        case channel.channel_id
+        when channel1.channel_id
+          false
+        when channel2.channel_id
+          true
+        end
+      end
+
+      expect(channel1).to receive(:leave!).and_call_original
+      expect(channel2).not_to receive(:leave!)
+
+      subject.send(:leave!)
+
+      expect(channel1.reload.enabled).to be false
+      expect(channel2.reload.enabled).to be true
+    end
+  end
+
   context 'check_channel_auth!' do
     let(:team) { Fabricate(:team) }
     let!(:channel1) { Fabricate(:channel, team:) }
