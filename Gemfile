@@ -23,7 +23,7 @@ gem 'rubyzip'
 gem 'slack-ruby-bot-server'
 gem 'slack-ruby-bot-server-events-app-mentions'
 gem 'slack-ruby-bot-server-mailchimp'
-gem 'slack-ruby-client', '~> 2.3.0'
+gem 'slack-ruby-client'
 gem 'stripe', '~> 1.58.0'
 gem 'wannabe_bool'
 

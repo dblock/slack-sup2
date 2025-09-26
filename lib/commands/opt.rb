@@ -76,8 +76,8 @@ module SlackSup
                         [
                           (myself ? 'You are' : "User <@#{user_id}> is").to_s,
                           [
-                            opted_in.any? ? "#{updated ? 'now ' : nil}opted in to #{opted_in.and}" : nil,
-                            opted_out.any? ? "#{updated ? 'now ' : nil}opted out of #{opted_out.and}" : nil,
+                            opted_in.any? ? "#{'now ' if updated}opted in to #{opted_in.and}" : nil,
+                            opted_out.any? ? "#{'now ' if updated}opted out of #{opted_out.and}" : nil,
                             not_a_member.any? ? "not a member of #{not_a_member.and}" : nil
                           ].compact.and
                         ].compact.join(' ') + '.'

@@ -120,7 +120,7 @@ module SlackSup
       Team.active.where(subscribed: false).each do |team|
         if team.trial?
           remaining_trial_days = team.remaining_trial_days
-          logger.info "Team #{team} created #{team.created_at.ago_in_words}, trial ends in #{remaining_trial_days} day#{remaining_trial_days == 1 ? '' : 's'}."
+          logger.info "Team #{team} created #{team.created_at.ago_in_words}, trial ends in #{remaining_trial_days} day#{'s' unless remaining_trial_days == 1}."
         elsif team.subscription_expired?
           logger.info "Team #{team} created #{team.created_at.ago_in_words}, subscription has expired."
           team.inform! team.subscribe_text

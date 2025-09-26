@@ -43,7 +43,7 @@ class RoundStats
   end
 
   def to_s(include_channel = false)
-    "* #{status}#{include_channel ? ' ' + in_channel : nil}: #{pluralize(sups_count, 'S\'Up')} " + [
+    "* #{status}#{' ' + in_channel if include_channel}: #{pluralize(sups_count, 'S\'Up')} " + [
       "paired #{pluralize(users_in_sups_count, 'user')}",
       sups_count && sups_count > 0 && reported_outcomes_count && reported_outcomes_count > 0 ? percent_s(positive_outcomes_count, sups_count) + ' positive outcomes' : nil,
       sups_count && sups_count > 0 ? percent_s(reported_outcomes_count, sups_count) + ' outcomes reported' : nil,

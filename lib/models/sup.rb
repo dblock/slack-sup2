@@ -148,7 +148,7 @@ class Sup
   end
 
   def calendar_href(dt = nil)
-    "#{SlackRubyBotServer::Service.url}/gcal?sup_id=#{id}&dt=#{dt ? dt.to_i : nil}&access_token=#{channel.short_lived_token}"
+    "#{SlackRubyBotServer::Service.url}/gcal?sup_id=#{id}&dt=#{dt.to_i if dt}&access_token=#{channel.short_lived_token}"
   end
 
   validates_presence_of :channel_id

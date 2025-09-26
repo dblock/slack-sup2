@@ -309,11 +309,11 @@ module SlackSup
         def set_odd(channel, data, user, v = nil)
           if channel.is_admin?(user) && !v.nil?
             channel.update_attributes!(sup_odd: v.to_b)
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up now connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people.")
           elsif !v.nil?
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry.")
           else
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people.")
           end
           logger.info "SET: #{channel}, user=#{data.user}, sup_odd=#{channel.sup_odd}."
         end
@@ -530,27 +530,27 @@ module SlackSup
 
         def channel_data_access_message(channel, user, updated_api = false, updated_token = false)
           if channel.api? && channel.is_admin?(user) && channel.api_token
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token `#{channel.api_token}`."
+            "Channel data access via the API is #{'now ' if updated_api}on with a#{updated_token ? ' new' : 'n'} access token `#{channel.api_token}`."
           elsif channel.api? && !channel.is_admin?(user) && channel.api_token
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
+            "Channel data access via the API is #{'now ' if updated_api}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
           else
-            "Channel data access via the API is #{updated_api ? 'now ' : nil}#{channel.api_s}."
+            "Channel data access via the API is #{'now ' if updated_api}#{channel.api_s}."
           end
         end
 
         def team_data_access_message(team, user, updated_api = false, updated_token = false)
           if team.api? && team.is_admin?(user) && team.api_token
-            "Team data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token `#{team.api_token}`."
+            "Team data access via the API is #{'now ' if updated_api}on with a#{updated_token ? ' new' : 'n'} access token `#{team.api_token}`."
           elsif team.api? && !team.is_admin?(user) && team.api_token
-            "Team data access via the API is #{updated_api ? 'now ' : nil}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
+            "Team data access via the API is #{'now ' if updated_api}on with a#{updated_token ? ' new' : 'n'} access token visible to admins."
           else
-            "Team data access via the API is #{updated_api ? 'now ' : nil}#{team.api_s}."
+            "Team data access via the API is #{'now ' if updated_api}#{team.api_s}."
           end
         end
 
         def channel_info(data, channel, user)
           message = [
-            "Channel #{channel.slack_mention} S'Up connects groups of #{channel.sup_odd ? 'max ' : ''}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
+            "Channel #{channel.slack_mention} S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
             "Channel users are _opted #{channel.opt_in_s}_ by default.",
             "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
             channel_data_access_message(channel, user),
