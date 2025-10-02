@@ -7,7 +7,7 @@ Ensure that you can build the project and run tests. You will need these.
 - [MongoDB](https://docs.mongodb.com/manual/installation/)
 - [Firefox](https://www.mozilla.org/firefox/new/)
 - [Geckodriver](https://github.com/mozilla/geckodriver)
-- Ruby 3.3.5
+- Ruby 3.4.6
 
 ```
 bundle install

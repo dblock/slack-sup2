@@ -2,7 +2,6 @@ S'Up v2 for Slack Channels
 ==========================
 
 [![Tests](https://github.com/dblock/slack-sup2/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/slack-sup2/actions/workflows/test.yml)
-[![Code Climate](https://codeclimate.com/github/dblock/slack-sup2.svg)](https://codeclimate.com/github/dblock/slack-sup2)
 
 ### What's This?
 
@@ -22,6 +21,6 @@ S'Up for Slack is made possible with the generous support of team [Artsy](https:
 
 ### Copyright & License
 
-Copyright [Daniel Doubrovkine, Vestris LLC](https://www.vestris.com), 2017-2023
+Copyright [Daniel Doubrovkine, Vestris LLC](https://www.vestris.com), 2017-2025
 
 [MIT License](LICENSE)
