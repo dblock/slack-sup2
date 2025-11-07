@@ -240,8 +240,9 @@ describe Team do
     let!(:inactive_team_a_week_ago) { Fabricate(:team, updated_at: 1.week.ago, active: false) }
     let!(:inactive_team_three_weeks_ago) { Fabricate(:team, updated_at: 3.weeks.ago, active: false) }
     let!(:inactive_team_a_month_ago) { Fabricate(:team, updated_at: 1.month.ago, active: false) }
+    let!(:inactive_team_three_weeks_ago_subscribed) { Fabricate(:team, updated_at: 3.weeks.ago, active: false, subscribed: true, stripe_customer_id: 'cus_123') }
 
-    it 'destroys teams inactive for two weeks' do
+    it 'destroys unsubscribed teams inactive for two weeks' do
       expect do
         Team.purge!
       end.to change(Team, :count).by(-2)
@@ -250,6 +251,7 @@ describe Team do
       expect(Team.find(inactive_team_a_week_ago.id)).to eq inactive_team_a_week_ago
       expect(Team.find(inactive_team_three_weeks_ago.id)).to be_nil
       expect(Team.find(inactive_team_a_month_ago.id)).to be_nil
+      expect(Team.find(inactive_team_three_weeks_ago_subscribed.id)).to eq inactive_team_three_weeks_ago_subscribed
     end
   end
 

@@ -17,6 +17,7 @@ class Team
 
   after_update :subscribed!
   after_save :activated!
+  before_destroy :destroy_subscribed_team
 
   def rounds
     Round.where(:channel_id.in => channels.distinct(:_id))
@@ -291,5 +292,9 @@ class Team
     return unless active? && activated_user_id && bot_user_id
 
     nil unless (active_changed? || saved_change_to_active?) || (activated_user_id_changed? || saved_change_to_activated_user_id?)
+  end
+
+  def destroy_subscribed_team
+    raise 'cannot destroy a subscribed team' if subscribed?
   end
 end
