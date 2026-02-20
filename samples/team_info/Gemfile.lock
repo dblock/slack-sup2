@@ -1,9 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
-    dotenv (3.1.8)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
+    dotenv (3.2.0)
     faraday (1.10.5)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -37,7 +37,7 @@ GEM
       faraday_hal_middleware
       faraday_middleware
     multipart-post (2.4.1)
-    public_suffix (6.0.2)
+    public_suffix (7.0.2)
     ruby2_keywords (0.0.5)
 
 PLATFORMS
@@ -48,4 +48,4 @@ DEPENDENCIES
   hyperclient (~> 1.0)
 
 BUNDLED WITH
-   2.7.2
+   2.4.19
