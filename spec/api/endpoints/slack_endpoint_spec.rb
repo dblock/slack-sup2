@@ -39,15 +39,15 @@ describe Api::Endpoints::SlackEndpoint do
             thread_ts: '1467321295.000010',
             text: message,
             attachments: [
-              text: '',
-              attachment_type: 'default',
-              actions: [
-                { name: 'outcome', text: 'We All Met', type: 'button', value: 'all', style: key == 'all' ? 'primary' : 'default' },
-                { name: 'outcome', text: 'Some of Us Met', type: 'button', value: 'some', style: key == 'some' ? 'primary' : 'default' },
-                { name: 'outcome', text: "We Haven't Met Yet", type: 'button', value: 'later', style: key == 'later' ? 'primary' : 'default' },
-                { name: 'outcome', text: "We Couldn't Meet", type: 'button', value: 'none', style: key == 'none' ? 'primary' : 'default' }
-              ],
-              callback_id: sup.id.to_s
+              { text: '',
+                attachment_type: 'default',
+                actions: [
+                  { name: 'outcome', text: 'We All Met', type: 'button', value: 'all', style: key == 'all' ? 'primary' : 'default' },
+                  { name: 'outcome', text: 'Some of Us Met', type: 'button', value: 'some', style: key == 'some' ? 'primary' : 'default' },
+                  { name: 'outcome', text: "We Haven't Met Yet", type: 'button', value: 'later', style: key == 'later' ? 'primary' : 'default' },
+                  { name: 'outcome', text: "We Couldn't Meet", type: 'button', value: 'none', style: key == 'none' ? 'primary' : 'default' }
+                ],
+                callback_id: sup.id.to_s }
             ]
           }.to_json, 'Content-Type' => 'application/json')
           post '/api/slack/action', payload: payload.merge(
