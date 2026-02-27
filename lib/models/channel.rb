@@ -310,7 +310,11 @@ class Channel
   end
 
   def sup_notify_s
-    sup_notify || 'channel'
+    case sup_notify
+    when 'off' then 'off'
+    when 'admin' then 'admin'
+    else 'channel'
+    end
   end
 
   def inform!(message)
@@ -318,6 +322,8 @@ class Channel
   end
 
   def inform_notify!(message)
+    return if sup_notify == 'off'
+
     if sup_notify == 'admin'
       team.inform!(message)
     else

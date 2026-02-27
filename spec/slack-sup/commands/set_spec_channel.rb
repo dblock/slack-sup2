@@ -305,6 +305,8 @@ describe SlackSup::Commands::Set do
           "Last users sync was less than 1 second ago, 2 users updated. Users will sync before the next round. #{channel.next_sup_at_text}"
         )
       end
+    end
+
     context 'notify' do
       it 'defaults to channel' do
         expect(make_message('@sup set notify', options)).to respond_with_slack_message(
@@ -316,6 +318,13 @@ describe SlackSup::Commands::Set do
         channel.update_attributes!(sup_notify: 'admin')
         expect(make_message('@sup set notify', options)).to respond_with_slack_message(
           'Round info is sent to the admin.'
+        )
+      end
+
+      it 'shows off' do
+        channel.update_attributes!(sup_notify: 'off')
+        expect(make_message('@sup set notify', options)).to respond_with_slack_message(
+          'Round notifications are off.'
         )
       end
     end
@@ -652,6 +661,14 @@ describe SlackSup::Commands::Set do
           'Round info will now be sent to the channel.'
         )
         expect(channel.reload.sup_notify).to eq 'channel'
+      end
+
+      it 'turns off' do
+        channel.update_attributes!(sup_notify: 'channel')
+        expect(make_message('@sup set notify off', options)).to respond_with_slack_message(
+          'Round notifications are now off.'
+        )
+        expect(channel.reload.sup_notify).to eq 'off'
       end
 
       it 'fails on an invalid notify value' do

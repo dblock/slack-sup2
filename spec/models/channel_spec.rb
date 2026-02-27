@@ -965,5 +965,15 @@ describe Channel do
         expect(channel.team).to have_received(:inform!).with('Hello admin!')
       end
     end
+
+    context 'when sup_notify is off' do
+      before { channel.update_attributes!(sup_notify: 'off') }
+
+      it 'sends no notification' do
+        allow(slack_client).to receive(:chat_postMessage)
+        channel.inform_notify!('Hello nobody!')
+        expect(slack_client).not_to have_received(:chat_postMessage)
+      end
+    end
   end
 end

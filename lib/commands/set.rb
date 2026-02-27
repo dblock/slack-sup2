@@ -398,19 +398,22 @@ module SlackSup
         end
 
         def set_notify(channel, data, user, v = nil)
-          raise ArgumentError, "Invalid value: #{v}." unless ['channel', 'admin', nil].include?(v)
+          raise ArgumentError, "Invalid value: #{v}." unless ['channel', 'admin', 'off', nil].include?(v)
+
+          current_message = channel.sup_notify == 'off' ? 'Round notifications are off.' : "Round info is sent to the #{channel.sup_notify_s}."
 
           if channel.is_admin?(user) && v
             channel.update_attributes!(sup_notify: v)
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Round info will now be sent to the #{v}.")
+            text = v == 'off' ? 'Round notifications are now off.' : "Round info will now be sent to the #{v}."
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: text)
           elsif v
             message = [
-              "Round info is sent to the #{channel.sup_notify_s}.",
+              current_message,
               "Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
             ].join(' ')
             data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
           else
-            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Round info is sent to the #{channel.sup_notify_s}.")
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: current_message)
           end
           logger.info "SET: #{channel}, user=#{data.user}, sup_notify=#{channel.sup_notify_s}."
         end
