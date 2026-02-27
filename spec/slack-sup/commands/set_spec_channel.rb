@@ -306,6 +306,28 @@ describe SlackSup::Commands::Set do
         )
       end
     end
+
+    context 'notify' do
+      it 'defaults to channel' do
+        expect(make_message('@sup set notify', options)).to respond_with_slack_message(
+          'Round info is sent to the channel.'
+        )
+      end
+
+      it 'shows admin' do
+        channel.update_attributes!(sup_notify: 'admin')
+        expect(make_message('@sup set notify', options)).to respond_with_slack_message(
+          'Round info is sent to the admin.'
+        )
+      end
+
+      it 'shows off' do
+        channel.update_attributes!(sup_notify: 'off')
+        expect(make_message('@sup set notify', options)).to respond_with_slack_message(
+          'Round notifications are off.'
+        )
+      end
+    end
   end
 
   shared_examples_for 'can change channel settings' do |options|
@@ -623,6 +645,39 @@ describe SlackSup::Commands::Set do
         expect(channel.reload.sync).to be false
       end
     end
+
+    context 'notify' do
+      it 'routes to admin' do
+        channel.update_attributes!(sup_notify: 'channel')
+        expect(make_message('@sup set notify admin', options)).to respond_with_slack_message(
+          'Round info will now be sent to the admin.'
+        )
+        expect(channel.reload.sup_notify).to eq 'admin'
+      end
+
+      it 'routes to channel' do
+        channel.update_attributes!(sup_notify: 'admin')
+        expect(make_message('@sup set notify channel', options)).to respond_with_slack_message(
+          'Round info will now be sent to the channel.'
+        )
+        expect(channel.reload.sup_notify).to eq 'channel'
+      end
+
+      it 'turns off' do
+        channel.update_attributes!(sup_notify: 'channel')
+        expect(make_message('@sup set notify off', options)).to respond_with_slack_message(
+          'Round notifications are now off.'
+        )
+        expect(channel.reload.sup_notify).to eq 'off'
+      end
+
+      it 'fails on an invalid notify value' do
+        expect(make_message('@sup set notify invalid', options)).to respond_with_slack_message(
+          'Invalid value: invalid.'
+        )
+        expect(channel.reload.sup_notify).to eq 'channel'
+      end
+    end
   end
 
   shared_examples_for 'cannot change channel settings' do |options|
@@ -719,6 +774,12 @@ describe SlackSup::Commands::Set do
       it 'cannot set sync now' do
         expect(make_message('@sup set sync now', options)).to respond_with_slack_message(
           "Users will sync before the next round. #{channel.next_sup_at_text} Only #{channel.channel_admins_slack_mentions.or} can manually sync, sorry."
+        )
+      end
+
+      it 'cannot set notify' do
+        expect(make_message('@sup set notify admin', options)).to respond_with_slack_message(
+          "Round info is sent to the channel. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
         )
       end
     end

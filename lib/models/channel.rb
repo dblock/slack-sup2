@@ -34,6 +34,9 @@ class Channel
 
   field :sup_message, type: String
 
+  # notify channel or admin
+  field :sup_notify, type: String, default: 'channel'
+
   # sync
   field :sync, type: Boolean, default: false
   field :last_sync_at, type: DateTime
@@ -306,8 +309,26 @@ class Channel
     messages.compact.join(' ')
   end
 
+  def sup_notify_s
+    case sup_notify
+    when 'off' then 'off'
+    when 'admin' then 'admin'
+    else 'channel'
+    end
+  end
+
   def inform!(message)
     slack_client.chat_postMessage(text: message, channel: channel_id, as_user: true)
+  end
+
+  def inform_notify!(message)
+    return if sup_notify == 'off'
+
+    if sup_notify == 'admin'
+      team.inform!(message)
+    else
+      inform!(message)
+    end
   end
 
   def export_filename(root)
