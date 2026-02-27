@@ -182,7 +182,7 @@ class Round
               else
                 "Hi! I have created a new round with #{pluralize(sups.count, 'S\'Up')}, pairing all of #{pluralize(paired_users_count, 'user')}."
               end
-    channel.inform! message
+    channel.inform_notify! message
     logger.info "Notified #{channel} about the new round. #{message}"
   rescue StandardError => e
     logger.warn "Error notifying #{channel} #{self} #{e.message}."

@@ -937,4 +937,33 @@ describe Channel do
       expect(channel.reload.sync).to be false
     end
   end
+
+  describe '#inform_notify!' do
+    let(:channel) { Fabricate(:channel) }
+    let(:slack_client) { instance_double(Slack::Web::Client) }
+
+    before do
+      allow(channel.team).to receive(:slack_client).and_return(slack_client)
+    end
+
+    context 'when sup_notify is channel (default)' do
+      it 'posts to channel' do
+        allow(slack_client).to receive(:chat_postMessage)
+        channel.inform_notify!('Hello channel!')
+        expect(slack_client).to have_received(:chat_postMessage).with(
+          text: 'Hello channel!', channel: channel.channel_id, as_user: true
+        )
+      end
+    end
+
+    context 'when sup_notify is admin' do
+      before { channel.update_attributes!(sup_notify: 'admin') }
+
+      it 'DMs the team admin' do
+        allow(channel.team).to receive(:inform!)
+        channel.inform_notify!('Hello admin!')
+        expect(channel.team).to have_received(:inform!).with('Hello admin!')
+      end
+    end
+  end
 end

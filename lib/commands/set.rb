@@ -397,6 +397,24 @@ module SlackSup
           raise SlackSup::Error, "Number _#{v}_ is invalid. Taking special care to not pair the same people more than every #{channel.reload.sup_recency_s}."
         end
 
+        def set_notify(channel, data, user, v = nil)
+          raise ArgumentError, "Invalid value: #{v}." unless ['channel', 'admin', nil].include?(v)
+
+          if channel.is_admin?(user) && v
+            channel.update_attributes!(sup_notify: v)
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Round info will now be sent to the #{v}.")
+          elsif v
+            message = [
+              "Round info is sent to the #{channel.sup_notify_s}.",
+              "Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
+            ].join(' ')
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
+          else
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Round info is sent to the #{channel.sup_notify_s}.")
+          end
+          logger.info "SET: #{channel}, user=#{data.user}, sup_notify=#{channel.sup_notify_s}."
+        end
+
         def set_sync(channel, data, user, v = nil)
           if channel.is_admin?(user) && v
             case v
@@ -455,6 +473,8 @@ module SlackSup
             set_message channel, data, user, v
           when 'sync'
             set_sync channel, data, user, v
+          when 'notify'
+            set_notify channel, data, user, v
           else
             raise SlackSup::Error, "Invalid channel setting _#{k}_, see _help_ for available options."
           end

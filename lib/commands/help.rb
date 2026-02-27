@@ -50,6 +50,7 @@ module SlackSup
         set recency [number]       - set the number of weeks during which to avoid pairing the same people, default is 12
         set opt [in|out]           - opt in (default) or opt out new users
         set sync [now]             - review or schedule a user sync from Slack
+        set notify [channel|admin] - send round info to the channel (default) or admin via DM
         sync                       - manually schedule a user sync (same as set sync now)
         set api [on|off]           - enable/disable API access to your channel data
         set api token              - require an access token in the X-Access-Token header for API access
