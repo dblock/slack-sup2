@@ -292,6 +292,50 @@ describe Channel do
     end
   end
 
+  describe '#sup_schedule_s' do
+    let(:tz) { 'Eastern Time (US & Canada)' }
+
+    context 'weekly (default)' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz) }
+
+      it 'describes weekly schedule' do
+        expect(channel.sup_schedule_s).to eq 'on Monday after 9:00 AM every week'
+      end
+    end
+
+    context 'every 2 weeks' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::TUESDAY, sup_every_n_weeks: 2, sup_tz: tz) }
+
+      it 'describes bi-weekly schedule' do
+        expect(channel.sup_schedule_s).to eq 'on Tuesday after 9:00 AM every 2 weeks'
+      end
+    end
+
+    context 'monthly - 1st weekday' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz, sup_week_of_month: 1) }
+
+      it 'describes 1st Monday schedule' do
+        expect(channel.sup_schedule_s).to eq 'on the 1st Monday of every month after 9:00 AM'
+      end
+    end
+
+    context 'monthly - 2nd weekday' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::WEDNESDAY, sup_tz: tz, sup_week_of_month: 2) }
+
+      it 'describes 2nd Wednesday schedule' do
+        expect(channel.sup_schedule_s).to eq 'on the 2nd Wednesday of every month after 9:00 AM'
+      end
+    end
+
+    context 'monthly - last weekday' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::FRIDAY, sup_tz: tz, sup_week_of_month: 5) }
+
+      it 'describes last Friday schedule' do
+        expect(channel.sup_schedule_s).to eq 'on the last Friday of every month after 9:00 AM'
+      end
+    end
+  end
+
   context 'channel sup on monday 3pm' do
     let(:tz) { 'Eastern Time (US & Canada)' }
     let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz) }
@@ -605,6 +649,110 @@ describe Channel do
     end
   end
 
+  context 'monthly scheduling' do
+    # 2017/1/2 is a Monday; the 1st Monday of January 2017
+    let(:tz) { 'Eastern Time (US & Canada)' }
+    let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz, sup_week_of_month: 2) }
+    # 2nd Monday of January 2017 is January 9
+    let(:second_monday) { DateTime.parse('2017/1/9 9:00 AM EST').utc }
+    let(:first_monday) { DateTime.parse('2017/1/2 9:00 AM EST').utc }
+
+    describe '#sup?' do
+      it 'is true on the 2nd Monday' do
+        Timecop.travel(second_monday) do
+          expect(channel.sup?).to be true
+        end
+      end
+
+      it 'is false on the 1st Monday (wrong week)' do
+        Timecop.travel(first_monday) do
+          expect(channel.sup?).to be false
+        end
+      end
+
+      it 'is false before sup time on the 2nd Monday' do
+        Timecop.travel(DateTime.parse('2017/1/9 8:00 AM EST').utc) do
+          expect(channel.sup?).to be false
+        end
+      end
+
+      context 'after running on the 2nd Monday' do
+        before do
+          allow(channel).to receive(:sync!)
+          allow(channel).to receive(:inform!)
+          Timecop.travel(second_monday) { channel.sup! }
+        end
+
+        it 'is false the rest of the month' do
+          Timecop.travel(DateTime.parse('2017/1/16 9:00 AM EST').utc) do
+            expect(channel.sup?).to be false
+          end
+        end
+
+        it 'is true on the 2nd Monday of next month' do
+          # 2nd Monday of February 2017 is February 13
+          Timecop.travel(DateTime.parse('2017/2/13 9:00 AM EST').utc) do
+            expect(channel.sup?).to be true
+          end
+        end
+      end
+    end
+
+    describe '#next_sup_at' do
+      it 'returns the 2nd Monday when before it' do
+        Timecop.travel(first_monday) do
+          expect(channel.next_sup_at).to eq DateTime.parse('2017/1/9 9:00 AM EST')
+        end
+      end
+
+      it 'returns the 2nd Monday when on it (before sup time)' do
+        Timecop.travel(DateTime.parse('2017/1/9 8:00 AM EST').utc) do
+          expect(channel.next_sup_at).to eq DateTime.parse('2017/1/9 9:00 AM EST')
+        end
+      end
+
+      context 'after running this month' do
+        before do
+          allow(channel).to receive(:sync!)
+          allow(channel).to receive(:inform!)
+          Timecop.travel(second_monday) { channel.sup! }
+        end
+
+        it 'returns the 2nd Monday of next month' do
+          Timecop.travel(second_monday) do
+            expect(channel.next_sup_at).to eq DateTime.parse('2017/2/13 9:00 AM EST')
+          end
+        end
+      end
+    end
+
+    context 'with last Monday of the month' do
+      let(:channel) { Fabricate(:channel, sup_wday: Date::MONDAY, sup_tz: tz, sup_week_of_month: 5) }
+
+      describe '#sup?' do
+        it 'is true on the last Monday of January (January 30)' do
+          Timecop.travel(DateTime.parse('2017/1/30 9:00 AM EST').utc) do
+            expect(channel.sup?).to be true
+          end
+        end
+
+        it 'is false on an earlier Monday' do
+          Timecop.travel(DateTime.parse('2017/1/23 9:00 AM EST').utc) do
+            expect(channel.sup?).to be false
+          end
+        end
+      end
+
+      describe '#next_sup_at' do
+        it 'returns the last Monday of January' do
+          Timecop.travel(first_monday) do
+            expect(channel.next_sup_at).to eq DateTime.parse('2017/1/30 9:00 AM EST')
+          end
+        end
+      end
+    end
+  end
+
   describe '#find_user_by_slack_mention!' do
     let(:channel) { Fabricate(:channel) }
     let(:user) { Fabricate(:user, channel:) }
@@ -753,6 +901,8 @@ describe Channel do
               sup_time_of_day
               sup_time_of_day_s
               sup_every_n_weeks
+              sup_week_of_month
+              sup_week_of_month_s
               sup_size
             ]
           )

@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/03/10: Added `set week [1st|2nd|3rd|4th|last]` to S'Up on the nth weekday of every month - [@dblock](https://github.com/dblock).
 * 2026/03/10: Added global `set notify [channel|admin|off]` to set round notifications for all channels - [@dblock](https://github.com/dblock).
 * 2026/02/27: Added `set notify [channel|admin|off]` to control where round notifications are sent - [@dblock](https://github.com/dblock).
 * 2025/10/02: Upgraded to Ruby 3.4.6 - [@dblock](https://github.com/dblock).
