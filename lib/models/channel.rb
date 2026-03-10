@@ -37,6 +37,17 @@ class Channel
   # notify channel or admin
   field :sup_notify, type: String, default: 'channel'
 
+  # sup on the nth weekday of every month (1=1st, 2=2nd, 3=3rd, 4=4th, 5=last), nil=weekly
+  field :sup_week_of_month, type: Integer
+
+  WEEK_OF_MONTH_ORDINALS = {
+    '1' => 1, '1st' => 1, 'first' => 1,
+    '2' => 2, '2nd' => 2, 'second' => 2,
+    '3' => 3, '3rd' => 3, 'third' => 3,
+    '4' => 4, '4th' => 4, 'fourth' => 4,
+    '5' => 5, '5th' => 5, 'fifth' => 5, 'last' => 5
+  }.freeze
+
   # sync
   field :sync, type: Boolean, default: false
   field :last_sync_at, type: DateTime
@@ -54,6 +65,7 @@ class Channel
   before_validation :validate_team_field_label_id
   before_validation :validate_sup_time_of_day
   before_validation :validate_sup_every_n_weeks
+  before_validation :validate_sup_week_of_month
   before_validation :validate_sup_size
   before_validation :validate_sup_recency
   before_create :set_sup_wday_to_tomorrow
@@ -228,6 +240,18 @@ class Channel
     sup_every_n_weeks == 1 ? 'week' : "#{sup_every_n_weeks} weeks"
   end
 
+  def sup_week_of_month_s
+    { 1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => 'last' }[sup_week_of_month]
+  end
+
+  def sup_schedule_s
+    if sup_week_of_month
+      "on the #{sup_week_of_month_s} #{sup_day} of every month after #{sup_time_of_day_s}"
+    else
+      "on #{sup_day} after #{sup_time_of_day_s} every #{sup_every_n_weeks_s}"
+    end
+  end
+
   def sup_recency_s
     sup_recency == 1 ? 'week' : "#{sup_recency} weeks"
   end
@@ -267,12 +291,41 @@ class Channel
     # sup after sup_time_of_day, 9am by default
     return false if now_in_tz < now_in_tz.beginning_of_day + sup_time_of_day
 
-    # don't sup more than sup_every_n_weeks, once a week by default
-    time_limit = now_in_tz.end_of_day - sup_every_n_weeks.weeks
-    (last_round_at || time_limit) <= time_limit
+    if sup_week_of_month
+      # monthly mode: must be the nth weekday of this month and not yet run this month
+      return false unless now_in_tz.to_date == monthly_sup_date(now_in_tz.year, now_in_tz.month)
+
+      last_round_at.nil? || last_round_at < now_in_tz.beginning_of_month
+    else
+      # don't sup more than sup_every_n_weeks, once a week by default
+      time_limit = now_in_tz.end_of_day - sup_every_n_weeks.weeks
+      (last_round_at || time_limit) <= time_limit
+    end
   end
 
   def next_sup_at
+    sup_week_of_month ? next_sup_at_monthly : next_sup_at_weekly
+  end
+
+  def next_sup_at_monthly
+    now_in_tz = now
+    year = now_in_tz.year
+    month = now_in_tz.month
+    loop do
+      target = monthly_sup_date(year, month)
+      start_of_month = Date.new(year, month, 1).in_time_zone(sup_tzone)
+      ran_this_month = last_round_at && last_round_at >= start_of_month
+      return target.in_time_zone(sup_tzone).beginning_of_day + sup_time_of_day if !ran_this_month && (target >= now_in_tz.to_date)
+
+      month += 1
+      if month > 12
+        month = 1
+        year += 1
+      end
+    end
+  end
+
+  def next_sup_at_weekly
     now_in_tz = now
     loop do
       time_limit = now_in_tz.end_of_day - sup_every_n_weeks.weeks
@@ -401,6 +454,12 @@ class Channel
     errors.add(:sup_time_of_day, "S'Up time of day _#{sup_time_of_day}_ is invalid.")
   end
 
+  def validate_sup_week_of_month
+    return if sup_week_of_month.nil? || (1..5).include?(sup_week_of_month)
+
+    errors.add(:sup_week_of_month, "S'Up week of month _#{sup_week_of_month}_ is invalid, must be between 1 and 5.")
+  end
+
   def validate_sup_every_n_weeks
     return if sup_every_n_weeks >= 1
 
@@ -417,6 +476,17 @@ class Channel
     return if sup_size >= 2
 
     errors.add(:sup_size, "S'Up for _#{sup_size}_ is invalid, requires at least 2 people to meet.")
+  end
+
+  def monthly_sup_date(year, month)
+    if sup_week_of_month == 5 # last
+      last = Date.new(year, month, -1)
+      last - ((last.wday - sup_wday) % 7)
+    else
+      first = Date.new(year, month, 1)
+      first_occurrence = first + ((sup_wday - first.wday) % 7)
+      first_occurrence + ((sup_week_of_month - 1) * 7)
+    end
   end
 
   def set_sup_wday_to_tomorrow

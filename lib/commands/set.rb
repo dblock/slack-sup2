@@ -418,6 +418,42 @@ module SlackSup
           logger.info "SET: #{channel}, user=#{data.user}, sup_notify=#{channel.sup_notify_s}."
         end
 
+        def set_week_of_month(channel, data, user, v = nil)
+          current_message = if channel.sup_week_of_month
+                              "Channel S'Up is on the #{channel.sup_week_of_month_s} #{channel.sup_day} of every month."
+                            else
+                              "Channel S'Up does not use a monthly schedule."
+                            end
+
+          if channel.is_admin?(user) && v
+            n = Channel::WEEK_OF_MONTH_ORDINALS[v.to_s.downcase]
+            raise SlackSup::Error, "Week _#{v}_ is invalid, use _1st_, _2nd_, _3rd_, _4th_, or _last_." unless n
+
+            channel.update_attributes!(sup_week_of_month: n)
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now on the #{channel.sup_week_of_month_s} #{channel.sup_day} of every month.")
+          elsif v
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{current_message} Only #{channel.channel_admins_slack_mentions.or} can change that, sorry.")
+          else
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: current_message)
+          end
+          logger.info "SET: #{channel}, user=#{data.user}, sup_week_of_month=#{channel.sup_week_of_month}."
+        end
+
+        def unset_week_of_month(channel, data, user)
+          if channel.is_admin?(user)
+            channel.update_attributes!(sup_week_of_month: nil)
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Channel S'Up is now every #{channel.sup_every_n_weeks_s}.")
+          else
+            current_message = if channel.sup_week_of_month
+                                "Channel S'Up is on the #{channel.sup_week_of_month_s} #{channel.sup_day} of every month."
+                              else
+                                "Channel S'Up does not use a monthly schedule."
+                              end
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{current_message} Only #{channel.channel_admins_slack_mentions.or} can change that, sorry.")
+          end
+          logger.info "UNSET: #{channel}, user=#{data.user}, sup_week_of_month=#{channel.sup_week_of_month}."
+        end
+
         def set_sync(channel, data, user, v = nil)
           if channel.is_admin?(user) && v
             case v
@@ -509,6 +545,8 @@ module SlackSup
             set_sync channel, data, user, v
           when 'notify'
             set_notify channel, data, user, v
+          when 'week'
+            set_week_of_month channel, data, user, v
           else
             raise SlackSup::Error, "Invalid channel setting _#{k}_, see _help_ for available options."
           end
@@ -522,6 +560,8 @@ module SlackSup
             unset_api_token channel, data, user
           when 'message'
             unset_message channel, data, user
+          when 'week'
+            unset_week_of_month channel, data, user
           else
             raise SlackSup::Error, "Invalid channel setting _#{k}_, see _help_ for available options."
           end
@@ -604,7 +644,7 @@ module SlackSup
 
         def channel_info(data, channel, user)
           message = [
-            "Channel #{channel.slack_mention} S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people on #{channel.sup_day} after #{channel.sup_time_of_day_s} every #{channel.sup_every_n_weeks_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
+            "Channel #{channel.slack_mention} S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people #{channel.sup_schedule_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
             "Channel users are _opted #{channel.opt_in_s}_ by default.",
             "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
             channel_data_access_message(channel, user),

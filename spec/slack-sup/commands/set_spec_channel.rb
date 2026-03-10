@@ -328,6 +328,21 @@ describe SlackSup::Commands::Set do
         )
       end
     end
+
+    context 'week' do
+      it 'shows no monthly schedule by default' do
+        expect(make_message('@sup set week', options)).to respond_with_slack_message(
+          "Channel S'Up does not use a monthly schedule."
+        )
+      end
+
+      it 'shows current monthly schedule when set' do
+        channel.update_attributes!(sup_week_of_month: 2)
+        expect(make_message('@sup set week', options)).to respond_with_slack_message(
+          "Channel S'Up is on the 2nd Monday of every month."
+        )
+      end
+    end
   end
 
   shared_examples_for 'can change channel settings' do |options|
@@ -678,6 +693,44 @@ describe SlackSup::Commands::Set do
         expect(channel.reload.sup_notify).to eq 'channel'
       end
     end
+
+    context 'week' do
+      it 'sets to 2nd' do
+        expect(make_message('@sup set week 2nd', options)).to respond_with_slack_message(
+          "Channel S'Up is now on the 2nd Monday of every month."
+        )
+        expect(channel.reload.sup_week_of_month).to eq 2
+      end
+
+      it 'sets to last' do
+        expect(make_message('@sup set week last', options)).to respond_with_slack_message(
+          "Channel S'Up is now on the last Monday of every month."
+        )
+        expect(channel.reload.sup_week_of_month).to eq 5
+      end
+
+      it 'sets to 1st with ordinal word' do
+        expect(make_message('@sup set week first', options)).to respond_with_slack_message(
+          "Channel S'Up is now on the 1st Monday of every month."
+        )
+        expect(channel.reload.sup_week_of_month).to eq 1
+      end
+
+      it 'fails on an invalid week value' do
+        expect(make_message('@sup set week 6th', options)).to respond_with_slack_message(
+          'Week _6th_ is invalid, use _1st_, _2nd_, _3rd_, _4th_, or _last_.'
+        )
+        expect(channel.reload.sup_week_of_month).to be_nil
+      end
+
+      it 'unsets monthly schedule' do
+        channel.update_attributes!(sup_week_of_month: 2)
+        expect(make_message('@sup unset week', options)).to respond_with_slack_message(
+          "Channel S'Up is now every week."
+        )
+        expect(channel.reload.sup_week_of_month).to be_nil
+      end
+    end
   end
 
   shared_examples_for 'cannot change channel settings' do |options|
@@ -781,6 +834,21 @@ describe SlackSup::Commands::Set do
         expect(make_message('@sup set notify admin', options)).to respond_with_slack_message(
           "Round info is sent to the channel. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
         )
+      end
+
+      it 'cannot set week' do
+        expect(make_message('@sup set week 2nd', options)).to respond_with_slack_message(
+          "Channel S'Up does not use a monthly schedule. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
+        )
+        expect(channel.reload.sup_week_of_month).to be_nil
+      end
+
+      it 'cannot unset week' do
+        channel.update_attributes!(sup_week_of_month: 2)
+        expect(make_message('@sup unset week', options)).to respond_with_slack_message(
+          "Channel S'Up is on the 2nd Monday of every month. Only #{channel.channel_admins_slack_mentions.or} can change that, sorry."
+        )
+        expect(channel.reload.sup_week_of_month).to eq 2
       end
     end
   end

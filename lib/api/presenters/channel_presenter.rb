@@ -18,6 +18,8 @@ module Api
       property :sup_time_of_day, type: String, desc: "Earliest time of day for a S'Up in seconds."
       property :sup_time_of_day_s, type: String, desc: "Earliest time of day for a S'Up."
       property :sup_every_n_weeks, type: Integer, desc: "Frequency of S'Up in weeks."
+      property :sup_week_of_month, type: Integer, desc: "Week of month for S'Up (1=1st, 2=2nd, 3=3rd, 4=4th, 5=last), nil for weekly."
+      property :sup_week_of_month_s, type: String, desc: "Week of month for S'Up in English."
       property :sup_size, type: Integer, desc: "The number of people that meet for each S'Up."
 
       link :team do |opts|
