@@ -39,6 +39,24 @@ describe SlackSup::Commands::Set do
       end
     end
 
+    context 'notify' do
+      it 'shows no channels when none enabled' do
+        expect(message: '@sup set notify', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+          "S'Up is not enabled in any channels."
+        )
+      end
+
+      context 'with a channel' do
+        let!(:channel) { Fabricate(:channel, team:, sup_notify: 'channel') }
+
+        it 'shows current notify setting' do
+          expect(message: '@sup set notify', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+            "Round notifications in #{channel.slack_mention} are sent to the channel."
+          )
+        end
+      end
+    end
+
     context 'api' do
       it 'shows current value of API on' do
         team.update_attributes!(api: true)
@@ -114,6 +132,45 @@ describe SlackSup::Commands::Set do
   end
 
   shared_examples_for 'can change team settings' do
+    context 'notify' do
+      context 'with channels' do
+        let!(:channel1) { Fabricate(:channel, team:, sup_notify: 'channel') }
+        let!(:channel2) { Fabricate(:channel, team:, sup_notify: 'channel') }
+
+        it 'sets notify to admin for all channels' do
+          expect(message: '@sup set notify admin', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+            'Round info in all channels will now be sent to the admin.'
+          )
+          expect(channel1.reload.sup_notify).to eq 'admin'
+          expect(channel2.reload.sup_notify).to eq 'admin'
+        end
+
+        it 'sets notify to off for all channels' do
+          expect(message: '@sup set notify off', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+            'Round notifications in all channels are now off.'
+          )
+          expect(channel1.reload.sup_notify).to eq 'off'
+          expect(channel2.reload.sup_notify).to eq 'off'
+        end
+
+        it 'sets notify to channel for all channels' do
+          channel1.update_attributes!(sup_notify: 'admin')
+          channel2.update_attributes!(sup_notify: 'off')
+          expect(message: '@sup set notify channel', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+            'Round info in all channels will now be sent to the channel.'
+          )
+          expect(channel1.reload.sup_notify).to eq 'channel'
+          expect(channel2.reload.sup_notify).to eq 'channel'
+        end
+
+        it 'fails on an invalid notify value' do
+          expect(message: '@sup set notify invalid', channel: 'DM', user: team.activated_user_id).to respond_with_slack_message(
+            'Invalid value: invalid.'
+          )
+        end
+      end
+    end
+
     context 'api' do
       it 'enables API' do
         team.update_attributes!(api: false)
@@ -180,6 +237,17 @@ describe SlackSup::Commands::Set do
   end
 
   shared_examples_for 'cannot change team settings' do
+    context 'notify' do
+      let!(:channel) { Fabricate(:channel, team:, sup_notify: 'channel') }
+
+      it 'cannot set notify' do
+        expect(message: '@sup set notify admin', channel: 'DM').to respond_with_slack_message(
+          "Round notifications in #{channel.slack_mention} are sent to the channel. Only <@#{team.activated_user_id}> or a Slack team admin can change that, sorry."
+        )
+        expect(channel.reload.sup_notify).to eq 'channel'
+      end
+    end
+
     context 'api' do
       it 'cannot enable API' do
         team.update_attributes!(api: false)
