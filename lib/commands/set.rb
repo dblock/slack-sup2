@@ -435,12 +435,43 @@ module SlackSup
           logger.info "SET: #{channel}, user=#{data.user}, sync_users=#{channel.sync}, last_sync_at=#{channel.last_sync_at}."
         end
 
+        def team_set_notify(team, data, user, v = nil)
+          raise ArgumentError, "Invalid value: #{v}." unless ['channel', 'admin', 'off', nil].include?(v)
+
+          channels = team.channels.enabled.to_a
+          current_message = if channels.empty?
+                              "S'Up is not enabled in any channels."
+                            else
+                              channels.map do |ch|
+                                notify_s = ch.sup_notify == 'off' ? 'off' : ch.sup_notify_s
+                                "Round notifications in #{ch.slack_mention} are #{notify_s == 'off' ? 'off' : "sent to the #{notify_s}"}."
+                              end.join("\n")
+                            end
+
+          if team.is_admin?(user) && v
+            channels.each { |ch| ch.update_attributes!(sup_notify: v) }
+            text = v == 'off' ? 'Round notifications in all channels are now off.' : "Round info in all channels will now be sent to the #{v}."
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: text)
+          elsif v
+            message = [
+              current_message,
+              "Only <@#{team.activated_user_id}> or a Slack team admin can change that, sorry."
+            ].join(' ')
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
+          else
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: current_message)
+          end
+          logger.info "SET: #{team}, user=#{user}, sup_notify=#{v || '(show)'}."
+        end
+
         def team_set(team, data, user, k, v)
           case k
           when 'api'
             team_set_api team, data, user, v
           when 'apitoken'
             team_set_api_token team, data, user
+          when 'notify'
+            team_set_notify team, data, user, v
           else
             raise SlackSup::Error, "Invalid global setting _#{k}_, see _help_ for available options."
           end

@@ -23,6 +23,7 @@ module SlackSup
         set api token                  - require an access token in the X-Access-Token header for API access
         unset api token                - don't require an access token for API access
         rotate api token               - rotate the token required for API access
+        set notify [channel|admin|off] - set round notifications for all channels
         set #channel ...               - change a setting for a channel
         unset #channel ...             - unset a setting for a channel
         rotate #channel api token      - rotate a channel token for API access
