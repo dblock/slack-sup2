@@ -14,9 +14,6 @@ module SlackSup
           check_subscribed_teams!
           check_expired_subscriptions!
         end
-        instance.once_and_every 60 * 60 * 24 do
-          close_old_sups!
-        end
         instance.once_and_every 60 * 15 do
           leave!
           sync!
@@ -26,6 +23,7 @@ module SlackSup
           remind!
           ask!
           ask_again!
+          close_old_sups!
         end
         instance.once_and_every 60 do
           export_data!
