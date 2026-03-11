@@ -21,6 +21,7 @@ module Api
       property :sup_week_of_month, type: Integer, desc: "Week of month for S'Up (1=1st, 2=2nd, 3=3rd, 4=4th, 5=last), nil for weekly."
       property :sup_week_of_month_s, type: String, desc: "Week of month for S'Up in English."
       property :sup_size, type: Integer, desc: "The number of people that meet for each S'Up."
+      property :sup_close, type: Grape::API::Boolean, desc: "Auto-close old S'Up DMs when a new round runs."
 
       link :team do |opts|
         "#{base_url(opts)}/api/teams/#{team.id}"

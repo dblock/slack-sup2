@@ -904,6 +904,7 @@ describe Channel do
               sup_week_of_month
               sup_week_of_month_s
               sup_size
+              sup_close
             ]
           )
           row = csv[0]

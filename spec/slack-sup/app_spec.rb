@@ -177,7 +177,7 @@ describe SlackSup::App do
 
   context 'close_old_sups!' do
     let!(:team) { Fabricate(:team) }
-    let!(:channel) { Fabricate(:channel, team:) }
+    let!(:channel) { Fabricate(:channel, team:, sup_close: true) }
 
     context 'with only one round' do
       let!(:round) { Fabricate(:round, channel:, ran_at: 1.week.ago) }
