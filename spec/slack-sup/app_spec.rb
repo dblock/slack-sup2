@@ -175,6 +175,40 @@ describe SlackSup::App do
     end
   end
 
+  context 'close_old_sups!' do
+    let!(:team) { Fabricate(:team) }
+    let!(:channel) { Fabricate(:channel, team:) }
+
+    context 'with only one round' do
+      let!(:round) { Fabricate(:round, channel:, ran_at: 1.week.ago) }
+      let!(:sup) { Fabricate(:sup, channel:, round:, conversation_id: 'C_ONLY') }
+
+      it 'does not close the only round' do
+        expect_any_instance_of(Slack::Web::Client).not_to receive(:conversations_close)
+        subject.send(:close_old_sups!)
+        expect(sup.reload.closed_at).to be_nil
+      end
+    end
+
+    context 'with multiple rounds' do
+      let!(:old_round) { Fabricate(:round, channel:, ran_at: 2.weeks.ago) }
+      let!(:new_round) { Fabricate(:round, channel:, ran_at: 1.week.ago) }
+      let!(:old_sup) { Fabricate(:sup, channel:, round: old_round, conversation_id: 'C_OLD') }
+      let!(:new_sup) { Fabricate(:sup, channel:, round: new_round, conversation_id: 'C_NEW') }
+      let!(:already_closed_sup) { Fabricate(:sup, channel:, round: old_round, conversation_id: 'C_CLOSED', closed_at: 1.day.ago) }
+      let!(:no_conversation_sup) { Fabricate(:sup, channel:, round: old_round) }
+
+      it 'closes only open DMs from rounds superseded by a newer round' do
+        expect_any_instance_of(Slack::Web::Client).to receive(:conversations_close).once.with(channel: 'C_OLD')
+        subject.send(:close_old_sups!)
+        expect(old_sup.reload.closed_at).not_to be_nil
+        expect(new_sup.reload.closed_at).to be_nil
+        expect(already_closed_sup.reload.closed_at).not_to be_nil
+        expect(no_conversation_sup.reload.closed_at).to be_nil
+      end
+    end
+  end
+
   context 'export_data!' do
     include_context 'uses temp dir'
 

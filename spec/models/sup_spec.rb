@@ -63,6 +63,39 @@ describe Sup do
       end
     end
 
+    describe '#close!' do
+      context 'without conversation_id' do
+        it 'does nothing' do
+          expect(sup.send(:slack_client)).not_to receive(:conversations_close)
+          sup.close!
+          expect(sup.closed_at).to be_nil
+        end
+      end
+
+      context 'with conversation_id' do
+        before do
+          sup.update_attributes!(conversation_id: 'channel')
+        end
+
+        it 'closes the conversation' do
+          expect(sup.send(:slack_client)).to receive(:conversations_close).with(channel: 'channel')
+          sup.close!
+          expect(sup.reload.closed_at).not_to be_nil
+        end
+
+        context 'already closed' do
+          before do
+            sup.update_attributes!(closed_at: Time.now.utc)
+          end
+
+          it 'does not close again' do
+            expect(sup.send(:slack_client)).not_to receive(:conversations_close)
+            sup.close!
+          end
+        end
+      end
+    end
+
     describe '#calendar_href' do
       it 'includes date/time and sup id and a valid access token' do
         t = Time.now.utc

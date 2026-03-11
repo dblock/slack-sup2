@@ -223,6 +223,18 @@ class Channel
     round
   end
 
+  def close_old_sups!
+    latest_ran_at = rounds.where(:ran_at.ne => nil).max(:ran_at)
+    return 0 unless latest_ran_at
+
+    old_round_ids = rounds.where(:ran_at.lt => latest_ran_at).distinct(:_id)
+    return 0 if old_round_ids.empty?
+
+    old_sups = sups.where(:round_id.in => old_round_ids, :conversation_id.ne => nil, :closed_at => nil)
+    old_sups.each(&:close!)
+    old_sups.count
+  end
+
   def last_round
     rounds.desc(:created_at).first
   end

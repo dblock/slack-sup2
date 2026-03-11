@@ -14,6 +14,9 @@ module SlackSup
           check_subscribed_teams!
           check_expired_subscriptions!
         end
+        instance.once_and_every 60 * 60 * 24 do
+          close_old_sups!
+        end
         instance.once_and_every 60 * 15 do
           leave!
           sync!
@@ -170,6 +173,13 @@ module SlackSup
     def export_data!
       invoke_with_criteria!(Export.requested) do |export|
         export.export!
+      end
+    end
+
+    def close_old_sups!
+      invoke! do |channel|
+        count = channel.close_old_sups!
+        logger.info "Closed #{count} old DM conversation(s) for #{channel}." if count.positive?
       end
     end
   end
