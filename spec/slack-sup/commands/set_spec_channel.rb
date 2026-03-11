@@ -17,6 +17,8 @@ describe SlackSup::Commands::Set do
         "Channel #{channel.slack_mention} S'Up connects groups of max 3 people on Monday after 9:00 AM every week in (GMT-05:00) Eastern Time (US & Canada), taking special care to not pair the same people more frequently than every 12 weeks.\n" \
         "Channel users are _opted in_ by default.\n" \
         "Custom profile team field is _not set_.\n" \
+        "Round info is sent to the channel.\n" \
+        "Auto-closing old S'Up DMs is off.\n" \
         "Channel data access via the API is on.\n" \
         "#{channel.api_url}"
       )

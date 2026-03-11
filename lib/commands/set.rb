@@ -689,6 +689,8 @@ module SlackSup
             "Channel #{channel.slack_mention} S'Up connects groups of #{'max ' if channel.sup_odd}#{channel.sup_size} people #{channel.sup_schedule_s} in #{channel.sup_tzone}, taking special care to not pair the same people more frequently than every #{channel.sup_recency_s}.",
             "Channel users are _opted #{channel.opt_in_s}_ by default.",
             "Custom profile team field is _#{channel.team_field_label || 'not set'}_.",
+            channel.sup_notify == 'off' ? 'Round notifications are off.' : "Round info is sent to the #{channel.sup_notify_s}.",
+            "Auto-closing old S'Up DMs is #{channel.sup_close ? 'on' : 'off'}.",
             channel_data_access_message(channel, user),
             channel.api_url
           ].compact.join("\n")
