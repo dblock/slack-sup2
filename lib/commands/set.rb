@@ -471,6 +471,44 @@ module SlackSup
           logger.info "SET: #{channel}, user=#{data.user}, sync_users=#{channel.sync}, last_sync_at=#{channel.last_sync_at}."
         end
 
+        def set_close(channel, data, user, v = nil)
+          raise ArgumentError, "Invalid value: #{v}." unless ['on', 'off', nil].include?(v)
+
+          current_message = "Auto-closing old S'Up DMs is #{channel.sup_close ? 'on' : 'off'}."
+          if channel.is_admin?(user) && v
+            channel.update_attributes!(sup_close: v == 'on')
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Auto-closing old S'Up DMs is now #{v}.")
+          elsif v
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "#{current_message} Only #{channel.channel_admins_slack_mentions.or} can change that, sorry.")
+          else
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: current_message)
+          end
+          logger.info "SET: #{channel}, user=#{data.user}, sup_close=#{channel.sup_close}."
+        end
+
+        def team_set_close(team, data, user, v = nil)
+          raise ArgumentError, "Invalid value: #{v}." unless ['on', 'off', nil].include?(v)
+
+          channels = team.channels.enabled.to_a
+          current_message = if channels.empty?
+                              "S'Up is not enabled in any channels."
+                            else
+                              channels.map do |ch|
+                                "Auto-closing old S'Up DMs in #{ch.slack_mention} is #{ch.sup_close ? 'on' : 'off'}."
+                              end.join("\n")
+                            end
+          if team.is_admin?(user) && v
+            channels.each { |ch| ch.update_attributes!(sup_close: v == 'on') }
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: "Auto-closing old S'Up DMs in all channels is now #{v}.")
+          elsif v
+            message = [current_message, "Only <@#{team.activated_user_id}> or a Slack team admin can change that, sorry."].join(' ')
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: message)
+          else
+            data.team.slack_client.chat_postMessage(channel: data.channel, text: current_message)
+          end
+          logger.info "SET: #{team}, user=#{user}, sup_close=#{v || '(show)'}."
+        end
+
         def team_set_notify(team, data, user, v = nil)
           raise ArgumentError, "Invalid value: #{v}." unless ['channel', 'admin', 'off', nil].include?(v)
 
@@ -508,6 +546,8 @@ module SlackSup
             team_set_api_token team, data, user
           when 'notify'
             team_set_notify team, data, user, v
+          when 'close'
+            team_set_close team, data, user, v
           else
             raise SlackSup::Error, "Invalid global setting _#{k}_, see _help_ for available options."
           end
@@ -545,6 +585,8 @@ module SlackSup
             set_sync channel, data, user, v
           when 'notify'
             set_notify channel, data, user, v
+          when 'close'
+            set_close channel, data, user, v
           when 'week'
             set_week_of_month channel, data, user, v
           else

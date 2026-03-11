@@ -24,6 +24,7 @@ module SlackSup
         unset api token                 - don't require an access token for API access
         rotate api token                - rotate the token required for API access
         set notify [channel|admin|off]  - set round notifications for all channels
+        set close [on|off]              - close old S'Up DMs for all channels
         set #channel ...                - change a setting for a channel
         unset #channel ...              - unset a setting for a channel
         rotate #channel api token       - rotate a channel token for API access
@@ -52,6 +53,7 @@ module SlackSup
         set opt [in|out]                - opt in (default) or opt out new users
         set sync [now]                  - review or schedule a user sync from Slack
         set notify [channel|admin|off]  - send round info to the channel (default), admin via DM, or turn notifications off
+        set close [on|off]              - close old S'Up DMs when a new round runs (default is off)
         set week [1st|2nd|3rd|4th|last] - set S'Up on the nth weekday of every month
         unset week                      - revert to weekly S'Up schedule
         sync                            - manually schedule a user sync (same as set sync now)

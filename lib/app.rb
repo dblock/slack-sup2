@@ -23,6 +23,7 @@ module SlackSup
           remind!
           ask!
           ask_again!
+          close_old_sups!
         end
         instance.once_and_every 60 do
           export_data!
@@ -170,6 +171,13 @@ module SlackSup
     def export_data!
       invoke_with_criteria!(Export.requested) do |export|
         export.export!
+      end
+    end
+
+    def close_old_sups!
+      invoke! do |channel|
+        count = channel.close_old_sups!
+        logger.info "Closed #{count} old DM conversation(s) for #{channel}." if count.positive?
       end
     end
   end

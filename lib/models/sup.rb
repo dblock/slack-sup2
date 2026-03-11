@@ -6,6 +6,7 @@ class Sup
 
   field :outcome, type: String
   field :conversation_id, type: String
+  field :closed_at, type: DateTime
   field :gcal_html_link, type: String
   field :gcal_message_ts, type: String
 
@@ -141,6 +142,15 @@ class Sup
     return unless messages.size <= 1
 
     dm!(text: captain ? "Bumping myself on top of your list, #{captain.slack_mention}." : 'Bumping myself on top of your list.')
+  end
+
+  def close!
+    return unless conversation_id
+    return if closed_at
+
+    logger.info "Closing DM channel #{conversation_id} with #{users.map(&:user_name)}."
+    slack_client.conversations_close(channel: conversation_id)
+    update_attributes!(closed_at: Time.now.utc)
   end
 
   def to_s

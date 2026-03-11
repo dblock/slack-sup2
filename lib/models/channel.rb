@@ -37,6 +37,9 @@ class Channel
   # notify channel or admin
   field :sup_notify, type: String, default: 'channel'
 
+  # auto-close old group DM conversations
+  field :sup_close, type: Boolean, default: false
+
   # sup on the nth weekday of every month (1=1st, 2=2nd, 3=3rd, 4=4th, 5=last), nil=weekly
   field :sup_week_of_month, type: Integer
 
@@ -221,6 +224,20 @@ class Channel
 
     round.remind!
     round
+  end
+
+  def close_old_sups!
+    return 0 unless sup_close
+
+    latest_ran_at = rounds.where(:ran_at.ne => nil).max(:ran_at)
+    return 0 unless latest_ran_at
+
+    old_round_ids = rounds.where(:ran_at.lt => latest_ran_at).distinct(:_id)
+    return 0 if old_round_ids.empty?
+
+    old_sups = sups.where(:round_id.in => old_round_ids, :conversation_id.ne => nil, :closed_at => nil)
+    old_sups.each(&:close!)
+    old_sups.count
   end
 
   def last_round
