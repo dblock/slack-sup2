@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/03/12: Capped auto-closing of old S'Up DMs per cron run to reduce Slack rate-limit errors - [@dblock](https://github.com/dblock).
 * 2026/03/11: Added `set close [on|off]` and global `set close [on|off]` to opt-in to auto-closing old S'Up group DMs - [@dblock](https://github.com/dblock).
 * 2026/03/11: Close old S'Up group DMs when a newer round has run for the same channel - [@dblock](https://github.com/dblock).
 * 2026/03/10: Added `set week [1st|2nd|3rd|4th|last]` to S'Up on the nth weekday of every month - [@dblock](https://github.com/dblock).
