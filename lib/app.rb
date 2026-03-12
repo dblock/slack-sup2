@@ -1,5 +1,7 @@
 module SlackSup
   class App < SlackRubyBotServer::App
+    MAX_OLD_SUPS_TO_CLOSE_PER_RUN = 10
+
     def prepare!
       super
       deactivate_asleep_teams!
@@ -175,10 +177,27 @@ module SlackSup
     end
 
     def close_old_sups!
-      invoke! do |channel|
-        count = channel.close_old_sups!
-        logger.info "Closed #{count} old DM conversation(s) for #{channel}." if count.positive?
+      closed_counts = Hash.new(0)
+      invoke_with_criteria!(closeable_old_sups(limit: MAX_OLD_SUPS_TO_CLOSE_PER_RUN)) do |sup|
+        sup.close!
+        closed_counts[sup.channel] += 1
       end
+      closed_counts.each do |channel, count|
+        logger.info "Closed #{count} old DM conversation(s) for #{channel}."
+      end
+    end
+
+    def closeable_old_sups(limit:)
+      old_sups = []
+      Channel.enabled.each do |channel|
+        break if old_sups.size >= limit
+
+        old_sups.concat(channel.closeable_old_sups(limit: limit - old_sups.size))
+      rescue StandardError => e
+        backtrace = e.backtrace.join("\n")
+        logger.warn "Error in cron for #{channel}, #{e.message}, #{backtrace}."
+      end
+      old_sups
     end
   end
 end

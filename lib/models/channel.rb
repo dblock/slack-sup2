@@ -226,18 +226,22 @@ class Channel
     round
   end
 
-  def close_old_sups!
-    return 0 unless sup_close
+  def close_old_sups!(limit: nil)
+    closeable_old_sups(limit:).count(&:close!)
+  end
+
+  def closeable_old_sups(limit: nil)
+    return [] unless sup_close
 
     latest_ran_at = rounds.where(:ran_at.ne => nil).max(:ran_at)
-    return 0 unless latest_ran_at
+    return [] unless latest_ran_at
 
     old_round_ids = rounds.where(:ran_at.lt => latest_ran_at).distinct(:_id)
-    return 0 if old_round_ids.empty?
+    return [] if old_round_ids.empty?
 
     old_sups = sups.where(:round_id.in => old_round_ids, :conversation_id.ne => nil, :closed_at => nil)
-    old_sups.each(&:close!)
-    old_sups.count
+    old_sups = old_sups.limit(limit) if limit
+    old_sups.to_a
   end
 
   def last_round

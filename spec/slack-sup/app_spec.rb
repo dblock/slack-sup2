@@ -207,6 +207,46 @@ describe SlackSup::App do
         expect(no_conversation_sup.reload.closed_at).to be_nil
       end
     end
+
+    context 'with more closeable DMs than the per-run limit' do
+      let!(:channel1) { Fabricate(:channel, team:, sup_close: true) }
+      let!(:channel2) { Fabricate(:channel, team:, sup_close: true) }
+
+      let!(:channel1_old_round) { Fabricate(:round, channel: channel1, ran_at: 2.weeks.ago) }
+      let!(:channel1_new_round) { Fabricate(:round, channel: channel1, ran_at: 1.week.ago) }
+      let!(:channel2_old_round) { Fabricate(:round, channel: channel2, ran_at: 2.weeks.ago) }
+      let!(:channel2_new_round) { Fabricate(:round, channel: channel2, ran_at: 1.week.ago) }
+
+      let!(:channel1_old_sup1) { Fabricate(:sup, channel: channel1, round: channel1_old_round, conversation_id: 'C_OLD_1') }
+      let!(:channel1_old_sup2) { Fabricate(:sup, channel: channel1, round: channel1_old_round, conversation_id: 'C_OLD_2') }
+      let!(:channel2_old_sup1) { Fabricate(:sup, channel: channel2, round: channel2_old_round, conversation_id: 'C_OLD_3') }
+      let!(:channel2_old_sup2) { Fabricate(:sup, channel: channel2, round: channel2_old_round, conversation_id: 'C_OLD_4') }
+      let!(:channel1_new_sup) { Fabricate(:sup, channel: channel1, round: channel1_new_round, conversation_id: 'C_NEW_1') }
+      let!(:channel2_new_sup) { Fabricate(:sup, channel: channel2, round: channel2_new_round, conversation_id: 'C_NEW_2') }
+
+      before do
+        stub_const('SlackSup::App::MAX_OLD_SUPS_TO_CLOSE_PER_RUN', 2)
+        allow(Channel).to receive(:enabled).and_return([channel1, channel2])
+      end
+
+      it 'closes only up to the per-run limit across channels' do
+        closed_conversation_ids = []
+        allow_any_instance_of(Slack::Web::Client).to receive(:conversations_close) do |_client, channel:|
+          closed_conversation_ids << channel
+        end
+
+        subject.send(:close_old_sups!)
+
+        eligible_sups = [channel1_old_sup1, channel1_old_sup2, channel2_old_sup1, channel2_old_sup2]
+        closed_sups = eligible_sups.count { |sup| sup.reload.closed_at.present? }
+
+        expect(closed_conversation_ids.size).to eq 2
+        expect(closed_conversation_ids - eligible_sups.map(&:conversation_id)).to be_empty
+        expect(closed_sups).to eq 2
+        expect(channel1_new_sup.reload.closed_at).to be_nil
+        expect(channel2_new_sup.reload.closed_at).to be_nil
+      end
+    end
   end
 
   context 'export_data!' do
