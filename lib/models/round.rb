@@ -251,7 +251,8 @@ class Round
       Sup.where(
         :round_id.ne => _id,
         :user_ids.in => pair.map(&:id),
-        :created_at.gt => Time.now.utc - channel.sup_recency.weeks
+        :created_at.gt => Time.now.utc - channel.sup_recency.weeks,
+        :outcome.nin => %w[later none]
       ).any? do |sup|
         pair.all? do |user|
           sup.user_ids.include?(user.id)
