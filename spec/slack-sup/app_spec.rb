@@ -37,6 +37,26 @@ describe SlackSup::App do
     end
   end
 
+  describe '#sync!' do
+    let!(:team) { Fabricate(:team) }
+    let!(:team_user) { User.create!(team:, user_id: 'U123', sync: true) }
+    let!(:team2) { Fabricate(:team) }
+    let!(:channel) { Fabricate(:channel, team:, sync: true) }
+
+    it 'syncs all active teams and pending channels' do
+      expect(Team).to receive(:active).and_return([team, team2])
+      expect(team).to receive(:sync!) do |instance|
+        instance.users.where(channel_id: nil).update_all(updated_at: Time.now.utc, sync: false)
+      end
+      expect(team2).to receive(:sync!) do |instance|
+        instance.users.where(channel_id: nil).update_all(updated_at: Time.now.utc, sync: false)
+      end
+      expect_any_instance_of(Channel).to receive(:sync!).once
+
+      subject.send(:sync!)
+    end
+  end
+
   context 'subscribed' do
     include_context 'stripe mock'
     let(:plan) { stripe_helper.create_plan(id: 'slack-sup2-yearly', amount: 3999) }

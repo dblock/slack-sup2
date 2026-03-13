@@ -14,7 +14,7 @@ module Api
         end
         get ':id' do
           sup = Sup.find(params[:id]) || error!('Not Found', 404)
-          authorize_channel! sup.round.channel
+          sup.channel ? authorize_channel!(sup.channel) : authorize_team!(sup.team)
           present sup, with: Api::Presenters::SupPresenter
         end
 

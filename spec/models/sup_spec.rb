@@ -192,11 +192,12 @@ describe Sup do
             let(:csv) { CSV.read(File.join(tmp, 'sup.csv'), headers: true) }
 
             it 'generates csv' do
-              expect(csv.headers).to eq(%w[id outcome created_at updated_at captain_user_name users])
+              expect(csv.headers).to eq(%w[id outcome created_at updated_at captain_user_name suggested_by_user_name suggested_text users])
               row = csv[0]
               expect(row['outcome']).to be_nil
               expect(row['users']).to eq sup.users.map(&:user_name).join("\n")
               expect(row['captain_user_name']).to eq sup.captain.user_name
+              expect(row['suggested_by_user_name']).to be_nil
             end
           end
         end
@@ -275,6 +276,48 @@ describe Sup do
         sup.sup!
         expect(sup.captain).to eq user2
       end
+    end
+  end
+
+  context 'suggested sup' do
+    include_context 'uses temp dir'
+
+    let(:channel) { Fabricate(:channel) }
+    let(:team) { channel.team }
+    let!(:suggested_by) { Fabricate(:user, team:, channel: nil, user_id: 'suggested-by') }
+    let!(:user1) { Fabricate(:user, team:, channel: nil, user_id: 'U1') }
+    let!(:user2) { Fabricate(:user, team:, channel: nil, user_id: 'U2') }
+    let(:sup) { Fabricate(:sup, team:, channel: nil, round: nil, users: [user1, user2], suggested_by:, suggested_text: 'talk about the weather') }
+
+    it 'renders a suggest-specific message' do
+      expected_users = [user1, user2].sort_by(&:id).map(&:slack_mention).and
+      expect(sup.send(:suggested_message)).to eq(
+        "Hey #{expected_users}! #{suggested_by.slack_mention} is suggesting you meet for 20 minutes: talk about the weather."
+      )
+    end
+
+    it 'exports the suggested-by user name' do
+      sup.export!(tmp)
+
+      csv = CSV.read(File.join(tmp, 'sup.csv'), headers: true)
+      expect(csv[0]['suggested_by_user_name']).to eq suggested_by.user_name
+    end
+
+    it 'allows team-scoped users without a channel' do
+      expect(sup).to be_valid
+    end
+  end
+
+  context 'validation' do
+    it 'requires the round channel to match the sup channel' do
+      channel = Fabricate(:channel)
+      other_channel = Fabricate(:channel)
+      round = Fabricate(:round, channel:)
+      user = Fabricate(:user, channel: other_channel)
+      sup = Sup.new(channel: other_channel, round:, users: [user])
+
+      expect(sup).not_to be_valid
+      expect(sup.errors[:channel]).to eq(['Rounds can only be created amongst users of the same channel.'])
     end
   end
 end

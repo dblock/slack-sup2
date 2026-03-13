@@ -30,6 +30,7 @@ module SlackSup
         rotate #channel api token       - rotate a channel token for API access
         data [#channel] [n|all]         - get DMed a link to a .zip of team data for the last n rounds
         admins                          - show team admin
+        suggest [@user ...] [topic]     - suggest an on-demand S'Up
 
         In a Channel
         ------------

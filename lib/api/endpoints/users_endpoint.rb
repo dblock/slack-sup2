@@ -14,7 +14,7 @@ module Api
         end
         get ':id' do
           user = User.find(params[:id]) || error!('Not Found', 404)
-          authorize_channel! user.channel
+          user.channel ? authorize_channel!(user.channel) : authorize_team!(user.team)
           present user, with: Api::Presenters::UserPresenter
         end
 

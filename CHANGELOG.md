@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/03/12: Added `suggest [@mentions] [topic]` to suggest on-demand S'Ups - [@dblock](https://github.com/dblock).
 * 2026/03/12: Ignore prior S'Up pairings for recency when groups reported they hadn't met - [@dblock](https://github.com/dblock).
 * 2026/03/12: Made auto-closing old S'Up DMs enabled by default for new channels - [@dblock](https://github.com/dblock).
 * 2026/03/12: Capped auto-closing of old S'Up DMs per cron run to reduce Slack rate-limit errors - [@dblock](https://github.com/dblock).
