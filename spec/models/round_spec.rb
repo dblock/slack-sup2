@@ -426,6 +426,21 @@ describe Round do
         it 'is true' do
           expect(round2.send(:met_recently?, [user1, user2])).to be true
         end
+
+        it 'is false when they reported not meeting yet' do
+          round.sups.first.update_attributes!(outcome: 'later')
+          expect(round2.send(:met_recently?, [user1, user2])).to be false
+        end
+
+        it 'is false when they reported they could not meet' do
+          round.sups.first.update_attributes!(outcome: 'none')
+          expect(round2.send(:met_recently?, [user1, user2])).to be false
+        end
+
+        it 'remains true when some of them met' do
+          round.sups.first.update_attributes!(outcome: 'some')
+          expect(round2.send(:met_recently?, [user1, user2])).to be true
+        end
       end
 
       context 'in a distant future' do
