@@ -38,7 +38,7 @@ class Channel
   field :sup_notify, type: String, default: 'channel'
 
   # auto-close old group DM conversations
-  field :sup_close, type: Boolean, default: false
+  field :sup_close, type: Boolean, default: true
 
   # sup on the nth weekday of every month (1=1st, 2=2nd, 3=3rd, 4=4th, 5=last), nil=weekly
   field :sup_week_of_month, type: Integer

@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe Channel do
+  context 'defaults' do
+    let(:channel) { Fabricate(:channel) }
+
+    it 'enables auto-closing old S\'Up DMs' do
+      expect(channel.sup_close).to be true
+    end
+  end
+
   context 'channel_admins' do
     let!(:channel) { Fabricate(:channel) }
 

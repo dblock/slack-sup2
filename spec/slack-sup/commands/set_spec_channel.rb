@@ -18,7 +18,7 @@ describe SlackSup::Commands::Set do
         "Channel users are _opted in_ by default.\n" \
         "Custom profile team field is _not set_.\n" \
         "Round info is sent to the channel.\n" \
-        "Auto-closing old S'Up DMs is off.\n" \
+        "Auto-closing old S'Up DMs is on.\n" \
         "Channel data access via the API is on.\n" \
         "#{channel.api_url}"
       )
