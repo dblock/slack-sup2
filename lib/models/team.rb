@@ -61,8 +61,8 @@ class Team
   def asleep?(dt = 3.weeks)
     return false unless subscription_expired?
 
-    time_limit = Time.now.utc - dt
-    created_at <= time_limit
+    time_limit = (Time.now.utc - dt).to_date
+    created_at.to_date <= time_limit
   end
 
   def inform!(message)
