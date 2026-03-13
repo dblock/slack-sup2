@@ -45,7 +45,7 @@ describe SlackSup::Commands::Rounds do
       end
 
       it 'reports counts' do
-        Timecop.travel(Time.now + 731.days)
+        Timecop.travel(Time.now + 732.days)
         expect(message: '@sup rounds 4', channel: 'DM').to respond_with_slack_message([
           "Team S'Up facilitated 4 rounds in 2 channels.",
           "* in progress in #{channel2.slack_mention}: 1 S'Up paired 3 users and no outcomes reported.",
@@ -89,7 +89,7 @@ describe SlackSup::Commands::Rounds do
       end
 
       it 'reports counts' do
-        Timecop.travel(Time.now + 731.days)
+        Timecop.travel(Time.now + 732.days)
         expect(message: '@sup rounds 2').to respond_with_slack_message(
           "Channel S'Up facilitated 2 rounds.\n" \
           "* in progress: 1 S'Up paired 3 users and no outcomes reported.\n" \
