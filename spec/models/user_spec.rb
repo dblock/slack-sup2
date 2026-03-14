@@ -106,6 +106,15 @@ describe User do
           expect(user).not_to be_nil
           expect(user.user_id).to eq 'user_id'
           expect(user.sync).to be true
+          expect(user.team).to eq channel.team
+        end.to change(User, :count).by(1)
+      end
+
+      it 'creates a user without checking Slack' do
+        expect do
+          user = channel.find_or_create_user!('missing-user')
+          expect(user.user_id).to eq 'missing-user'
+          expect(user.team).to eq channel.team
         end.to change(User, :count).by(1)
       end
     end
@@ -124,6 +133,24 @@ describe User do
           channel.find_or_create_user!(user.user_id)
         end.not_to change(User, :count)
       end
+    end
+  end
+
+  describe 'validation' do
+    it 'assigns team from channel when missing' do
+      channel = Fabricate(:channel)
+      user = User.create!(channel:, user_id: 'user_id')
+
+      expect(user.team).to eq channel.team
+    end
+
+    it 'requires team to match channel team' do
+      channel = Fabricate(:channel)
+      other_team = Fabricate(:team)
+      user = User.new(channel:, team: other_team, user_id: 'user_id')
+
+      expect(user).not_to be_valid
+      expect(user.errors[:team]).to eq(['must match the user channel team.'])
     end
   end
 

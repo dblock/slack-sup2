@@ -146,7 +146,9 @@ class Channel
 
   def find_or_create_user!(user_id)
     user = users.where(user_id:).first
-    user || users.create!(user_id:, sync: true, opted_in: opt_in)
+    return user if user
+
+    users.create!(user_id:, team:, sync: true, opted_in: opt_in)
   end
 
   def sync!

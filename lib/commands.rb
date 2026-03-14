@@ -14,9 +14,11 @@ require_relative 'commands/sync'
 require_relative 'commands/promote'
 require_relative 'commands/demote'
 require_relative 'commands/data'
+require_relative 'commands/suggest'
 
 SlackRubyBotServer::Events::AppMentions.configure do |config|
   config.handlers = [
+    SlackSup::Commands::Suggest,
     SlackSup::Commands::Help,
     SlackSup::Commands::About,
     SlackSup::Commands::Admins,

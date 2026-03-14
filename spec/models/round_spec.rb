@@ -461,6 +461,11 @@ describe Round do
           Fabricate(:sup, round:, channel:, users: [Fabricate(:user), user2, Fabricate(:user)])
           expect(round2.send(:met_recently?, [user1, user2])).to be false
         end
+
+        it 'ignores suggested sups' do
+          Fabricate(:sup, channel:, round: nil, users: [user1, user2], suggested_by: Fabricate(:user, channel:))
+          expect(round2.send(:met_recently?, [user1, user2])).to be false
+        end
       end
     end
 

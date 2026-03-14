@@ -60,6 +60,67 @@ describe Api::Endpoints::SlackEndpoint do
         end
       end
     end
+
+    context 'for a suggested sup' do
+      let!(:channel) { Fabricate(:channel) }
+      let!(:suggested_by) { Fabricate(:user, channel:, user_id: 'suggested-by') }
+      let(:sup) { Fabricate(:sup, channel:, round: nil, suggested_by:) }
+
+      before do
+        sup.users << Fabricate(:user, channel:, user_id: 'U1')
+        sup.users << Fabricate(:user, channel:, user_id: 'U2')
+      end
+
+      it 'notifies the suggestor on a terminal outcome' do
+        expect(Faraday).to receive(:post)
+        expect_any_instance_of(Slack::Web::Client).to receive(:conversations_open).with(users: 'suggested-by').and_return(
+          Hashie::Mash.new(channel: { id: 'suggestor-dm' })
+        )
+        expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).with(
+          channel: 'suggestor-dm',
+          text: "#{sup.users.map(&:slack_mention).and} updated the S'Up you suggested. Glad you all met! Thanks for letting me know.",
+          as_user: true
+        )
+
+        post '/api/slack/action', payload: payload.merge(
+          callback_id: sup.id.to_s,
+          actions: [
+            { name: 'outcome', type: 'button', value: 'all' }
+          ]
+        ).to_json
+
+        expect(last_response.status).to eq 204
+      end
+
+      context 'when team-scoped' do
+        let!(:team) { Fabricate(:team) }
+        let!(:channel) { Fabricate(:channel, team:) }
+        let!(:suggested_by) { Fabricate(:user, team:, channel: nil, user_id: 'suggested-by') }
+        let(:sup) { Fabricate(:sup, team:, channel: nil, round: nil, suggested_by:) }
+
+        it 'logs the team instead of a nil channel' do
+          expect(Faraday).to receive(:post)
+          expect(Api::Middleware.logger).to receive(:info).with(
+            a_string_starting_with('Updated team ').and(
+              a_string_including(", sup #{sup} outcome to 'all'.")
+            )
+          )
+          expect_any_instance_of(Slack::Web::Client).to receive(:conversations_open).with(users: 'suggested-by').and_return(
+            Hashie::Mash.new(channel: { id: 'suggestor-dm' })
+          )
+          expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage)
+
+          post '/api/slack/action', payload: payload.merge(
+            callback_id: sup.id.to_s,
+            actions: [
+              { name: 'outcome', type: 'button', value: 'all' }
+            ]
+          ).to_json
+
+          expect(last_response.status).to eq 204
+        end
+      end
+    end
   end
 
   it 'requires payload' do

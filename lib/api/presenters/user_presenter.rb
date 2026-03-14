@@ -18,6 +18,8 @@ module Api
       property :updated_at, type: DateTime, desc: 'Date/time when the user was updated.'
 
       link :channel do |opts|
+        next unless channel_id
+
         "#{base_url(opts)}/api/channels/#{channel_id}"
       end
 

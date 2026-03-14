@@ -246,10 +246,10 @@ class Round
   end
 
   def met_recently?(users)
-    pairs = users.to_a.permutation(2)
-    pairs.any? do |pair|
+    users.to_a.permutation(2).any? do |pair|
       Sup.where(
-        :round_id.ne => _id,
+        channel_id: channel.id,
+        :round_id.nin => [nil, id],
         :user_ids.in => pair.map(&:id),
         :created_at.gt => Time.now.utc - channel.sup_recency.weeks,
         :outcome.nin => %w[later none]

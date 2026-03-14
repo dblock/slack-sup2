@@ -36,6 +36,23 @@ describe Api::Endpoints::UsersEndpoint do
     end
   end
 
+  context 'team-scoped user' do
+    let(:existing_user) { Fabricate(:user, team:, channel: nil) }
+
+    context 'with a team api token' do
+      before do
+        client.headers.update('X-Access-Token' => 'token')
+        team.update_attributes!(api_token: 'token')
+      end
+
+      it 'returns a team-scoped user using a team API token' do
+        user = client.user(id: existing_user.id)
+        expect(user.id).to eq existing_user.id.to_s
+        expect(user._links).not_to respond_to(:channel)
+      end
+    end
+  end
+
   context 'users' do
     let!(:user_1) { Fabricate(:user, channel:) }
     let!(:user_2) { Fabricate(:user, channel:) }

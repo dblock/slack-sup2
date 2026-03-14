@@ -9,7 +9,8 @@ SlackRubyBotServer::Events.configure do |config|
       sup = Sup.find(payload[:callback_id]) || error!('Sup Not Found', 404)
       sup.update_attributes!(outcome: payload[:actions].first[:value])
 
-      Api::Middleware.logger.info "Updated channel #{sup.round.channel}, sup #{sup} outcome to '#{sup.outcome}'."
+      owner = sup.channel ? "channel #{sup.channel}" : "team #{sup.team}"
+      Api::Middleware.logger.info "Updated #{owner}, sup #{sup} outcome to '#{sup.outcome}'."
 
       message = Sup::ASK_WHO_SUP_MESSAGE.dup
 
@@ -24,6 +25,7 @@ SlackRubyBotServer::Events.configure do |config|
         response_type: 'in_channel',
         thread_ts: payload[:original_message][:ts]
       }.merge(message).to_json, 'Content-Type' => 'application/json')
+      sup.notify_suggested_by!
     end
 
     false

@@ -9,15 +9,22 @@ class Sup
   field :closed_at, type: DateTime
   field :gcal_html_link, type: String
   field :gcal_message_ts, type: String
+  field :suggested_text, type: String
 
-  belongs_to :channel
-  belongs_to :round
+  belongs_to :team, optional: true
+  belongs_to :channel, optional: true
+  belongs_to :round, optional: true
   has_and_belongs_to_many :users
 
   belongs_to :captain, class_name: 'User', inverse_of: nil, optional: true
+  belongs_to :suggested_by, class_name: 'User', inverse_of: nil, optional: true
 
   def captain_user_name
     captain&.user_name
+  end
+
+  def suggested_by_user_name
+    suggested_by&.user_name
   end
 
   index(round: 1, user_ids: 1)
@@ -30,9 +37,9 @@ class Sup
     logger.info "Creating S'Up on a DM channel with #{users.map(&:user_name)}."
     update_attributes!(captain: select_best_captain)
     messages = [
-      hi_message,
-      intro_message,
-      channel.sup_message || PLEASE_SUP_MESSAGE,
+      suggested? ? suggested_message : hi_message,
+      suggested? ? nil : intro_message,
+      channel&.sup_message || PLEASE_SUP_MESSAGE,
       captain && "#{captain.slack_mention}, you're in charge this week to make it happen!"
     ].compact
     dm!(text: messages.join("\n\n"))
@@ -157,11 +164,32 @@ class Sup
     "id=#{id}, users=#{users.map(&:user_name).and}"
   end
 
-  def calendar_href(dt = nil)
-    "#{SlackRubyBotServer::Service.url}/gcal?sup_id=#{id}&dt=#{dt.to_i if dt}&access_token=#{channel.short_lived_token}"
+  def suggested?
+    !suggested_by_id.nil?
   end
 
-  validates_presence_of :channel_id
+  def notify_suggested_by!
+    return unless suggested?
+    return if outcome == 'later'
+
+    conversation = slack_client.conversations_open(users: suggested_by.user_id)
+    slack_client.chat_postMessage(
+      channel: conversation.channel.id,
+      text: [
+        "#{users.map(&:slack_mention).and} updated the S'Up you suggested.",
+        Sup::RESPOND_TO_ASK_MESSAGES[outcome]
+      ].join(' '),
+      as_user: true
+    )
+  end
+
+  def calendar_href(dt = nil)
+    resource = channel || team
+    "#{SlackRubyBotServer::Service.url}/gcal?sup_id=#{id}&dt=#{dt.to_i if dt}&access_token=#{resource.short_lived_token}"
+  end
+
+  validates_presence_of :team
+  before_validation :set_team
   before_validation :validate_channel
   after_save :notify_gcal_html_link_changed!
 
@@ -187,7 +215,7 @@ class Sup
 
     if gcal_message_ts && conversation_id
       begin
-        channel.slack_client.chat_update(
+        slack_client.chat_update(
           message.merge(
             channel: conversation_id,
             ts: gcal_message_ts
@@ -211,7 +239,14 @@ class Sup
   end
 
   def hi_message
-    "Hi there! I'm your #{channel.slack_mention} channel S'Up bot."
+    channel ? "Hi there! I'm your #{channel.slack_mention} channel S'Up bot." : "Hi there! I'm your team's S'Up bot."
+  end
+
+  def suggested_message
+    [
+      "Hey #{users.sort_by(&:id).map(&:slack_mention).and}!",
+      "#{suggested_by.slack_mention} is suggesting you meet for 20 minutes#{": #{suggested_text}" if suggested_text.present?}."
+    ].join(' ')
   end
 
   def intro_message
@@ -226,13 +261,28 @@ class Sup
   end
 
   def validate_channel
-    return if channel_id && round.channel_id == channel_id && users.all? { |user| user.channel_id == channel_id }
+    if round && (round.channel_id.present? || channel_id.present?) && round.channel_id != channel_id
+      errors.add(:channel, 'Rounds can only be created amongst users of the same channel.')
+      return
+    end
+
+    unless users.all? { |user| user.team_id == team_id }
+      errors.add(:channel, "S'Ups can only be created amongst users of the same team.")
+      return
+    end
+
+    return unless channel_id
+    return if users.all? { |user| user.channel_id.nil? || user.channel_id == channel_id }
 
     errors.add(:channel, 'Rounds can only be created amongst users of the same channel.')
   end
 
   def slack_client
-    round.channel.slack_client
+    (channel || team).slack_client
+  end
+
+  def set_team
+    self.team ||= channel&.team || round&.channel&.team || suggested_by&.team || users.find(&:team)&.team
   end
 
   # creates a DM between all the parties involved

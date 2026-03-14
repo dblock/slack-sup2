@@ -30,18 +30,22 @@ class User
   scope :suppable, -> { where(enabled: true, vacation: false, opted_in: true) }
   index(channel_id: 1, enabled: 1, opted_in: 1)
 
-  belongs_to :channel, index: true
-  validates_presence_of :channel
+  belongs_to :team, optional: true
+  belongs_to :channel, index: true, optional: true
+  validates_presence_of :team
+  validate :validate_team
 
-  index({ user_id: 1, channel_id: 1 }, unique: true)
-  index(user_name: 1, channel_id: 1)
+  index({ user_id: 1, team_id: 1, channel_id: 1 }, unique: true)
+  index(user_name: 1, team_id: 1, channel_id: 1)
+
+  before_validation :set_team
 
   def slack_client
-    channel.slack_client
+    team.slack_client
   end
 
   def activated_user?
-    channel.team.is_admin?(user_id)
+    team.is_admin?(user_id)
   end
 
   def team_admin?
@@ -49,6 +53,8 @@ class User
   end
 
   def channel_admin?
+    return team_admin? unless channel
+
     user_id == channel.inviter_id || team_admin?
   end
 
@@ -70,13 +76,13 @@ class User
   end
 
   def last_captain_at
-    last_captain_sup = channel.sups.where(captain_id: id).desc(:created_at).limit(1).first
+    last_captain_sup = (channel ? channel.sups : team.sups).where(captain_id: id).desc(:created_at).limit(1).first
     last_captain_sup&.created_at
   end
 
   def update_info_attributes!(info)
     update_attributes!(
-      is_organizer: channel.inviter_id == user_id,
+      is_organizer: channel&.inviter_id == user_id,
       is_admin: is_admin || info.is_admin,
       is_owner: info.is_owner,
       vacation: info.profile&.status_emoji == ':palm_tree:',
@@ -108,10 +114,20 @@ class User
 
   private
 
-  def get_team_name
-    return unless channel.team_field_label_id
+  def set_team
+    self.team ||= channel&.team
+  end
 
-    fields = channel.team.slack_client_with_activated_user_access.users_profile_get(user: user_id).profile.fields
+  def validate_team
+    return unless channel && team && team != channel.team
+
+    errors.add(:team, 'must match the user channel team.')
+  end
+
+  def get_team_name
+    return unless channel&.team_field_label_id
+
+    fields = team.slack_client_with_activated_user_access.users_profile_get(user: user_id).profile.fields
     custom_field_value = fields[channel.team_field_label_id] if fields&.is_a?(::Slack::Messages::Message)
     custom_field_value&.value
   rescue Exception => e

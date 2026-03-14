@@ -8,11 +8,14 @@ describe Api::Endpoints::SupsEndpoint do
 
   before do
     allow_any_instance_of(Channel).to receive(:inform!)
-    @cursor_params = { round_id: round.id.to_s }
   end
 
   context 'with a round' do
     let!(:round) { Fabricate(:round, channel:) }
+
+    before do
+      @cursor_params = { round_id: round.id.to_s }
+    end
 
     it_behaves_like 'a cursor api', Sup
     it_behaves_like 'a channel token api', Sup
@@ -103,7 +106,7 @@ describe Api::Endpoints::SupsEndpoint do
       context 'with a team api token' do
         before do
           client.headers.update('X-Access-Token' => 'token')
-          team.update_attributes!(api_token: 'token')
+          team.update_attributes!(api: true, api_token: 'token')
         end
 
         it 'returns a sup using a team API token' do
@@ -125,13 +128,35 @@ describe Api::Endpoints::SupsEndpoint do
       context 'with a team api token' do
         before do
           client.headers.update('X-Access-Token' => 'token')
-          team.update_attributes!(api_token: 'token')
+          team.update_attributes!(api: true, api_token: 'token')
         end
 
         it 'returns sups' do
           sups = client.sups(round_id: round.id)
           expect(sups.map(&:id).sort).to eq [sup_1, sup_2].map(&:id).map(&:to_s).sort
         end
+      end
+    end
+  end
+
+  context 'with a suggested sup' do
+    let!(:suggested_by) { Fabricate(:user, team:, channel: nil, user_id: 'suggested-by') }
+    let!(:user1) { Fabricate(:user, team:, channel: nil) }
+    let!(:user2) { Fabricate(:user, team:, channel: nil) }
+    let!(:suggested_sup) { Fabricate(:sup, team:, channel: nil, round: nil, users: [user1, user2], suggested_by:, suggested_text: 'talk about the weather') }
+
+    context 'with a team api token' do
+      before do
+        client.headers.update('X-Access-Token' => 'token')
+        team.update_attributes!(api: true, api_token: 'token')
+      end
+
+      it 'returns a suggested sup using a team API token' do
+        sup = client.sup(id: suggested_sup.id)
+        expect(sup.id).to eq suggested_sup.id.to_s
+        expect(sup.suggested_text).to eq 'talk about the weather'
+        expect(sup._links.suggested_by._url).to eq "http://example.org/api/users/#{suggested_by.id}"
+        expect(sup._links).not_to respond_to(:round)
       end
     end
   end

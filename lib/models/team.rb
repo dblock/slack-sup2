@@ -28,11 +28,11 @@ class Team
   end
 
   def sups
-    Sup.where(:channel_id.in => channels.distinct(:_id))
+    Sup.where(team_id: id)
   end
 
   def users
-    User.where(:channel_id.in => channels.distinct(:_id))
+    User.where(team_id: id)
   end
 
   def tags
@@ -211,7 +211,21 @@ class Team
 
   def find_create_or_update_user_in_channel_by_slack_id!(channel_id, user_id)
     channel = find_create_or_update_channel_by_channel_id!(channel_id, user_id)
-    channel ? channel.find_or_create_user!(user_id) : user_id
+    channel ? channel.find_or_create_user!(user_id) : find_or_create_user!(user_id)
+  end
+
+  def find_or_create_user!(user_id)
+    user = users.where(user_id:, channel_id: nil).first
+    return user if user
+
+    User.create!(team: self, user_id:, sync: true)
+  end
+
+  def sync!
+    users.where(channel_id: nil).each do |user|
+      user.sync!
+      logger.info "Team #{self}: #{user} updated."
+    end
   end
 
   def join_channel!(channel_id, inviter_id)

@@ -6,6 +6,9 @@ describe Team do
 
     before do
       allow(team.slack_client).to receive(:conversations_info)
+      allow_any_instance_of(Slack::Web::Client).to receive(:users_info) do |_client, **args|
+        Hashie::Mash.new(user: { id: args[:user] })
+      end
     end
 
     it 'creates a new channel' do
@@ -76,9 +79,12 @@ describe Team do
 
   describe '#find_create_or_update_user_in_channel_by_slack_id!' do
     let(:team) { Fabricate(:team) }
+    let(:slack_client) { instance_double(Slack::Web::Client) }
 
     before do
-      allow(team.slack_client).to receive(:conversations_info)
+      allow(team).to receive(:slack_client).and_return(slack_client)
+      allow_any_instance_of(Channel).to receive(:slack_client).and_return(slack_client)
+      allow(slack_client).to receive(:conversations_info)
     end
 
     it 'creates a new channel and user' do
@@ -91,13 +97,26 @@ describe Team do
       end.to change(User, :count).by(1)
     end
 
-    it 'does not create a new channel or user for a DM' do
+    it 'does not create a new channel and creates a team-scoped user for a DM' do
       expect do
         expect do
-          user_id = team.find_create_or_update_user_in_channel_by_slack_id!('D123', 'U123')
-          expect(user_id).to eq 'U123'
+          user = team.find_create_or_update_user_in_channel_by_slack_id!('D123', 'U123')
+          expect(user.user_id).to eq 'U123'
+          expect(user.team).to eq team
+          expect(user.channel).to be_nil
         end.not_to change(Channel, :count)
-      end.not_to change(User, :count)
+      end.to change(User, :count).by(1)
+    end
+
+    it 'creates a team-scoped user for a valid Slack mention without checking Slack' do
+      expect do
+        expect do
+          user = team.find_create_or_update_user_in_channel_by_slack_id!('D123', 'U404')
+          expect(user.user_id).to eq 'U404'
+          expect(user.team).to eq team
+          expect(user.channel).to be_nil
+        end.not_to change(Channel, :count)
+      end.to change(User, :count).by(1)
     end
 
     context 'with an existing channel' do
@@ -124,6 +143,47 @@ describe Team do
           end.not_to change(User, :count)
         end
       end
+    end
+  end
+
+  describe '#sync!' do
+    let(:team) { Fabricate(:team) }
+    let(:slack_client) { instance_double(Slack::Web::Client) }
+    let!(:team_user) { User.create!(team:, user_id: 'U123', sync: true) }
+    let!(:channel) { Fabricate(:channel, team:) }
+    let!(:channel_user) { Fabricate(:user, channel:, user_id: 'C123', user_name: 'channel-user') }
+
+    before do
+      allow_any_instance_of(Team).to receive(:slack_client).and_return(slack_client)
+      allow(slack_client).to receive(:users_info).with(user: 'U123').and_return(
+        Hashie::Mash.new(
+          user: {
+            id: 'U123',
+            name: 'team-user',
+            real_name: 'Team User',
+            is_admin: true,
+            is_owner: false,
+            profile: {
+              email: 'team-user@example.com',
+              status_emoji: ''
+            }
+          }
+        )
+      )
+    end
+
+    it 'updates team-scoped user attributes without changing membership' do
+      expect(slack_client).not_to receive(:users_info).with(user: 'C123')
+
+      expect { team.sync! }.not_to change(User, :count)
+
+      expect(team_user.reload.user_name).to eq 'team-user'
+      expect(team_user.real_name).to eq 'Team User'
+      expect(team_user.email).to eq 'team-user@example.com'
+      expect(team_user.is_admin).to be true
+      expect(team_user.sync).to be false
+      expect(team_user.last_sync_at).not_to be_nil
+      expect(channel_user.reload.user_name).to eq 'channel-user'
     end
   end
 
