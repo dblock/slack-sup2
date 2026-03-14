@@ -322,6 +322,18 @@ describe Sup do
 
       sup.sup!
     end
+
+    it 'maps invalid_user_combination to a user-facing error' do
+      allow_any_instance_of(Slack::Web::Client).to receive(:conversations_open)
+        .and_raise(Slack::Web::Api::Errors::SlackError, 'invalid_user_combination')
+
+      expect do
+        sup.send(:dm!, text: 'hello')
+      end.to raise_error(
+        SlackSup::Error,
+        "Sorry, this S'Up isn't possible. Everyone must already be in at least one channel together to send a message."
+      )
+    end
   end
 
   context 'validation' do

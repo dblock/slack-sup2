@@ -40,6 +40,7 @@ module SlackSup
         set                             - show all channel settings
         data [n|all]                    - get DMed a link to a .zip of channel data for the last n rounds
         admins                          - show channel admins
+        suggest [@user ...] [topic]     - suggest an on-demand S'Up for members of this channel
 
         In a Channel (Admins)
         ---------------------

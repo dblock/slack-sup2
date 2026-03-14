@@ -32,6 +32,8 @@ class Sup
   PLEASE_SUP_MESSAGE =
     'Please find a time for a quick 20 minute break on the calendar. ' \
     "Then get together and tell each other about something awesome you're working on these days.".freeze
+  INVALID_USER_COMBINATION_MESSAGE =
+    "Sorry, this S'Up isn't possible. Everyone must already be in at least one channel together to send a message.".freeze
 
   def sup!
     logger.info "Creating S'Up on a DM channel with #{display_users}."
@@ -296,5 +298,9 @@ class Sup
       update_attributes!(conversation_id: conversation.channel.id)
     end
     slack_client.chat_postMessage(message.merge(channel: conversation_id, as_user: true))
+  rescue Slack::Web::Api::Errors::SlackError => e
+    raise SlackSup::Error, INVALID_USER_COMBINATION_MESSAGE if e.message == 'invalid_user_combination'
+
+    raise SlackSup::Error, "Sorry, I couldn't create that S'Up because of a Slack error: #{e.message}."
   end
 end
