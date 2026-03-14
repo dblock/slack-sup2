@@ -306,6 +306,22 @@ describe Sup do
     it 'allows team-scoped users without a channel' do
       expect(sup).to be_valid
     end
+
+    it 'uses slack mentions when user names are missing' do
+      user1.update_attributes!(user_name: nil, real_name: nil)
+      user2.update_attributes!(user_name: nil, real_name: nil)
+
+      expect(sup.to_s).to include('users=<@U1> and <@U2>')
+    end
+
+    it 'logs display names when creating a DM' do
+      user1.update_attributes!(user_name: nil, real_name: nil)
+      user2.update_attributes!(user_name: nil, real_name: nil)
+      expect(sup).to receive(:dm!)
+      expect_any_instance_of(Logger).to receive(:info).with("Creating S'Up on a DM channel with <@U1> and <@U2>.")
+
+      sup.sup!
+    end
   end
 
   context 'validation' do

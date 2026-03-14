@@ -34,7 +34,7 @@ class Sup
     "Then get together and tell each other about something awesome you're working on these days.".freeze
 
   def sup!
-    logger.info "Creating S'Up on a DM channel with #{users.map(&:user_name)}."
+    logger.info "Creating S'Up on a DM channel with #{display_users}."
     update_attributes!(captain: select_best_captain)
     messages = [
       suggested? ? suggested_message : hi_message,
@@ -131,14 +131,14 @@ class Sup
   def ask!
     message = ASK_WHO_SUP_MESSAGE.dup
     message[:attachments].first[:callback_id] = id.to_s
-    logger.info "Asking for outcome on a DM channel with #{users.map(&:user_name)}."
+    logger.info "Asking for outcome on a DM channel with #{display_users}."
     dm!(message)
   end
 
   def ask_again!
     message = ASK_WHO_SUP_AGAIN_MESSAGE.dup
     message[:attachments].first[:callback_id] = id.to_s
-    logger.info "Asking again for outcome on a DM channel with #{users.map(&:user_name)}."
+    logger.info "Asking again for outcome on a DM channel with #{display_users}."
     dm!(message)
   end
 
@@ -155,13 +155,13 @@ class Sup
     return unless conversation_id
     return if closed_at
 
-    logger.info "Closing DM channel #{conversation_id} with #{users.map(&:user_name)}."
+    logger.info "Closing DM channel #{conversation_id} with #{display_users}."
     slack_client.conversations_close(channel: conversation_id)
     update_attributes!(closed_at: Time.now.utc)
   end
 
   def to_s
-    "id=#{id}, users=#{users.map(&:user_name).and}"
+    "id=#{id}, users=#{display_users}"
   end
 
   def suggested?
@@ -283,6 +283,10 @@ class Sup
 
   def set_team
     self.team ||= channel&.team || round&.channel&.team || suggested_by&.team || users.find(&:team)&.team
+  end
+
+  def display_users
+    users.map(&:display_name).and
   end
 
   # creates a DM between all the parties involved
