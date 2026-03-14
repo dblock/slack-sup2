@@ -62,8 +62,12 @@ class User
     "<@#{user_id}>"
   end
 
+  def display_name
+    user_name || real_name || slack_mention
+  end
+
   def self.parse_slack_mention(mention)
-    user_match = mention.match(/^<@(.*)>$/)
+    user_match = mention.match(/^<@([^>|]+)(?:\|[^>]+)?>$/)
     user_match[1] if user_match
   end
 
@@ -101,7 +105,7 @@ class User
   end
 
   def to_s
-    "user_name=#{user_name}, user_id=#{user_id}, email=#{email}, real_name=#{real_name}, custom_team_name=#{custom_team_name}"
+    "user_name=#{display_name}, user_id=#{user_id}, email=#{email}, real_name=#{real_name}, custom_team_name=#{custom_team_name}"
   end
 
   def self.suppable_user?(user_info)

@@ -58,6 +58,15 @@ describe SlackSup::Commands::Suggest do
       expect(sup.users.map(&:channel_id)).to all(be_nil)
     end
 
+    it 'accepts Slack mentions that include names' do
+      expect(message: '@sup suggest <@U1|user1> <@U2|user2>').to respond_with_slack_message(
+        "Suggested a S'Up for #{user1.slack_mention} and #{user2.slack_mention}."
+      )
+
+      sup = Sup.desc(:_id).first
+      expect(sup.users.map(&:user_id).sort).to eq %w[U1 U2]
+    end
+
     it 'creates a suggested sup for valid Slack mentions without checking Slack' do
       expect(message: '@sup suggest <@U404> <@U1>').to respond_with_slack_message(
         "Suggested a S'Up for <@U404> and #{user1.slack_mention}."

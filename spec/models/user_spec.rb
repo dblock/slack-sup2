@@ -230,6 +230,10 @@ describe User do
       expect(User.parse_slack_mention('<@user_id>')).to eq 'user_id'
     end
 
+    it 'valid with name' do
+      expect(User.parse_slack_mention('<@user_id|name>')).to eq 'user_id'
+    end
+
     it 'invalid' do
       expect(User.parse_slack_mention('invalid')).to be_nil
     end
@@ -238,6 +242,10 @@ describe User do
   describe '#parse_slack_mention!' do
     it 'valid' do
       expect(User.parse_slack_mention!('<@user_id>')).to eq 'user_id'
+    end
+
+    it 'valid with name' do
+      expect(User.parse_slack_mention!('<@user_id|name>')).to eq 'user_id'
     end
 
     it 'invalid' do
