@@ -77,25 +77,47 @@ describe SlackSup::Commands::Suggest do
       expect(sup.users.map(&:channel_id)).to all(be_nil)
     end
 
+    it 'surfaces invalid_user_combination back to the caller' do
+      allow_any_instance_of(Sup).to receive(:dm!).and_call_original
+      allow_any_instance_of(Slack::Web::Client).to receive(:conversations_open)
+        .and_raise(Slack::Web::Api::Errors::SlackError, 'invalid_user_combination')
+
+      expect(message: '@sup suggest <@U1> <@U2>').to respond_with_slack_message(
+        "Sorry, this S'Up isn't possible. Everyone must already be in at least one channel together to send a message."
+      )
+
+      expect(Sup.count).to eq 0
+    end
+
     it 'rejects suggesting yourself' do
       expect(message: "@sup suggest <@user> #{user1.slack_mention}").to respond_with_slack_message(
         "Sorry, you cannot suggest a S'Up for yourself."
       )
     end
 
-    it 'creates a suggested sup even when users met recently' do
-      round = Fabricate(:round, channel:)
-      Fabricate(:sup, round:, channel:, users: [user1, user2], created_at: 1.day.ago)
+    context 'when users met recently' do
+      let(:round) { Fabricate(:round, channel:) }
+      let(:sup) { Fabricate(:sup, round:, channel:, users: [user1, user2], created_at: 1.day.ago) }
 
-      expect(message: "@sup suggest #{user1.slack_mention} #{user2.slack_mention}").to respond_with_slack_message(
-        "Suggested a S'Up for #{user1.slack_mention} and #{user2.slack_mention}."
-      )
+      before do
+        allow_any_instance_of(Channel).to receive(:inform!)
+      end
 
-      sup = Sup.desc(:_id).first
-      expect(sup.round).to be_nil
-      expect(sup.channel).to be_nil
-      expect(sup.conversation_id).to be_nil
-      expect(sup.suggested_by.user_id).to eq 'user'
+      it 'creates a suggested sup even when users met recently' do
+        expect(sup).not_to be_nil
+
+        expect do
+          expect(message: "@sup suggest #{user1.slack_mention} #{user2.slack_mention}").to respond_with_slack_message(
+            "Suggested a S'Up for #{user1.slack_mention} and #{user2.slack_mention}."
+          )
+        end.to change(Sup, :count).by(1)
+
+        sup = Sup.desc(:_id).first
+        expect(sup.round).to be_nil
+        expect(sup.channel).to be_nil
+        expect(sup.conversation_id).to be_nil
+        expect(sup.suggested_by.user_id).to eq 'user'
+      end
     end
   end
 end
