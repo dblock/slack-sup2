@@ -4,6 +4,13 @@ module SlackSup
       module PeriodStats
         extend ActiveSupport::Concern
 
+        def period_since
+          case period
+          when 'monthly' then 1.year.ago.beginning_of_month
+          when 'quarterly' then 3.years.ago.beginning_of_quarter
+          end
+        end
+
         def period_label(id)
           case period
           when 'yearly'

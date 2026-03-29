@@ -13,7 +13,7 @@ module SlackSup
           stats = (channel || data.team).stats(period)
           data.team.slack_client.chat_postMessage(channel: data.channel, text: stats.to_s)
         end
-        logger.info "STATS: #{data.team}, channel=#{data.channel}, user=#{data.user}"
+        logger.info "STATS: #{data.team}, channel=#{data.channel}, user=#{data.user}#{", period=#{period}" if period}"
       end
     end
   end

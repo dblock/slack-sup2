@@ -35,7 +35,9 @@ class TeamStats
 
     return unless period
 
-    @period_data = Sup.collection.aggregate([{ '$match' => { channel_id: { '$in' => channel_ids } } }] + Stats.period_pipeline(period)).to_a
+    match = { channel_id: { '$in' => channel_ids } }
+    match[:created_at] = { '$gte' => period_since } if period_since
+    @period_data = Sup.collection.aggregate([{ '$match' => match }] + Stats.period_pipeline(period)).to_a
   end
 
   def positive_outcomes_count
