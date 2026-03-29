@@ -187,8 +187,12 @@ class Channel
     update_attributes!(sync: false, last_sync_at: tt)
   end
 
-  def stats
-    @stats ||= ChannelStats.new(self)
+  def stats(period = nil)
+    if period
+      ChannelStats.new(self, period)
+    else
+      @stats ||= ChannelStats.new(self)
+    end
   end
 
   def stats_s

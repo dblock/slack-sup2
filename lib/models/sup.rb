@@ -28,6 +28,7 @@ class Sup
   end
 
   index(round: 1, user_ids: 1)
+  index(channel_id: 1, created_at: 1)
 
   PLEASE_SUP_MESSAGE =
     'Please find a time for a quick 20 minute break on the calendar. ' \
