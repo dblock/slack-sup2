@@ -1,12 +1,14 @@
 class ChannelStats
   include ActiveModel::Model
   include SlackSup::Models::Mixins::Pluralize
+  include SlackSup::Models::Mixins::PeriodStats
   include SlackSup::Models::Mixins::Export
 
-  attr_accessor :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :pairs, :pairs_of_user_names, :channel
+  attr_accessor :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :outcomes, :pairs, :pairs_of_user_names, :channel, :period, :period_data
 
-  def initialize(channel)
+  def initialize(channel, period = nil)
     @channel = channel
+    @period = period
     @rounds_count = channel.rounds.count
     @sups_count = channel.sups.count
     @users_in_sups_count = channel.sups.distinct(:user_ids).count
@@ -29,6 +31,10 @@ class ChannelStats
 
     pairs_user_name_pipeline = pairs_pipeline + Stats::PAIRS_TO_USERNAMES_PIPELINE
     @pairs_of_user_names = Sup.collection.aggregate(pairs_user_name_pipeline).map { |doc| ChannelStatsPair.new(doc) }
+
+    return unless period
+
+    @period_data = Sup.collection.aggregate([{ '$match' => { channel_id: channel.id } }] + Stats.period_pipeline(period)).to_a
   end
 
   def positive_outcomes_count
@@ -68,6 +74,7 @@ class ChannelStats
                   "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
                   "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
     end
+    messages.concat(period_to_s_lines)
     messages.join("\n")
   end
 

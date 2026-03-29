@@ -251,8 +251,12 @@ class Team
     api? ? 'on' : 'off'
   end
 
-  def stats
-    @stats ||= TeamStats.new(self)
+  def stats(period = nil)
+    if period
+      TeamStats.new(self, period)
+    else
+      @stats ||= TeamStats.new(self)
+    end
   end
 
   def stats_s

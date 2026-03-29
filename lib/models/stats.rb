@@ -34,6 +34,33 @@ class Stats
     { '$group' => { _id: { outcome: '$outcome' }, count: { '$sum' => 1 } } }
   ]
 
+  def self.period_pipeline(period)
+    group_id = case period
+               when 'yearly'
+                 { year: { '$year' => '$created_at' } }
+               when 'monthly'
+                 { year: { '$year' => '$created_at' }, month: { '$month' => '$created_at' } }
+               when 'quarterly'
+                 { year: { '$year' => '$created_at' }, quarter: { '$ceil' => { '$divide' => [{ '$month' => '$created_at' }, 3.0] } } }
+               end
+    [
+      { '$group' => {
+        _id: group_id,
+        sups_count: { '$sum' => 1 },
+        rounds: { '$addToSet' => '$round_id' },
+        positive_outcomes: { '$sum' => { '$cond' => [{ '$in' => ['$outcome', %w[all some]] }, 1, 0] } },
+        reported_outcomes: { '$sum' => { '$cond' => [{ '$in' => ['$outcome', %w[all some later none]] }, 1, 0] } }
+      } },
+      { '$project' => {
+        sups_count: 1,
+        rounds_count: { '$size' => '$rounds' },
+        positive_outcomes_count: '$positive_outcomes',
+        reported_outcomes_count: '$reported_outcomes'
+      } },
+      { '$sort' => { '_id.year' => -1, '_id.month' => -1, '_id.quarter' => -1 } }
+    ]
+  end
+
   def initialize
     @teams_count = Team.count
     @teams_active_count = Team.active.count

@@ -106,5 +106,52 @@ describe Stats do
         "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported."
       ].join("\n")
     end
+
+    context 'with yearly period' do
+      let(:stats) { ChannelStats.new(channel, 'yearly') }
+      let(:year) { Time.now.year }
+
+      it 'reports yearly breakdown' do
+        expect(stats.to_s).to eq [
+          "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+          "This channel S'Up started 2 years ago and has 100% (3/3) of users opted in.",
+          "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.",
+          "#{year - 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.",
+          "#{year - 2}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+        ].join("\n")
+      end
+    end
+
+    context 'with monthly period' do
+      let(:stats) { ChannelStats.new(channel, 'monthly') }
+      let(:year) { Time.now.year }
+      let(:month_name) { Date::MONTHNAMES[Time.now.month] }
+
+      it 'reports monthly breakdown' do
+        expect(stats.to_s).to eq [
+          "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+          "This channel S'Up started 2 years ago and has 100% (3/3) of users opted in.",
+          "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.",
+          "#{month_name} #{year - 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.",
+          "#{month_name} #{year - 2}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+        ].join("\n")
+      end
+    end
+
+    context 'with quarterly period' do
+      let(:stats) { ChannelStats.new(channel, 'quarterly') }
+      let(:year) { Time.now.year }
+      let(:quarter) { ((Time.now.month - 1) / 3) + 1 }
+
+      it 'reports quarterly breakdown' do
+        expect(stats.to_s).to eq [
+          "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in #{channel.slack_mention}.",
+          "This channel S'Up started 2 years ago and has 100% (3/3) of users opted in.",
+          "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.",
+          "Q#{quarter} #{year - 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.",
+          "Q#{quarter} #{year - 2}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+        ].join("\n")
+      end
+    end
   end
 end

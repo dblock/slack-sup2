@@ -1,12 +1,14 @@
 class TeamStats
   include ActiveModel::Model
   include SlackSup::Models::Mixins::Pluralize
+  include SlackSup::Models::Mixins::PeriodStats
   include SlackSup::Models::Mixins::Export
 
-  attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :pairs, :pairs_of_user_names, :outcomes, :team
+  attr_accessor :channels_count, :channels_enabled_count, :rounds_count, :sups_count, :users_in_sups_count, :users_opted_in_count, :users_count, :pairs, :pairs_of_user_names, :outcomes, :team, :period, :period_data
 
-  def initialize(team)
+  def initialize(team, period = nil)
     @team = team
+    @period = period
     @channels_count = team.channels.count
     @channels_enabled_count = team.channels.enabled.count
     channel_ids = team.channels.enabled.distinct(:_id)
@@ -30,6 +32,10 @@ class TeamStats
     @pairs = Sup.collection.aggregate(pairs_pipeline)
     pairs_user_name_pipeline = pairs_pipeline + Stats::PAIRS_TO_USERNAMES_PIPELINE
     @pairs_of_user_names = Sup.collection.aggregate(pairs_user_name_pipeline).map { |doc| ChannelStatsPair.new(doc) }
+
+    return unless period
+
+    @period_data = Sup.collection.aggregate([{ '$match' => { channel_id: { '$in' => channel_ids } } }] + Stats.period_pipeline(period)).to_a
   end
 
   def positive_outcomes_count
@@ -67,6 +73,7 @@ class TeamStats
                   "with #{positive_outcomes_count * 100 / sups_count}% positive outcomes " \
                   "from #{reported_outcomes_count * 100 / sups_count}% outcomes reported."
     end
+    messages.concat(period_to_s_lines)
     messages.join("\n")
   end
 
