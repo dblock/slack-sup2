@@ -79,11 +79,24 @@ describe SlackSup::Commands::Stats do
 
         it 'reports monthly breakdown' do
           expect(message: '@sup stats monthly').to respond_with_slack_message(
-            "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.\n" \
-            "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!\n" \
-            "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.\n" \
-            "#{month_name} #{year + 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.\n" \
-            "#{month_name} #{year}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+            [
+              "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.",
+              "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!",
+              "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.",
+              "#{month_name} #{year + 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.",
+              "February #{year + 1}: No S'Ups.",
+              "January #{year + 1}: No S'Ups.",
+              "December #{year}: No S'Ups.",
+              "November #{year}: No S'Ups.",
+              "October #{year}: No S'Ups.",
+              "September #{year}: No S'Ups.",
+              "August #{year}: No S'Ups.",
+              "July #{year}: No S'Ups.",
+              "June #{year}: No S'Ups.",
+              "May #{year}: No S'Ups.",
+              "April #{year}: No S'Ups.",
+              "#{month_name} #{year}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+            ].join("\n")
           )
         end
       end
@@ -94,11 +107,16 @@ describe SlackSup::Commands::Stats do
 
         it 'reports quarterly breakdown' do
           expect(message: '@sup stats quarterly').to respond_with_slack_message(
-            "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.\n" \
-            "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!\n" \
-            "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.\n" \
-            "Q#{quarter} #{year + 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.\n" \
-            "Q#{quarter} #{year}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+            [
+              "Channel S'Up connects groups of 3 people on Monday after 9:00 AM every week in <#channel>.",
+              "The channel S'Up currently only has 2 users opted in. Invite some more users to S'Up!",
+              "Facilitated 2 S'Ups in 2 rounds for 3 users creating 3 unique connections with 50% positive outcomes from 50% outcomes reported.",
+              "Q#{quarter} #{year + 1}: Facilitated 1 S'Up in 1 round with 0% positive outcomes from 0% outcomes reported.",
+              "Q4 #{year}: No S'Ups.",
+              "Q3 #{year}: No S'Ups.",
+              "Q2 #{year}: No S'Ups.",
+              "Q#{quarter} #{year}: Facilitated 1 S'Up in 1 round with 100% positive outcomes from 100% outcomes reported."
+            ].join("\n")
           )
         end
       end
