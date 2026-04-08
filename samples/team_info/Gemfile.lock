@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.8)
+    addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
     dotenv (3.2.0)
     faraday (1.10.5)
@@ -37,7 +37,7 @@ GEM
       faraday_hal_middleware
       faraday_middleware
     multipart-post (2.4.1)
-    public_suffix (7.0.2)
+    public_suffix (7.0.5)
     ruby2_keywords (0.0.5)
 
 PLATFORMS
