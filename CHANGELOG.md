@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/04/19: Added `check_stripe_subscribers!` cron to reconcile Stripe subscriptions with teams - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/03/29: Added `stats [yearly|monthly|quarterly]` to show S'Up stats broken down by time period, with gaps shown for periods with no S'Ups - [@dblock](https://github.com/dblock).
 * 2026/03/29: Limited `stats monthly` to the last year and `stats quarterly` to the last 3 years - [@dblock](https://github.com/dblock).
 * 2026/03/12: Added `suggest [@mentions] [topic]` to suggest on-demand S'Ups - [@dblock](https://github.com/dblock).
