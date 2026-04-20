@@ -51,6 +51,9 @@ module Api
 
           rc = client.send(SlackRubyBotServer.config.oauth_access_method, options)
 
+          raise rc['error'] || 'invalid OAuth response' unless rc['ok']
+          raise 'Enterprise Grid is not supported.' if rc['ok'] && rc['team'].nil?
+
           token = nil
           access_token = nil
           user_id = nil

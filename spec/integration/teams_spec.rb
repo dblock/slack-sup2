@@ -17,6 +17,7 @@ describe 'Teams', :js, type: :feature do
       allow_any_instance_of(Team).to receive(:ping!).and_return(ok: true)
       expect(SlackRubyBotServer::Service.instance).to receive(:start!)
       oauth_access = {
+        'ok' => true,
         'access_token' => 'token',
         'token_type' => 'bot',
         'bot_user_id' => 'bot_user_id',
