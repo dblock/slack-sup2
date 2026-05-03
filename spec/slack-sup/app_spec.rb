@@ -75,14 +75,34 @@ describe SlackSup::App do
         allow_any_instance_of(Team).to receive(:short_lived_token).and_return('token')
         expect_any_instance_of(Team).to receive(:inform!).with("Your subscription to StripeMock Default Plan ID ($39.99) is past due. #{team.update_cc_text}")
         subject.send(:check_subscribed_teams!)
+        expect(team.reload.past_due_informed_at).not_to be_nil
       end
 
-      it 'notifies past due subscription' do
+      it 'does not re-notify past due subscription within 72 hours' do
+        team.update_attributes!(past_due_informed_at: 1.hour.ago)
+        customer.subscriptions.data.first['status'] = 'past_due'
+        expect(Stripe::Customer).to receive(:retrieve).and_return(customer)
+        expect_any_instance_of(Team).not_to receive(:inform!)
+        subject.send(:check_subscribed_teams!)
+      end
+
+      it 'notifies past due subscription again after 72 hours' do
+        team.update_attributes!(past_due_informed_at: 73.hours.ago)
+        customer.subscriptions.data.first['status'] = 'past_due'
+        expect(Stripe::Customer).to receive(:retrieve).and_return(customer)
+        allow_any_instance_of(Team).to receive(:short_lived_token).and_return('token')
+        expect_any_instance_of(Team).to receive(:inform!).with("Your subscription to StripeMock Default Plan ID ($39.99) is past due. #{team.update_cc_text}")
+        subject.send(:check_subscribed_teams!)
+      end
+
+      it 'notifies canceled subscription' do
         customer.subscriptions.data.first['status'] = 'canceled'
+        team.update_attributes!(past_due_informed_at: 1.hour.ago)
         expect(Stripe::Customer).to receive(:retrieve).and_return(customer)
         expect_any_instance_of(Team).to receive(:inform!).with('Your subscription to StripeMock Default Plan ID ($39.99) was canceled and your team has been downgraded. Thank you for being a customer!')
         subject.send(:check_subscribed_teams!)
         expect(team.reload.subscribed?).to be false
+        expect(team.reload.past_due_informed_at).to be_nil
       end
 
       it 'notifies no active subscriptions' do

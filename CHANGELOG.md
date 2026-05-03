@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/05/03: Throttle past due subscription notifications to at most once every 72 hours - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/04/20: Raise a descriptive error when Slack OAuth returns `ok: false`, or when an Enterprise Grid install is attempted - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/04/19: Added `check_stripe_subscribers!` cron to reconcile Stripe subscriptions with teams - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/03/29: Added `stats [yearly|monthly|quarterly]` to show S'Up stats broken down by time period, with gaps shown for periods with no S'Ups - [@dblock](https://github.com/dblock).
