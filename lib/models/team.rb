@@ -5,6 +5,7 @@ class Team
   field :stripe_customer_id, type: String
   field :subscribed, type: Boolean, default: false
   field :subscribed_at, type: DateTime
+  field :past_due_informed_at, type: DateTime
 
   scope :api, -> { where(api: true) }
 

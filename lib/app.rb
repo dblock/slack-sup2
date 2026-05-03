@@ -190,12 +190,15 @@ module SlackSup
           logger.info "Checking #{team} subscription to #{subscription_name}, #{subscription.status}."
           case subscription.status
           when 'past_due'
+            next if team.past_due_informed_at && Time.now.utc < team.past_due_informed_at + 72.hours
+
             logger.warn "Subscription for #{team} is #{subscription.status}, notifying."
             team.inform! "Your subscription to #{subscription_name} is past due. #{team.update_cc_text}"
+            team.update_attributes!(past_due_informed_at: Time.now.utc)
           when 'canceled', 'unpaid'
             logger.warn "Subscription for #{team} is #{subscription.status}, downgrading."
             team.inform! "Your subscription to #{subscription.plan.name} (#{ActiveSupport::NumberHelper.number_to_currency(subscription.plan.amount.to_f / 100)}) was canceled and your team has been downgraded. Thank you for being a customer!"
-            team.update_attributes!(subscribed: false)
+            team.update_attributes!(subscribed: false, past_due_informed_at: nil)
           end
         end
         if customer.subscriptions.none?
