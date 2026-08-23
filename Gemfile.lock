@@ -170,7 +170,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    mongo (2.24.0)
+    mongo (2.25.0)
       base64
       bson (>= 4.14.1, < 6.0.0)
     mongoid (9.1.0)
@@ -374,6 +374,7 @@ DEPENDENCIES
   irb
   jwt
   mailchimp_api_v3
+  mongo (~> 2.25.0)
   mongoid
   mongoid-scroll
   mongoid-shell
