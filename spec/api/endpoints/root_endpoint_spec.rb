@@ -10,6 +10,20 @@ describe Api::Endpoints::RootEndpoint do
     expect(links.keys.sort).to eq(%w[self data round rounds stats status subscriptions channel channels credit_cards sup sups team teams user users].sort)
   end
 
+  it 'preserves a reverse proxy path prefix in hypermedia links' do
+    header 'X-Forwarded-Prefix', '/slack-sup2'
+    get '/api'
+
+    links = JSON.parse(last_response.body)['_links']
+    expect(links['self']['href']).to eq 'http://example.org/slack-sup2/api'
+    expect(links['status']['href']).to eq 'http://example.org/slack-sup2/api/status'
+
+    get '/api/teams'
+
+    links = JSON.parse(last_response.body)['_links']
+    expect(links['self']['href']).to eq 'http://example.org/slack-sup2/api/teams'
+  end
+
   it 'follows all links' do
     get '/api'
     expect(last_response.status).to eq 200

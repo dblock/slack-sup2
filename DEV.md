@@ -1,5 +1,48 @@
 ## Development Environment
 
+### Docker
+
+Docker runs the app with the same Ruby version as CI and can connect to MongoDB
+running on the host.
+
+```
+cp .env.sample .env
+docker compose build
+docker compose up
+```
+
+Navigate to [localhost:5000](http://localhost:5000).
+
+Run the full test suite against the host MongoDB:
+
+```
+docker compose run --rm \
+  -e RACK_ENV=test \
+  -e MONGO_URL=mongodb://host.docker.internal:27017/slack_sup2_test?directConnection=true \
+  app script/docker-test bundle exec rake
+```
+
+The compose configuration uses `host.docker.internal` to reach MongoDB on the
+host at port 27017.
+
+### MongoDB OIDC on AKS
+
+Production can connect to Azure Cosmos DB for MongoDB vCore with
+`MONGODB-OIDC` and AKS workload identity:
+
+```
+MONGO_URL=mongodb+srv://<cluster>/slack_sup2_production?tls=true&authMechanism=MONGODB-OIDC&retryWrites=false
+```
+
+The AKS workload identity webhook provides `AZURE_CLIENT_ID`,
+`AZURE_TENANT_ID`, and `AZURE_FEDERATED_TOKEN_FILE`. The app exchanges the
+projected service account token for an access token with the default scope
+`https://ossrdbms-aad.database.windows.net/.default`.
+
+Set `MONGO_OIDC_TOKEN_SCOPE` only when the MongoDB provider requires a
+different scope. The MongoDB URI must not contain a password and uses
+`$external` as the authentication source.
+
 ### Prerequisites
 
 Ensure that you can build the project and run tests. You will need these.
@@ -7,7 +50,7 @@ Ensure that you can build the project and run tests. You will need these.
 - [MongoDB](https://docs.mongodb.com/manual/installation/)
 - [Firefox](https://www.mozilla.org/firefox/new/)
 - [Geckodriver](https://github.com/mozilla/geckodriver)
-- Ruby 3.4.6
+- Ruby 4.0.2
 
 ```
 bundle install
