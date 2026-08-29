@@ -1,6 +1,16 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<% indexable_page = !%w[/subscribe.html /update_cc.html /gcal.html].include?(request.path) %>
+<% if indexable_page %>
+<link rel="canonical" href="<%= "#{SlackRubyBotServer::Service.url}#{request.path}" %>">
+<meta property="og:site_name" content="S'Up for Slack Teams">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<%= "#{SlackRubyBotServer::Service.url}#{request.path}" %>">
+<meta property="og:image" content="<%= "#{SlackRubyBotServer::Service.url}/img/icon.png" %>">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@playplayio">
+<% end %>
 <!-- Bootstrap Core CSS -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <!-- Custom CSS -->

@@ -21,7 +21,7 @@ module Api
           r302 %r{(/[\w/]*/)(%7B|\{)?(.*)(%7D|\})}, '$1'
         end
 
-        use Rack::Robotz, 'User-Agent' => '*', 'Disallow' => '/api'
+        use Rack::Robotz, 'User-Agent' => '*', 'Disallow' => '/api', 'Sitemap' => "#{SlackRubyBotServer::Service.url}/sitemap.xml"
 
         use Rack::ServerPages
 
