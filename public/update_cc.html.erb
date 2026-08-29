@@ -1,7 +1,8 @@
-<html>
+<html lang="en">
   <head>
     <title>S'Up for Slack Teams: Update Credit Card Info</title>
     <%= partial 'public/partials/_head.html' %>
+    <meta name="robots" content="noindex, nofollow">
     <%= partial 'public/partials/_scripts.html' %>
     <%
       team = Team.where(team_id: request.params['team_id']).first
@@ -13,7 +14,7 @@
   </head>
   <body style='text-align: center'>
     <p style='margin: 50px;'>
-      <a href='/'><img src='img/icon.png' width='120px'></a>
+      <a href='/'><img src='img/icon.png' width='120px' alt="S'Up for Slack Teams logo"></a>
     </p>
     <p>
       <h3>S'Up for Slack Teams: Update Credit Card Info</h3>
@@ -34,7 +35,7 @@
       </form>
     </p>
     <p>
-      <img src='/img/stripe.png' width='119' height='26'></img>
+      <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe"></img>
       <div class='small'>
         Questions? Contact dblock[at]vestris[dot]com.
       </div>

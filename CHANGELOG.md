@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/08/29: Improve SEO for public marketing pages with sitemap and metadata updates - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/06/27: Bumped concurrent-ruby to 1.3.7, faraday to 2.14.3, nokogiri to 1.19.4 - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/05/03: Throttle past due subscription notifications to at most once every 72 hours - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/04/20: Raise a descriptive error when Slack OAuth returns `ok: false`, or when an Enterprise Grid install is attempted - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).

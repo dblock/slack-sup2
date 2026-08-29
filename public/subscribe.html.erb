@@ -1,14 +1,15 @@
-<html>
+<html lang="en">
   <head>
     <title>S'Up for Slack Teams: Subscribe</title>
     <%= partial 'public/partials/_head.html.erb' %>
+    <meta name="robots" content="noindex, nofollow">
     <script src='https://checkout.stripe.com/checkout.js'></script>
     <link rel='stylesheet' href='https://checkout.stripe.com/v3/checkout/button.css'></link>
     <%= partial 'public/partials/_scripts.html' %>
   </head>
   <body style='text-align: center'>
     <p style='margin: 50px;'>
-      <a href='/'><img src='img/icon.png' width='120px'></a>
+      <a href='/'><img src='img/icon.png' width='120px' alt="S'Up for Slack Teams logo"></a>
     </p>
     <p>
       <h3>S'Up for Slack Teams: Subscribe</h3>
@@ -19,7 +20,7 @@
           <span style='display: block; min-height: 30px;'>Pay $39.99 with Card</span>
       </button>
       <p>
-        <img src='/img/stripe.png' width='119' height='26'></img>
+        <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe"></img>
       </p>
       <script>
         $(document).ready(function() {
