@@ -1,0 +1,39 @@
+.add-to-slack img {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease-in-out;
+  vertical-align: middle;
+}
+
+.add-to-slack img:hover {
+  transform: scale(1.03);
+}
+
+.tagline {
+  color: #fff;
+  font-size: 13px;
+}
+
+#tagline-wrapper {
+  display: block;
+  text-align: center;
+  margin: 15px auto 0;
+  max-width: 400px;
+  min-height: 36px;
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  #tagline-wrapper {
+    display: inline-block;
+    text-align: left;
+    margin: 0 0 0 10px;
+    max-width: none;
+    vertical-align: middle;
+  }
+}
+
+@media (max-width: 767px) {
+  .header-screenshot {
+    width: 90%;
+  }
+}
