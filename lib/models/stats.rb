@@ -6,13 +6,20 @@ class Stats
 
   # https://stackoverflow.com/questions/37456062/how-to-get-combinations-of-items-in-an-array-field-in-mongodb
 
+  # Computes all unique pairs of users that appear together in the same S'Up.
+  #
+  # This used to perform a $lookup that re-queried the sups collection for
+  # every unwound user_id (an expensive, per-document correlated subquery)
+  # just to get a second copy of the same document's user_ids array to unwind
+  # against. Instead, we duplicate user_ids into a second field with $project
+  # before unwinding both, which produces the same cross-product of pairs
+  # without ever leaving the current document (no $lookup needed).
   PAIRS_PIPELINE = [
+    { '$project': { user_ids: 1, user_ids2: '$user_ids' } },
     { '$unwind': '$user_ids' },
-    { '$lookup': { from: 'sups', localField: '_id', foreignField: '_id', as: 'users' } },
-    { '$unwind': '$users' },
-    { '$unwind': '$users.user_ids' },
-    { '$redact': { '$cond': { if: { '$cmp': ['$user_ids', '$users.user_ids'] }, then: '$$DESCEND', else: '$$PRUNE' } } },
-    { '$group': { _id: { k1: '$user_ids', k2: '$users.user_ids' }, users: { '$sum': 0.5 } } },
+    { '$unwind': '$user_ids2' },
+    { '$redact': { '$cond': { if: { '$cmp': ['$user_ids', '$user_ids2'] }, then: '$$DESCEND', else: '$$PRUNE' } } },
+    { '$group': { _id: { k1: '$user_ids', k2: '$user_ids2' }, users: { '$sum': 0.5 } } },
     { '$sort': { _id: 1 } },
     { '$project':
       { _id: 1, users: 1,
