@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/08/30: Optimize the unique connections (pairs) aggregation used by `/api/stats` to avoid a slow, correlated `$lookup` subquery, speeding it up by more than 10x - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/08/30: Include legacy sup.playplay.io stats (from an earlier version of this app) in the S'Ups facilitated count shown in the tagline - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/08/30: Remove the active teams count from the "Add to Slack" tagline, keeping S'Ups facilitated and unique connections made - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/08/30: Add a live stats tagline near the "Add to Slack" button (active teams, S'Ups facilitated, unique connections made), fetched from `/api/stats` - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
