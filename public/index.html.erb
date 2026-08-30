@@ -77,9 +77,12 @@
                         Generates fresh triads of team members to meet for coffee every week in an informal standup, or S'Up.
                         <br><br>
                         <a class="add-to-slack" href="<%= SlackRubyBotServer::Config.oauth_authorize_url %>?scope=<%= SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',') %>&amp;client_id=<%= ENV['SLACK_CLIENT_ID'] %>"><img alt="Add S'Up to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"></a>
+                        <div id="tagline-wrapper">
+                            <small id="tagline" class="tagline" style="display: none;">Bringing teams together, one coffee at a time.</small>
+                        </div>
                     </div>
                     <div>
-                        <img src="img/sup-dm.png" width="75%" alt="S'Up direct message example">
+                        <img src="img/sup-dm.png" width="75%" alt="S'Up direct message example" class="img-centered header-screenshot">
                     </div>
                 </div>
             </div>
@@ -272,6 +275,8 @@
         <%= partial 'public/partials/_scripts.html' %>
         <!-- Slack -->
         <script src="js/register.js"></script>
+        <!-- Stats -->
+        <script src="js/stats.js"></script>
         <!-- Uptime -->
         <script src="js/uptime.js"></script>
     </body>

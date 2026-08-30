@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/08/30: Add a live stats tagline near the "Add to Slack" button (active teams, S'Ups facilitated, unique connections made), fetched from `/api/stats` - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/08/29: Improve SEO for public marketing pages with sitemap and metadata updates - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/06/27: Bumped concurrent-ruby to 1.3.7, faraday to 2.14.3, nokogiri to 1.19.4 - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/05/03: Throttle past due subscription notifications to at most once every 72 hours - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
