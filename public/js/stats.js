@@ -11,8 +11,7 @@ $(document).ready(function() {
   }).done(function(data) {
     $tagline.text(
       "Bringing teams together, one coffee at a time: " +
-      data.teams_active_count + " teams, " +
-      data.sups_count + " S'Ups, and " +
+      data.sups_count + " S'Ups facilitated, and " +
       data.unique_pairs_count + " unique connections made."
     );
   }).always(function() {
