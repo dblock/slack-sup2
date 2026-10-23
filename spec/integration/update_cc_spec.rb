@@ -43,7 +43,7 @@ describe 'Update cc', :js, type: :feature do
           find('button[type="submit"]').click
         end
         sleep 5
-        find_by_id('update_cc', visible: false)
+        find_by_id('update_cc', visible: :all)
         expect(find_by_id('messages')).to have_text("Successfully updated team #{team.name} credit card.\n\nThank you for your support!")
       end
     end
@@ -65,7 +65,7 @@ describe 'Update cc', :js, type: :feature do
           find('button[type="submit"]').click
         end
         sleep 5
-        find_by_id('update_cc', visible: false)
+        find_by_id('update_cc', visible: :all)
         expect(find_by_id('messages')).to have_text('Not a Subscriber')
       end
     end

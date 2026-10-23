@@ -18,12 +18,12 @@ unless ENV['CI']
 
       it 'errors without any parameters' do
         visit '/gcal?2'
-        expect(find_by_id('messages', visible: true)).to have_text("Missing or invalid S'Up ID.")
+        expect(find_by_id('messages', visible: :visible)).to have_text("Missing or invalid S'Up ID.")
       end
 
       it 'errors without a sup ID' do
         visit '/gcal?dt=1483394400'
-        expect(find_by_id('messages', visible: true)).to have_text("Missing or invalid S'Up ID.")
+        expect(find_by_id('messages', visible: :visible)).to have_text("Missing or invalid S'Up ID.")
       end
 
       context 'with a team' do
@@ -39,24 +39,24 @@ unless ENV['CI']
 
           it 'errors without a sup time' do
             visit "/gcal?sup_id=#{sup.id}"
-            expect(find_by_id('messages', visible: true)).to have_text("Missing or invalid S'Up time.")
+            expect(find_by_id('messages', visible: :visible)).to have_text("Missing or invalid S'Up time.")
           end
 
           it 'errors without an access token' do
             visit "/gcal?sup_id=#{sup.id}&dt=1483394400"
-            expect(find_by_id('messages', visible: true)).to have_text("This link has expired, ask for a new one on your S'Up channel.")
+            expect(find_by_id('messages', visible: :visible)).to have_text("This link has expired, ask for a new one on your S'Up channel.")
           end
 
           it 'errors with an expired access token' do
             access_token = channel.short_lived_token
             Timecop.travel(30.minutes.from_now)
             visit "/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{access_token}"
-            expect(find_by_id('messages', visible: true)).to have_text("This link has expired, ask for a new one on your S'Up channel.")
+            expect(find_by_id('messages', visible: :visible)).to have_text("This link has expired, ask for a new one on your S'Up channel.")
           end
 
           it 'errors when users do not have any users' do
             visit "/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{channel.short_lived_token}"
-            expect(find_by_id('messages', visible: true)).to have_text("S'Up does not have any users.")
+            expect(find_by_id('messages', visible: :visible)).to have_text("S'Up does not have any users.")
           end
 
           context 'with users' do
@@ -68,13 +68,13 @@ unless ENV['CI']
 
             it 'errors when users do not have e-mail addresses' do
               visit "/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{channel.short_lived_token}"
-              expect(find_by_id('messages', visible: true)).to have_text('None of 3 users have e-mail addresses.')
+              expect(find_by_id('messages', visible: :visible)).to have_text('None of 3 users have e-mail addresses.')
             end
 
             it 'errors when some of the users do not have e-mail addresses' do
               sup.users.first.update_attributes!(email: Faker::Internet.email)
               visit "/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{channel.short_lived_token}"
-              expect(find_by_id('messages', visible: true)).to have_text('Only 1 of 3 users have e-mail addresses.')
+              expect(find_by_id('messages', visible: :visible)).to have_text('Only 1 of 3 users have e-mail addresses.')
             end
 
             unless ENV['CI']
@@ -84,7 +84,7 @@ unless ENV['CI']
                 end
                 # Firefox will fail locally with idpiframe_initialization_failed
                 visit "/gcal?sup_id=#{sup.id}&dt=1483394400&access_token=#{sup.channel.short_lived_token}"
-                expect(find_by_id('messages', visible: true)).to have_text("Adding S'Up calendar for on Monday, January 02, 2017 at 5:00 pm ...")
+                expect(find_by_id('messages', visible: :visible)).to have_text("Adding S'Up calendar for on Monday, January 02, 2017 at 5:00 pm ...")
               end
             end
           end
