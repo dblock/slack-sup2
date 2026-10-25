@@ -31,9 +31,9 @@
         <details class="help-topic">
           <summary>What does an introduction look like?</summary>
           <p>S'Up introduces the group in a Slack conversation and asks someone to organize a quick meeting. A few days later, it asks whether you met and keeps track of the result.</p>
-          <img src="/img/sup-intro.png" width="700" alt="S'Up introducing teammates" loading="lazy">
-          <img src="/img/sup-ask.png" width="500" alt="S'Up asking whether a group met" loading="lazy">
-          <img src="/img/sup-answer.png" width="500" alt="Responding to a S'Up follow-up" loading="lazy">
+          <img src="<%= h asset_path('/img/sup-intro.png') %>" width="700" alt="S'Up introducing teammates" loading="lazy">
+          <img src="<%= h asset_path('/img/sup-ask.png') %>" width="500" alt="S'Up asking whether a group met" loading="lazy">
+          <img src="<%= h asset_path('/img/sup-answer.png') %>" width="500" alt="Responding to a S'Up follow-up" loading="lazy">
         </details>
         <details class="help-topic">
           <summary>Can I suggest an introduction right now?</summary>
@@ -47,7 +47,7 @@
           <summary>Who can change the schedule and group settings?</summary>
           <p>Channel and Slack admins can configure the timezone, day, time, group size, and frequency. For example, use <code>@sup set timezone Eastern Time (US &amp; Canada)</code>, <code>@sup set day Monday</code>, <code>@sup set time 9AM</code>, and <code>@sup set weeks 1</code>.</p>
           <p>Use <code>@sup set recency 12</code> to avoid repeating introductions for 12 weeks, and <code>@sup set odd no</code> to control odd-sized groups. Try <code>@sup help</code> for all the options.</p>
-          <img src="/img/sup-help.png" width="700" alt="S'Up help and settings commands" loading="lazy">
+          <img src="<%= h asset_path('/img/sup-help.png') %>" width="700" alt="S'Up help and settings commands" loading="lazy">
         </details>
         <details class="help-topic">
           <summary>Can we customize messages or match people across subteams?</summary>
@@ -56,7 +56,7 @@
         <details class="help-topic">
           <summary>How do I see statistics or download our data?</summary>
           <p>Use <code>@sup stats</code> and <code>@sup rounds</code> for meeting outcomes, or <code>@sup data</code> to download data for analysis. Your team can also opt in to the <a href="<%= SlackRubyBotServer::Service.api_url %>">Hypermedia API</a>; see the <a href="https://github.com/dblock/slack-sup2/blob/main/API.md">documentation</a>.</p>
-          <img src="/img/sup-stats.png" width="500" alt="S'Up statistics example" loading="lazy">
+          <img src="<%= h asset_path('/img/sup-stats.png') %>" width="500" alt="S'Up statistics example" loading="lazy">
         </details>
         <details class="help-topic">
           <summary>How much does S'Up cost? How do I cancel?</summary>
@@ -70,6 +70,6 @@
       </section>
     </main>
     <%= partial 'public/partials/_footer.html.erb' %>
-    <%= partial 'public/partials/_scripts.html' %>
+    <%= partial 'public/partials/_scripts.html.erb' %>
   </body>
 </html>

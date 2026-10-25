@@ -4,13 +4,13 @@ describe 'Website', :js, type: :feature do
   it 'shows introductions, follow-up, and reporting as clear product demonstrations' do
     visit '/'
     expect(page).to have_css('.hero h1', text: 'Meet for coffee.')
-    expect(page).to have_css('.hero-preview img[src="/img/sup-dm.png"]')
-    find('img[src="/img/sup-ask.png"]').execute_script("this.scrollIntoView({block: 'center'})")
-    expect(page).to have_css('.followup-preview img[src="/img/sup-ask.png"]') do |image|
+    expect(page).to have_css('.hero-preview img[src^="/img/sup-dm.png?v="]')
+    find('img[src^="/img/sup-ask.png?v="]').execute_script("this.scrollIntoView({block: 'center'})")
+    expect(page).to have_css('.followup-preview img[src^="/img/sup-ask.png?v="]') do |image|
       image.evaluate_script('this.complete && this.naturalWidth > 0 && this.width === this.naturalWidth / 2')
     end
     find('.reporting-preview').execute_script("this.scrollIntoView({block: 'center'})")
-    expect(page).to have_css('.reporting-preview img[src="/img/sup-stats.png"]') do |image|
+    expect(page).to have_css('.reporting-preview img[src^="/img/sup-stats.png?v="]') do |image|
       image.evaluate_script('this.complete && this.naturalWidth > 0 && this.width <= this.naturalWidth / 2')
     end
   end
@@ -20,7 +20,7 @@ describe 'Website', :js, type: :feature do
     expect(page).to have_css('section[aria-labelledby="solution-title"] + section[aria-labelledby="followup-title"]')
     expect(page).to have_css('#solution-title', text: "You haven't tried 3.")
     find('.solution-preview').execute_script("this.scrollIntoView({block: 'center'})")
-    expect(page).to have_css('.solution-preview img[src="/img/sup-triad.png"]') do |image|
+    expect(page).to have_css('.solution-preview img[src^="/img/sup-triad.png?v="]') do |image|
       image.evaluate_script('this.complete && this.naturalWidth > 0 && this.width <= this.naturalWidth / 2')
     end
   end
@@ -33,6 +33,16 @@ describe 'Website', :js, type: :feature do
       expect(page).to have_css('p', text: 'opt out')
       find('summary').send_keys(:enter)
       expect(page).to have_no_css('p')
+    end
+  end
+
+  it 'loads the generated stylesheet and versioned artwork after a reload' do
+    visit '/'
+    page.refresh
+    background = page.evaluate_script("getComputedStyle(document.body, '::before').backgroundImage")
+    expect(background).to include("/img/screenshot-background.svg?v=#{Digest::SHA256.file('public/img/screenshot-background.svg').hexdigest}")
+    expect(page).to have_css('.hero-preview img[src^="/img/sup-dm.png?v="]') do |image|
+      image.evaluate_script('this.complete && this.naturalWidth > 0')
     end
   end
 
