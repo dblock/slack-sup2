@@ -23,6 +23,10 @@ S'Up for Slack is made possible with the generous support of team [Artsy](https:
 
 The website follows the shared Slava, Strata, Strada, and Shell layout with a purple palette inspired by the existing Slack conversation preview (base `#4a154b`). A high-contrast purple hero gives the main message, installation button, and original Slack screenshot priority; quieter sections explain the workflow and triads approach, show the follow-up and participation reporting, and separate pricing from technical details. The triads screenshot `public/img/sup-triad.png` is cropped from the introduction message in `public/img/sup-dm.png`. Screenshots in the supporting sections display at half their source dimensions, shrinking further when needed to fit their containers without scrolling. The editable `public/img/screenshot-background.svg` keeps `preserveAspectRatio="none"` and is painted on a fixed viewport-sized layer so opening help topics does not resize the ribbons. Preserve the original transparent `public/img/icon.png` logo, matching favicons, and product demonstration images.
 
+### Website asset caching
+
+Local stylesheets, scripts, images, and favicons use content-hashed `asset_path` URLs from rack-server-pages 0.3.0. The stylesheet is an ERB template served at `/styles.css`, so its background artwork URL is versioned too. The custom API middleware applies the slack-ruby-bot-server 2.3.0 `config.server_pages` callback; HTML and generated CSS use `Cache-Control: private, no-cache` so browsers revalidate and discover updated asset URLs, including when only a nested image changes. Static assets retain the middleware's content ETags and timestamp validation defaults without a long-lived or immutable cache policy. Versioned query strings are cache keys, not archived copies: old URLs still serve the current file.
+
 ### Copyright & License
 
 Copyright [Daniel Doubrovkine, Vestris LLC](https://www.vestris.com), 2017-2025

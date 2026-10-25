@@ -37,7 +37,7 @@
               <p class="trial-note">Free for 3 weeks. No credit card needed.</p>
             </div>
             <figure class="hero-preview">
-              <img src="/img/sup-dm.png" width="2292" height="1664" alt="S'Up introducing three teammates in a Slack conversation">
+              <img src="<%= h asset_path('/img/sup-dm.png') %>" width="2292" height="1664" alt="S'Up introducing three teammates in a Slack conversation">
               <figcaption class="team-count"><span id="tagline" style="display: none;">Bringing teams together, one coffee at a time.</span></figcaption>
             </figure>
           </div>
@@ -58,7 +58,7 @@
               <p>Two people create one connection. Three people create three in the same meeting. <a href="https://medium.com/artsy-blog/what-sup-using-triads-to-develop-tribal-leadership-a01d4f207bf8">Artsy</a> has used S'Up continuously since 2014.</p>
             </div>
             <figure class="followup-preview solution-preview">
-              <img src="/img/sup-triad.png" width="700" height="212" alt="S'Up introducing three coworkers in Slack and inviting them to discuss what they are working on" loading="lazy">
+              <img src="<%= h asset_path('/img/sup-triad.png') %>" width="700" height="212" alt="S'Up introducing three coworkers in Slack and inviting them to discuss what they are working on" loading="lazy">
             </figure>
           </div>
         </section>
@@ -69,7 +69,7 @@
               <p>S'Up follows up a few days later to ask whether each group met, so you can track participation, not just introductions.</p>
             </div>
             <figure class="followup-preview">
-              <img src="/img/sup-ask.png" width="475" height="115" alt="S'Up asking how a meeting went, with We All Met, Some of Us Met, and We Couldn't Meet buttons" loading="lazy">
+              <img src="<%= h asset_path('/img/sup-ask.png') %>" width="475" height="115" alt="S'Up asking how a meeting went, with We All Met, Some of Us Met, and We Couldn't Meet buttons" loading="lazy">
             </figure>
           </div>
         </section>
@@ -81,7 +81,7 @@
               <p>Use <code>@sup stats</code> for channel statistics and <code>@sup rounds</code> to review individual rounds, right in Slack.</p>
             </div>
             <figure class="followup-preview reporting-preview">
-              <img src="/img/sup-stats.png" width="690" height="101" alt="S'Up channel statistics in Slack showing the introduction schedule, opt-in rate, positive meeting outcomes, and response rate" loading="lazy">
+              <img src="<%= h asset_path('/img/sup-stats.png') %>" width="690" height="101" alt="S'Up channel statistics in Slack showing the introduction schedule, opt-in rate, positive meeting outcomes, and response rate" loading="lazy">
             </figure>
           </div>
         </section>
@@ -116,9 +116,9 @@
       </section>
     </main>
     <%= partial 'public/partials/_footer.html.erb' %>
-    <%= partial 'public/partials/_scripts.html' %>
-    <script src="/js/register.js"></script>
-    <script src="/js/stats.js"></script>
-    <script src="/js/uptime.js"></script>
+    <%= partial 'public/partials/_scripts.html.erb' %>
+    <script src="<%= h asset_path('/js/register.js') %>"></script>
+    <script src="<%= h asset_path('/js/stats.js') %>"></script>
+    <script src="<%= h asset_path('/js/uptime.js') %>"></script>
   </body>
 </html>

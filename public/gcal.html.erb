@@ -4,12 +4,12 @@
     <title>S'Up for Slack Teams: Create a Calendar Event</title>
     <%= partial 'public/partials/_head.html.erb' %>
     <meta name="robots" content="noindex, nofollow">
-    <%= partial 'public/partials/_scripts.html' %>
+    <%= partial 'public/partials/_scripts.html.erb' %>
   </head>
   <body class="site-page">
     <%= partial 'public/partials/_navigation.html.erb' %>
     <main id="main" class="page-container transaction-page">
-    <a href="/"><img class="transaction-logo" src="/img/icon.png" width="100" height="100" alt="S'Up for Slack Teams logo"></a>
+    <a href="/"><img class="transaction-logo" src="<%= h asset_path('/img/icon.png') %>" width="100" height="100" alt="S'Up for Slack Teams logo"></a>
     <h3>S'Up for Slack Teams: Creating a Calendar Event</h3>
     <p id="messages" role="status" aria-live="polite"></p>
 
