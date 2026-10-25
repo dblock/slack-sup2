@@ -405,6 +405,27 @@ describe Round do
     end
   end
 
+  [
+    ['spring forward', '2026/3/8 8:30:15 AM EDT'],
+    ['fall back', '2026/11/1 8:30:15 AM EST']
+  ].each do |transition, scheduled_time|
+    context "scheduling during #{transition}" do
+      let(:scheduled_at) { DateTime.parse(scheduled_time).utc }
+      let(:channel) do
+        Fabricate(:channel, sup_followup_wday: Date::SUNDAY, sup_tz: 'Eastern Time (US & Canada)',
+                            sup_time_of_day: (8 * 60 * 60) + (30 * 60) + 15)
+      end
+      let!(:round) { Timecop.freeze(scheduled_at - 2.days) { channel.sup! } }
+
+      %i[ask? remind?].each do |predicate|
+        it "#{predicate} waits until the configured local time" do
+          Timecop.freeze(scheduled_at - 1.second) { expect(round.public_send(predicate)).to be false }
+          Timecop.freeze(scheduled_at) { expect(round.public_send(predicate)).to be true }
+        end
+      end
+    end
+  end
+
   context 'a sup round' do
     let!(:user1) { Fabricate(:user, channel:) }
     let!(:user2) { Fabricate(:user, channel:) }

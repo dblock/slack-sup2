@@ -307,6 +307,11 @@ class Channel
     now.tomorrow
   end
 
+  def sup_time_on(date)
+    time = Time.at(sup_time_of_day).utc
+    sup_tzone.local(date.year, date.month, date.day, time.hour, time.min, time.sec)
+  end
+
   # is it time to sup?
   def sup?
     return false unless team.active?
@@ -316,7 +321,7 @@ class Channel
     return false unless now_in_tz.wday == sup_wday
 
     # sup after sup_time_of_day, 9am by default
-    return false if now_in_tz < now_in_tz.beginning_of_day + sup_time_of_day
+    return false if now_in_tz < sup_time_on(now_in_tz)
 
     if sup_week_of_month
       # monthly mode: must be the nth weekday of this month and not yet run this month
@@ -342,7 +347,7 @@ class Channel
       target = monthly_sup_date(year, month)
       start_of_month = Date.new(year, month, 1).in_time_zone(sup_tzone)
       ran_this_month = last_round_at && last_round_at >= start_of_month
-      return target.in_time_zone(sup_tzone).beginning_of_day + sup_time_of_day if !ran_this_month && (target >= now_in_tz.to_date)
+      return sup_time_on(target) if !ran_this_month && (target >= now_in_tz.to_date)
 
       month += 1
       if month > 12
@@ -357,8 +362,8 @@ class Channel
     loop do
       time_limit = now_in_tz.end_of_day - sup_every_n_weeks.weeks
 
-      return now_in_tz.beginning_of_day + sup_time_of_day if (now_in_tz.wday == sup_wday) &&
-                                                             ((last_round_at || time_limit) <= time_limit)
+      return sup_time_on(now_in_tz) if (now_in_tz.wday == sup_wday) &&
+                                       ((last_round_at || time_limit) <= time_limit)
 
       now_in_tz = now_in_tz.beginning_of_day + 1.day
     end
