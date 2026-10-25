@@ -1,283 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta name="description" content="S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week.">
-        <meta property="og:title" content="S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week">
-        <meta property="og:description" content="S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week.">
-        <meta name="twitter:title" content="S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week">
-        <meta name="twitter:description" content="S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week.">
-        <meta name="keywords" content="slack,scrum,standup,triads,teams,organizations,donut,coffee">
-        <title>S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week</title>
-        <%= partial 'public/partials/_head.html' %>
-        <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          "name": "S'Up for Slack Teams",
-          "url": "<%= SlackRubyBotServer::Service.url %>",
-          "applicationCategory": "BusinessApplication",
-          "operatingSystem": "Slack",
-          "description": "S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week."
-        }
-        </script>
-    </head>
-    <body id="page-top" class="index">
-        <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-fixed-top">
-            <div class="container">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header page-scroll">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand page-scroll" href="#page-top">S'Up for Slack Teams</a>
-                </div>
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="hidden">
-                            <a href="#page-top"></a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" href="#howtouse">How To Use</a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" href="#oss">Open-Source</a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" href="#api">API</a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" href="#pricing">Pricing</a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" href="#contact">Help</a>
-                        </li>
-                        <li>
-                            <a class="page-scroll" target="_blank" href="https://twitter.com/playplayio">Follow Us</a>
-                        </li>
-                    </ul>
-                </div>
-                <!-- /.navbar-collapse -->
+  <head>
+    <meta name="description" content="S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week.">
+    <meta property="og:title" content="S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week">
+    <meta property="og:description" content="Bring teammates together with fresh groups of three for coffee, informal standups, and better connections in Slack.">
+    <meta name="twitter:title" content="S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week">
+    <meta name="twitter:description" content="Bring teammates together with fresh groups of three for coffee, informal standups, and better connections in Slack.">
+    <meta name="keywords" content="slack,scrum,standup,triads,teams,organizations,donut,coffee">
+    <title>S'Up for Slack Teams - Generate Fresh Triads of Team Members to Meet for Coffee Every Week</title>
+    <%= partial 'public/partials/_head.html.erb' %>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "S'Up for Slack Teams",
+      "url": "<%= SlackRubyBotServer::Service.url %>",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Slack",
+      "description": "S'Up for Slack Teams facilitates informal standups and coffee meetings by creating fresh triads of teammates every week."
+    }
+    </script>
+  </head>
+  <body id="page-top" class="site-page">
+    <%= partial 'public/partials/_navigation.html.erb' %>
+    <main id="main">
+      <div id="homepage">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="page-container">
+            <div class="hero-copy">
+              <h1 id="hero-title">Meet for coffee.<br>Three teammates at a time.</h1>
+              <p class="hero-description">Help employees turn casual conversations into their next collaboration. S'Up generates fresh triads every week for an informal standup.</p>
+              <div class="hero-actions">
+                <%= partial 'public/partials/_install_button.html.erb' %>
+                <a class="hero-link" href="#howtouse">See how it works</a>
+              </div>
+              <p class="trial-note">Free for 3 weeks. No credit card needed.</p>
             </div>
-            <!-- /.container-fluid -->
-        </nav>
-        <!-- Header -->
-        <header>
-            <div class="container">
-                <div class="intro-text">
-                    <div class="intro-icon">
-                        <img class='icon' src="img/icon.png" alt="S'Up for Slack Teams logo">
-                    </div>
-                    <div class="intro-lead-in">
-                        <p>The most valuable relationships are not made of two people, they're made of three.</p>
-                        Generates fresh triads of team members to meet for coffee every week in an informal standup, or S'Up.
-                        <br><br>
-                        <a class="add-to-slack" href="<%= SlackRubyBotServer::Config.oauth_authorize_url %>?scope=<%= SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',') %>&amp;client_id=<%= ENV['SLACK_CLIENT_ID'] %>"><img alt="Add S'Up to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"></a>
-                        <div id="tagline-wrapper">
-                            <small id="tagline" class="tagline" style="display: none;">Bringing teams together, one coffee at a time.</small>
-                        </div>
-                    </div>
-                    <div>
-                        <img src="img/sup-dm.png" width="75%" alt="S'Up direct message example" class="img-centered header-screenshot">
-                    </div>
-                </div>
-            </div>
-        </header>
-        <section id="howtouse" class="bg-light-gray">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h3 class="section-heading">Why Triads?</h3>
-                        <h3 class="section-subheading text-muted">
-                            <p>
-                                A third person will always stabilize and grow the relationship between the other two.
-                                It's called a <a href='http://www.culturesync.net/toolbox/intro-to-triads' target='_blank'>triad</a>, and the more you create, the stronger your network.
-                            </p>
-                            <p>
-                                Don't care about triads and just want to use S'Up to pair team members? S'Up can be customized to introduce any number of people.
-                            </p>
-                        </h3>
-                        <h3 class="section-heading">How to Use</h3>
-                        <h3 class="section-subheading text-muted">
-                            <p>
-                                First, invite the bot to a Slack channel.
-                                <br>
-                                It will then generate fresh triads of members of the Slack channel to meet for coffee every week in an informal standup, or <i>S'Up</i>.
-                                <br>
-                                It also introduces itself to new team members and can help setup a GCal meeting.
-                            </p>
-                            <p>
-                                <img src="img/sup-intro.png" width="50%" alt="S'Up introduction message example">
-                            </p>
-                            <p>
-                                S'Up will then ask whether you met and keep track, a few days later.
-                            </p>
-                            <p>
-                                <img src="img/sup-ask.png" width="40%" alt="S'Up follow-up question example"> <img src="img/sup-answer.png" width="40%" alt="S'Up follow-up answer example">
-                            </p>
-                            <p>
-                                Need to make an introduction happen right away? Use <code>@sup suggest @user1 @user2 [topic]</code> to suggest an on-demand S'Up.
-                            </p>
-                            <p>
-                                Don't want to participate?<br>Message <b>@sup opt out</b> to opt out, or <b>@sup opt in</b> to opt back in, or leave the channel.<br>Admins can opt out users (e.g. <code>@sup opt out @username</code>).
-                            </p>
-                            <p>
-                                S'Up channel and Slack admins can configure
-                                <br>the <b>timezone</b> (e.g. <code>@sup set timezone Eastern Time (US & Canada)</code>),
-                                <br>the <b>number of people</b> that meet (e.g. <code>@sup set size 3</code>),
-                                <br>the <b>day of the week</b> and <b>time</b> to S'Up (e.g. <code>@sup set day Monday</code> and <code>@sup set time 9AM</code>)
-                                <br><b>how often</b> S'Ups are created (e.g. <code>@sup set weeks 1</code>),
-                                <br><b>how long to avoid</b> meeting with the same people (e.g. <code>@sup set recency 12</code>),
-                                <br>whether to <b>generate odd-sized groups</b> (e.g. <code>@sup set odd no</code>),
-                                <br>can <b>download all data</b> for analysis with <code>@sup data</code>,
-                                <br>and more (try <code>@sup help</code> for all options).
-                            </p>
-                            <p>
-                                <img src="img/sup-help.png" width="75%" alt="S'Up help command options">
-                            </p>
-                            <p>
-                                You can also <b>customize S'Up messages</b> (e.g. <code>@sup set message Please find a time for a quick 20 minute break on the calendar.</code>),<br>and take advantage of <b>custom Slack fields</b> (e.g. <code>@sup set team field Team Name</code>) to improve matches across subteams.
-                            </p>
-                            <p>
-                                Finally, S'Up provides statistics on the meeting outcomes with <code>@sup stats</code> and <code>@sup rounds</code>.
-                            </p>
-                            <p>
-                                <img src="img/sup-stats.png" width="50%" alt="S'Up statistics example">
-                            </p>
-                            <p>
-                                DM the bot <code>subscription</code> to get subscription info and change the credit card used.
-                                <br>
-                                DM the bot <code>unsubscribe</code> at any time to cancel auto-renew.
-                            </p>
-                        </h3>
-                    </div>
-                </div>
-            </div>
+            <figure class="hero-preview">
+              <img src="/img/sup-dm.png" width="2292" height="1664" alt="S'Up introducing three teammates in a Slack conversation">
+              <figcaption class="team-count"><span id="tagline" style="display: none;">Bringing teams together, one coffee at a time.</span></figcaption>
+            </figure>
+          </div>
         </section>
-        <section id="oss">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h3 class="section-heading">Open-Source</h3>
-                        <h3 class="section-subheading text-muted">
-                            <p><a href="https://github.com/dblock/slack-sup2" target="_blank"><img src="img/sup-oss.png" width="75%" alt="S'Up open source repository screenshot"></a></p>
-                            <p>The bot Ruby code is open-source under the MIT license.</p>
-                            <p><a href="https://github.com/dblock/slack-sup2" target="_blank">Fork us on Github</a></p>
-                        </h3>
-                    </div>
-                </div>
-            </div>
+        <section class="homepage-section page-container" id="howtouse" aria-labelledby="how-title">
+          <h2 id="how-title">How it works</h2>
+          <ol class="setup-steps">
+            <li><h3>Invite the bot</h3><p>First, add S'Up to your workspace and invite it to a Slack channel. Each channel has its own introductions and settings.</p></li>
+            <li><h3>Meet for coffee</h3><p>It will then generate fresh triads of members of the Slack channel to meet for coffee every week in an informal standup, or <i>S'Up</i>.</p></li>
+            <li><h3>Get it on the calendar</h3><p>It also introduces itself to new team members and can help set up a Google Calendar meeting.</p></li>
+          </ol>
+          <p class="setup-help"><a href="/help.html">Explore the commands &amp; FAQ</a></p>
         </section>
-        <section id="api" class="bg-light-gray">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h3 class="setion-heading">Hypermedia API</h3>
-                        <h3 class="section-subheading text-muted">
-                            <p>Your team's data belongs to you and is available for download in CSV format with <code>data</code> and via a Hypermedia API.</p>
-                            <p><a href="<%= SlackRubyBotServer::Service.api_url %>" target="_blank"><img src="img/sup-api.png" width="75%" alt="S'Up API browser screenshot"></a></p>
-                            <p>See <a href="https://github.com/dblock/slack-sup2/blob/master/API.md" target="_blank">API documentation</a> and <a href="https://github.com/dblock/slack-sup2/blob/master/samples">samples</a> for details.</p>
-                        </h3>
-                    </div>
-                </div>
+        <section class="followup-section" aria-labelledby="solution-title">
+          <div class="page-container followup-layout">
+            <div class="followup-copy">
+              <h2 id="solution-title">You haven't tried 3.</h2>
+              <p>Two people create one connection. Three people create three in the same meeting. <a href="https://medium.com/artsy-blog/what-sup-using-triads-to-develop-tribal-leadership-a01d4f207bf8">Artsy</a> has used S'Up continuously since 2014.</p>
             </div>
+            <figure class="followup-preview solution-preview">
+              <img src="/img/sup-triad.png" width="700" height="212" alt="S'Up introducing three coworkers in Slack and inviting them to discuss what they are working on" loading="lazy">
+            </figure>
+          </div>
         </section>
-        <section id="pricing">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h4 class="section-heading">Pricing</h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h3 class="section-subheading text-muted">
-                            <p>
-                                You can try S'Up for free for 3 weeks without a credit card or personal info.
-                                <br>
-                                Subscribe for $39.99/yr thereafter.
-                                <br>
-                                You can unsubscribe any time by DMing the bot <code>unsubscribe</code>.
-                                <br>
-                                We're not trying to make money, but we need it for hosting.
-                                <br>
-                                We also offer a lifetime subscriptions to <a href='https://github.com/dblock/slack-sup2/issues' target='_blank'>major contributors to our open-source code</a>.
-                            </p>
-                        </h3>
-                    </div>
-                </div>
+        <section class="followup-section" aria-labelledby="followup-title">
+          <div class="page-container followup-layout">
+            <div class="followup-copy">
+              <h2 id="followup-title">See introductions turn into meetings.</h2>
+              <p>S'Up follows up a few days later to ask whether each group met, so you can track participation, not just introductions.</p>
             </div>
+            <figure class="followup-preview">
+              <img src="/img/sup-ask.png" width="475" height="115" alt="S'Up asking how a meeting went, with We All Met, Some of Us Met, and We Couldn't Meet buttons" loading="lazy">
+            </figure>
+          </div>
         </section>
-        <section id="contact">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h4 class="section-heading">About and Help</h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="text-center">
-                        <a id="uptime" href="https://twitter.com/playplayio">
-                            <h6 id="value" class="section-subheading text-center">&nbsp;</h6>
-                        </a>
-                    </div>
-                    <div class="col-lg-12 text-center">
-                        <h3 class="section-subheading text-muted">
-                            <p>
-                                S'Up for Slack is made possible with the generous support of team <a href="https://www.artsy.net">Artsy</a>.
-                                <br>
-                                Originally written by <a href='https://twitter.com/dblockdotorg' target="_blank">@dblockdotorg</a> during <a href='http://artsy.github.io'>@ArtsyOpenSource</a> Hackathon 5.0.
-                            </p>
-                            <p>
-                                <img src="img/artsy.png" alt="Artsy logo">
-                            </p>
-                            <p>
-                                <a href="https://github.com/dblock/slack-sup2">Fork me on Github</a>,
-                                <a href="https://github.com/dblock/slack-sup2/issues/new">open an issue</a>,
-                                <a href="https://twitter.com/playplayio">tweet at @playplayio</a>,
-                                or <a href="mailto:dblock[at]vestris[dot]com'>e-mail dblock[at]vestris[dot]com</a>.
-                            </p>
-                            <p>
-                                <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they're made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
-                            </p>
-                            <p>
-                                tl;dr: S'Up for Slack does not want to know who you are and tries to collect just enough data to enable our services. Read our <a href='/privacy' target="_blank">Privacy Policy</a>.
-                            </p>
-                            <p>
-                                <a href="https://www.vestris.com" target="_blank">&copy; Vestris LLC</a>
-                            </p>
-                        </h3>
-                    </div>
-                </div>
+        <section class="followup-section" aria-labelledby="reporting-title">
+          <div class="page-container followup-layout">
+            <div class="followup-copy">
+              <h2 id="reporting-title">Show it's working.</h2>
+              <p>S&rsquo;Up collects meeting feedback automatically, giving you participation and outcome numbers to share.</p>
+              <p>Use <code>@sup stats</code> for channel statistics and <code>@sup rounds</code> to review individual rounds, right in Slack.</p>
             </div>
+            <figure class="followup-preview reporting-preview">
+              <img src="/img/sup-stats.png" width="690" height="101" alt="S'Up channel statistics in Slack showing the introduction schedule, opt-in rate, positive meeting outcomes, and response rate" loading="lazy">
+            </figure>
+          </div>
         </section>
-        <div id="register" style="display: none;">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <div class="row spacer"></div>
-                        <div id="messages" class="alert">just click the button</div>
-                        <div class="alert">
-                            Having trouble? Please e-mail <b>dblock[at]vestris[dot]com</b>.
-                            <br><br>
-                            <a href="https://twitter.com/share" class="twitter-share-button" data-url="<%= SlackRubyBotServer::Service.url %>" data-text="The most valuable relationships are not made of two people, they're made of three." data-via="playplayio" data-size="large" data-related="SlackAPI">Tweet</a>
-                            <br><br>
-                            <a href='<%= SlackRubyBotServer::Service.url %>'>Go back to playplay.io.</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <%= partial 'public/partials/_scripts.html' %>
-        <!-- Slack -->
-        <script src="js/register.js"></script>
-        <!-- Stats -->
-        <script src="js/stats.js"></script>
-        <!-- Uptime -->
-        <script src="js/uptime.js"></script>
-    </body>
+        <section class="pricing-section page-container" id="pricing" aria-labelledby="pricing-title">
+          <div>
+            <h2 id="pricing-title">A small investment<br>in a more connected team.</h2>
+            <p>You can try S'Up for free for 3 weeks without a credit card or personal info.</p>
+            <p>You can unsubscribe any time by DMing the bot <code>unsubscribe</code>.</p>
+            <a href="/help.html#support">Questions? We're here to help.</a>
+          </div>
+          <div class="pricing-action">
+            <p class="section-label">Simple pricing</p>
+            <p class="price"><strong>$39.99</strong><span>per team / year</span></p>
+            <%= partial 'public/partials/_install_button.html.erb' %>
+          </div>
+        </section>
+        <section class="project-info page-container" id="oss" aria-labelledby="source-title">
+          <div>
+            <h2 id="source-title">Open by design.</h2>
+            <p>MIT-licensed Ruby code. Built in the open.<br><a href="https://github.com/dblock/slack-sup2">Explore the project on GitHub</a>.</p>
+          </div>
+          <div id="api">
+            <h3>Your data stays yours.</h3>
+            <p>Download CSV with <code>@sup data</code>, or use the <a href="<%= SlackRubyBotServer::Service.api_url %>">API</a>.<br><a href="https://github.com/dblock/slack-sup2/blob/main/API.md">Documentation</a> &middot; <a href="https://github.com/dblock/slack-sup2/tree/main/samples">Examples</a></p>
+          </div>
+        </section>
+      </div>
+      <section id="register" class="page-container registration-panel" style="display: none;" aria-labelledby="register-title">
+        <h1 id="register-title">Connect your Slack team</h1>
+        <p id="messages" role="status" aria-live="polite">Working, please wait ...</p>
+        <p>Having trouble? <a href="mailto:dblock@vestris.com">Contact support</a> or <a href="/">return to S'Up</a>.</p>
+      </section>
+    </main>
+    <%= partial 'public/partials/_footer.html.erb' %>
+    <%= partial 'public/partials/_scripts.html' %>
+    <script src="/js/register.js"></script>
+    <script src="/js/stats.js"></script>
+    <script src="/js/uptime.js"></script>
+  </body>
 </html>

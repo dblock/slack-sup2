@@ -1,5 +1,6 @@
 ### Changelog
 
+* 2026/10/25: Redesign the S'Up website with a focused high-contrast purple hero, original Slack demonstrations, a triads explanation, participation reporting, clearer visual hierarchy, responsive layouts, subtle ribbon artwork, and expandable help while preserving Slack installation, statistics, subscription, credit-card, and Google Calendar flows - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent), [#150](https://github.com/dblock/slack-sup2/pull/150).
 * 2026/10/25: Keep introductions, next-round times, follow-ups, and reminders at the configured local time across daylight-saving changes, with deterministic scheduling regression tests - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/10/23: Upgrade Ruby to 4.0.9 and refresh dependencies, leaving Stripe dependencies unchanged - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).
 * 2026/08/30: Optimize the unique connections (pairs) aggregation used by `/api/stats` to avoid a slow, correlated `$lookup` subquery, speeding it up by more than 10x - [@dblock](https://github.com/dblock), [@Copilot](https://github.com/apps/copilot-swe-agent).

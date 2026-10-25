@@ -19,6 +19,10 @@ We host the bot at [sup2.playplay.io](https://sup2.playplay.io).
 
 S'Up for Slack is made possible with the generous support of team [Artsy](https://www.artsy.net). This is a fresh rewrite of [artsy/sup](https://github.com/artsy/sup) for Slack teams during [ArtsyOpenSource](http://artsy.github.io) Hackathon 5.0. This is a [fork, or v2 of S'Up](https://github.com/dblock/slack-sup) that allows for multiple S'Ups, one per channel.
 
+### Website artwork
+
+The website follows the shared Slava, Strata, Strada, and Shell layout with a purple palette inspired by the existing Slack conversation preview (base `#4a154b`). A high-contrast purple hero gives the main message, installation button, and original Slack screenshot priority; quieter sections explain the workflow and triads approach, show the follow-up and participation reporting, and separate pricing from technical details. The triads screenshot `public/img/sup-triad.png` is cropped from the introduction message in `public/img/sup-dm.png`. Screenshots in the supporting sections display at half their source dimensions, shrinking further when needed to fit their containers without scrolling. The editable `public/img/screenshot-background.svg` keeps `preserveAspectRatio="none"` and is painted on a fixed viewport-sized layer so opening help topics does not resize the ribbons. Preserve the original transparent `public/img/icon.png` logo, matching favicons, and product demonstration images.
+
 ### Copyright & License
 
 Copyright [Daniel Doubrovkine, Vestris LLC](https://www.vestris.com), 2017-2025
