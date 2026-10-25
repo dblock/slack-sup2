@@ -415,7 +415,7 @@ describe Channel do
 
   context 'channel' do
     let(:tz) { 'Eastern Time (US & Canada)' }
-    let(:t_in_time_zone) { Time.now.utc.in_time_zone(tz) }
+    let(:t_in_time_zone) { ActiveSupport::TimeZone[tz].local(2026, 10, 25, 12) }
     let(:wday) { t_in_time_zone.wday }
     let(:beginning_of_day) { t_in_time_zone.beginning_of_day }
     let(:eight_am) { 8 * 60 * 60 }
@@ -652,6 +652,37 @@ describe Channel do
           it 'is false' do
             expect(channel.sup?).to be false
           end
+        end
+      end
+    end
+  end
+
+  [
+    ['spring forward', '2026/3/8 8:30:15 AM EDT', 2],
+    ['fall back', '2026/11/1 8:30:15 AM EST', 1]
+  ].each do |transition, scheduled_time, week_of_month|
+    context "scheduling during #{transition}" do
+      let(:scheduled_at) { DateTime.parse(scheduled_time).utc }
+      let(:channel) do
+        Fabricate(:channel, sup_wday: Date::SUNDAY, sup_tz: 'Eastern Time (US & Canada)',
+                            sup_time_of_day: (8 * 60 * 60) + (30 * 60) + 15)
+      end
+
+      it 'runs at the configured local time, not a second earlier' do
+        Timecop.freeze(scheduled_at - 1.second) { expect(channel.sup?).to be false }
+        Timecop.freeze(scheduled_at) { expect(channel.sup?).to be true }
+      end
+
+      it 'keeps the next weekly round at the configured local time' do
+        Timecop.freeze(scheduled_at - 1.day) do
+          expect(channel.next_sup_at).to eq scheduled_at
+        end
+      end
+
+      it 'keeps the next monthly round at the configured local time' do
+        channel.update_attributes!(sup_week_of_month: week_of_month)
+        Timecop.freeze(scheduled_at - 1.day) do
+          expect(channel.next_sup_at).to eq scheduled_at
         end
       end
     end
