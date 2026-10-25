@@ -8,9 +8,7 @@ SlackSup.message = function(text) {
 };
 
 SlackSup.register = function(text) {
-  $('.navbar').fadeOut('slow');
-  $('header').fadeOut('slow');
-  $('section').fadeOut('slow');
+  $('#homepage').hide();
   $('#register').show();
 };
 

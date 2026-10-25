@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>S'Up for Slack Teams: Update Credit Card Info</title>
@@ -12,15 +13,13 @@
       stripe_email = request.params['stripeEmail']
     %>
   </head>
-  <body style='text-align: center'>
-    <p style='margin: 50px;'>
-      <a href='/'><img src='img/icon.png' width='120px' alt="S'Up for Slack Teams logo"></a>
-    </p>
-    <p>
-      <h3>S'Up for Slack Teams: Update Credit Card Info</h3>
-    </p>
-    <p id='messages' />
-    <p id='update_cc'>
+  <body class="site-page">
+    <%= partial 'public/partials/_navigation.html.erb' %>
+    <main id="main" class="page-container transaction-page">
+    <a href="/"><img class="transaction-logo" src="/img/icon.png" width="100" height="100" alt="S'Up for Slack Teams logo"></a>
+    <h3>S'Up for Slack Teams: Update Credit Card Info</h3>
+    <p id="messages" role="status" aria-live="polite"></p>
+    <div id="update_cc">
       <form action="" method="POST">
         <script
           src="https://checkout.stripe.com/checkout.js" class="stripe-button"
@@ -33,13 +32,11 @@
           data-locale="auto">
         </script>
       </form>
-    </p>
+    </div>
     <p>
-      <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe"></img>
-      <div class='small'>
-        Questions? Contact dblock[at]vestris[dot]com.
-      </div>
+      <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe">
     </p>
+    <p class="small">Questions? Contact <a href="mailto:dblock@vestris.com">dblock@vestris.com</a>.</p>
     <script>
       $(document).ready(function() {
         var data = {
@@ -76,5 +73,7 @@
         }
       });
     </script>
+    </main>
+    <%= partial 'public/partials/_footer.html.erb' %>
   </body>
 </html>

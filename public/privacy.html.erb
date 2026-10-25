@@ -12,40 +12,10 @@
   <%= partial 'public/partials/_head.html' %>
 </head>
 
-<body id="page-top" class="index">
-  <!-- Navigation -->
-  <nav class="navbar navbar-default navbar-fixed-top" style="background-color: black;">
-    <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header page-scroll">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand page-scroll" href="/">S'Up for Slack Teams</a>
-      </div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav navbar-right">
-          <li class="hidden">
-            <a href="#page-top"></a>
-          </li>
-          <li>
-            <a class="page-scroll" href="/">S'Up for Slack Teams</a>
-          </li>
-        </ul>
-      </div>
-      <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container-fluid -->
-  </nav>
-  <section id="privacy" style="margin-top: 120px;">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-left">
-          <h2 class="section-heading">S'Up for Slack Teams Privacy Policy</h2>
+<body id="page-top" class="site-page">
+  <%= partial 'public/partials/_navigation.html.erb' %>
+  <main id="main" class="page-container content-page">
+          <h1 id="privacy">S'Up for Slack Teams Privacy Policy</h1>
           <h3>tl;dr</h3>
           <p>
             S'Up for Slack Teams does not want to know who you are and tries to collect just enough data to enable our services.
@@ -119,10 +89,8 @@
           <p>
             You have a right to access the data we hold about you, get a copy of it, make us correct or amend the data we hold about you, ask us to delete, block, or supress data we hold about you (though for legal reasons we may not always be able to do it), object to us using your data for certain purposes, such as direct marketing or research or statistical reasons, request transfer of your data to you or a third party, and withdraw any consent you've previously given us. If you need to exercise this right for any reason, please e-mail <b>dblock[at]vestris[dot]com</b>.
           </p>
-        </div>
-      </div>
-    </div>
-  </section>
+  </main>
+  <%= partial 'public/partials/_footer.html.erb' %>
   <%= partial 'public/partials/_scripts.html' %>
 </body>
 

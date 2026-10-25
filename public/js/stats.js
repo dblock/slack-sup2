@@ -15,9 +15,8 @@ $(document).ready(function() {
     var current = currentResponse[0];
 
     $tagline.text(
-      "Bringing teams together, one coffee at a time: " +
-      (current.sups_count + legacy.sups_count) + " S'Ups facilitated, and " +
-      current.unique_pairs_count + " unique connections made."
+      (current.sups_count + legacy.sups_count).toLocaleString('en-US') + " S'Ups facilitated \u00b7 " +
+      current.unique_pairs_count.toLocaleString('en-US') + " unique connections"
     );
   }).always(function() {
     $tagline.fadeIn('slow');

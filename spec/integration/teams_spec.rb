@@ -35,6 +35,8 @@ describe 'Teams', :js, type: :feature do
       expect do
         visit '/?code=code'
         expect(page.find_by_id('messages')).to have_text 'Team successfully registered! Check your DMs.'
+        expect(page).to have_no_css('#homepage')
+        expect(page).to have_css('#register')
       end.to change(Team, :count).by(1)
     end
   end
@@ -51,7 +53,7 @@ describe 'Teams', :js, type: :feature do
 
       it 'includes a link to add to slack with the client id' do
         url = "#{SlackRubyBotServer::Config.oauth_authorize_url}?scope=#{SlackRubyBotServer::Config.oauth_scope_s.gsub('+', ',')}&client_id=#{ENV.fetch('SLACK_CLIENT_ID', nil)}"
-        expect(find("a[href='#{url}']"))
+        expect(page).to have_link('Add to Slack', href: url, count: 2)
       end
     end
 

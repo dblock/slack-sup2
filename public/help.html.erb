@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>S'Up for Slack: Help</title>
+    <meta name="description" content="Get started with S'Up for Slack. Learn about introductions, group sizes, scheduling, opting out, subscriptions, and your team's data.">
+    <%= partial 'public/partials/_head.html.erb' %>
+  </head>
+  <body class="site-page help-page">
+    <%= partial 'public/partials/_navigation.html.erb' %>
+    <main id="main" class="page-container help-content">
+      <header class="help-header">
+        <h1>S'Up: Help</h1>
+        <p class="section-intro">A little help making the next introduction.</p>
+      </header>
+      <section id="get-started" class="help-section" aria-labelledby="start-title">
+        <h2 id="start-title">Get started</h2>
+        <ol class="getting-started-steps">
+          <li><%= partial 'public/partials/_install_button.html.erb' %> and authorize S'Up for your workspace.</li>
+          <li>Invite <code>@sup</code> into a channel whose members would like to meet.</li>
+          <li>S'Up introduces fresh groups each week. Try <code>@sup help</code> for the available commands.</li>
+        </ol>
+        <p>Each channel has its own settings and introductions. S'Up introduces itself to new members, can help create a Google Calendar meeting, and follows up a few days after an introduction.</p>
+      </section>
+      <section class="help-section" aria-labelledby="questions-title">
+        <h2 id="questions-title">Commands &amp; questions</h2>
+        <details class="help-topic" open>
+          <summary>Why triads? Can we use pairs instead?</summary>
+          <p>In <a href="https://www.harpercollins.com/products/tribal-leadership-dave-loganjohn-kinghalee-fischer-wright">Tribal Leadership</a>, a third person helps bridge disagreements and keep the relationship grounded in shared values, rather than letting it stall when two people don&rsquo;t see eye to eye.</p>
+          <p>Don't care about triads and just want to use S'Up to pair team members? S'Up can be customized to introduce any number of people. An admin can set the number of people with <code>@sup set size 2</code> or <code>@sup set size 3</code>.</p>
+        </details>
+        <details class="help-topic">
+          <summary>What does an introduction look like?</summary>
+          <p>S'Up introduces the group in a Slack conversation and asks someone to organize a quick meeting. A few days later, it asks whether you met and keeps track of the result.</p>
+          <img src="/img/sup-intro.png" width="700" alt="S'Up introducing teammates" loading="lazy">
+          <img src="/img/sup-ask.png" width="500" alt="S'Up asking whether a group met" loading="lazy">
+          <img src="/img/sup-answer.png" width="500" alt="Responding to a S'Up follow-up" loading="lazy">
+        </details>
+        <details class="help-topic">
+          <summary>Can I suggest an introduction right now?</summary>
+          <p>Use <code>@sup suggest @user1 @user2 [topic]</code> to suggest an on-demand S'Up.</p>
+        </details>
+        <details class="help-topic">
+          <summary>How do I opt out or opt back in?</summary>
+          <p>Message the bot <code>opt out</code> to stop participating or <code>opt in</code> to return. Leaving the channel also removes you from its introductions. Admins can opt out a member with <code>@sup opt out @username</code>.</p>
+        </details>
+        <details class="help-topic">
+          <summary>Who can change the schedule and group settings?</summary>
+          <p>Channel and Slack admins can configure the timezone, day, time, group size, and frequency. For example, use <code>@sup set timezone Eastern Time (US &amp; Canada)</code>, <code>@sup set day Monday</code>, <code>@sup set time 9AM</code>, and <code>@sup set weeks 1</code>.</p>
+          <p>Use <code>@sup set recency 12</code> to avoid repeating introductions for 12 weeks, and <code>@sup set odd no</code> to control odd-sized groups. Try <code>@sup help</code> for all the options.</p>
+          <img src="/img/sup-help.png" width="700" alt="S'Up help and settings commands" loading="lazy">
+        </details>
+        <details class="help-topic">
+          <summary>Can we customize messages or match people across subteams?</summary>
+          <p>Set your introduction text with <code>@sup set message Please find a time for a quick 20 minute break on the calendar.</code> Use a custom Slack profile field, such as <code>@sup set team field Team Name</code>, to improve matches across subteams.</p>
+        </details>
+        <details class="help-topic">
+          <summary>How do I see statistics or download our data?</summary>
+          <p>Use <code>@sup stats</code> and <code>@sup rounds</code> for meeting outcomes, or <code>@sup data</code> to download data for analysis. Your team can also opt in to the <a href="<%= SlackRubyBotServer::Service.api_url %>">Hypermedia API</a>; see the <a href="https://github.com/dblock/slack-sup2/blob/main/API.md">documentation</a>.</p>
+          <img src="/img/sup-stats.png" width="500" alt="S'Up statistics example" loading="lazy">
+        </details>
+        <details class="help-topic">
+          <summary>How much does S'Up cost? How do I cancel?</summary>
+          <p>Try S'Up free for three weeks without a credit card, then subscribe for $39.99 per year. DM the bot <code>subscription</code> for subscription information or to change your credit card, and <code>unsubscribe</code> to cancel auto-renewal at any time.</p>
+          <p>Subscriptions help cover hosting. <a href="https://github.com/dblock/slack-sup2/issues">Major contributors to the open-source project</a> can receive a lifetime subscription.</p>
+        </details>
+      </section>
+      <section id="support" class="help-section" aria-labelledby="support-title">
+        <h2 id="support-title">Need a hand?</h2>
+        <p>Contact <a href="mailto:dblock@vestris.com">dblock@vestris.com</a>, DM <a href="https://twitter.com/playplayio">@playplayio</a>, or <a href="https://github.com/dblock/slack-sup2/issues">report an issue on GitHub</a>.</p>
+      </section>
+    </main>
+    <%= partial 'public/partials/_footer.html.erb' %>
+    <%= partial 'public/partials/_scripts.html' %>
+  </body>
+</html>

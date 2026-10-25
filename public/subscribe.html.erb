@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>S'Up for Slack Teams: Subscribe</title>
@@ -7,20 +8,18 @@
     <link rel='stylesheet' href='https://checkout.stripe.com/v3/checkout/button.css'></link>
     <%= partial 'public/partials/_scripts.html' %>
   </head>
-  <body style='text-align: center'>
-    <p style='margin: 50px;'>
-      <a href='/'><img src='img/icon.png' width='120px' alt="S'Up for Slack Teams logo"></a>
-    </p>
-    <p>
-      <h3>S'Up for Slack Teams: Subscribe</h3>
-    </p>
-    <p id='messages' />
-    <p id='subscribe'>
+  <body class="site-page">
+    <%= partial 'public/partials/_navigation.html.erb' %>
+    <main id="main" class="page-container transaction-page">
+    <a href="/"><img class="transaction-logo" src="/img/icon.png" width="100" height="100" alt="S'Up for Slack Teams logo"></a>
+    <h3>S'Up for Slack Teams: Subscribe</h3>
+    <p id="messages" role="status" aria-live="polite"></p>
+    <section id="subscribe" aria-label="Subscription payment">
       <button id='subscribeButton' class='stripe-button-el'>
           <span style='display: block; min-height: 30px;'>Pay $39.99 with Card</span>
       </button>
       <p>
-        <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe"></img>
+        <img src='/img/stripe.png' width='119' height='26' alt="Powered by Stripe">
       </p>
       <script>
         $(document).ready(function() {
@@ -81,6 +80,8 @@
           });
         });
       </script>
-    </p>
+    </section>
+    </main>
+    <%= partial 'public/partials/_footer.html.erb' %>
   </body>
 </html>
